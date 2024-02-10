@@ -25,6 +25,7 @@ public:
 
 	void AddUniform(const std::string& uniformName);
 	void SendMat4Uniform(const std::string& uniformName, const glm::mat4& mat);
+	void SendIntUniform(const std::string& uniformName, int value);
 
 private:
 	void SetDefaultSource();

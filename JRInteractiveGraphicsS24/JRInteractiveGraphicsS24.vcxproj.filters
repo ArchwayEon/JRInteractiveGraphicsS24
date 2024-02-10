@@ -66,6 +66,9 @@
     <ClCompile Include="..\3rdparty\imgui\imgui_widgets.cpp">
       <Filter>Source Files\3rdparty</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseObject.h">
@@ -89,9 +92,14 @@
     <ClInclude Include="VertexBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="basic.frag.glsl" />
     <None Include="basic.vert.glsl" />
+    <None Include="texture.vert.glsl" />
+    <None Include="texture.frag.glsl" />
   </ItemGroup>
 </Project>

@@ -38,6 +38,10 @@ void Renderer::RenderObject(const GraphicsObject& object)
 
 	auto& buffer = object.GetVertexBuffer();
 	buffer->Select();
+	if (buffer->HasTexture()) {
+		shader->SendIntUniform("tex", buffer->GetTextureUnit());
+		buffer->GetTexture()->SelectToRender();
+	}
 	buffer->SetUpAttributeInterpretration();
 	glDrawArrays(buffer->GetPrimitiveType(), 0, buffer->GetNumberOfVertices());
 

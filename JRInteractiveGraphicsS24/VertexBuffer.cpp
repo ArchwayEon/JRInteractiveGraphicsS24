@@ -8,6 +8,8 @@ VertexBuffer::VertexBuffer(unsigned int numElementsPerVertex)
 	numberOfVertices = 0;
 	primitiveType = GL_TRIANGLES;
 	glGenBuffers(1, &vboId);
+	textureUnit = 0;
+	texture = nullptr;
 }
 
 VertexBuffer::~VertexBuffer()
@@ -37,6 +39,9 @@ void VertexBuffer::StaticAllocate()
 	unsigned long long bytesToAllocate = vertexData.size() * sizeof(float);
 	glBufferData(
 		GL_ARRAY_BUFFER, bytesToAllocate, vertexData.data(), GL_STATIC_DRAW);
+	if (texture != nullptr) {
+		texture->Allocate();
+	}
 }
 
 void VertexBuffer::AddVertexAttribute(
@@ -62,5 +67,12 @@ void VertexBuffer::SetUpAttributeInterpretration()
 			attr.index, attr.numberOfComponents, attr.type,
 			attr.isNormalized, attr.bytesToNext, attr.byteOffset
 		);
+	}
+}
+
+void VertexBuffer::SelectTexture() const
+{
+	if (texture != nullptr) {
+		texture->SelectToRender(textureUnit);
 	}
 }
