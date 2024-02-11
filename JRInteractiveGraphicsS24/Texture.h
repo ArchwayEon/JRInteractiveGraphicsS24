@@ -11,6 +11,7 @@ private:
 	unsigned int internalFormat, sourceFormat;
 	unsigned int wrapS, wrapT;
 	unsigned int magFilter, minFilter;
+	int numberOfChannels;
 
 public:
 	Texture();
@@ -25,9 +26,15 @@ public:
 	void SetTextureData(unsigned int count, unsigned char* data);
 	inline unsigned int GetTextureId() const { return textureId; }
 	void SetDimension(unsigned int width, unsigned int height);
+	void SetWrapS(unsigned int wrapS) { this->wrapS = wrapS; }
+	void SetWrapT(unsigned int wrapT) { this->wrapT = wrapT; }
+	void SetMagFilter(unsigned int magFilter) { this->magFilter = magFilter; }
+	void SetMinFilter(unsigned int minFilter) { this->minFilter = minFilter; }
 	void SelectToChange();
 	void SelectToRender(int textureUnit = 0);
 	void Allocate();
+	inline int GetNumberOfChannels() const { return numberOfChannels; }
+	void LoadTextureDataFromFile(const std::string& filepath);
 
 private:
 	void CleanUp();

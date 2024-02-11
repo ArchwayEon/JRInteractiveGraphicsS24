@@ -67,6 +67,9 @@ static void SetUpTexturedScene(
 
 	std::shared_ptr<Texture> rgbwTexture = std::make_shared<Texture>();
 	rgbwTexture->SetDimension(4, 4);
+	rgbwTexture->SetWrapS(GL_CLAMP_TO_EDGE);
+	rgbwTexture->SetWrapT(GL_CLAMP_TO_EDGE);
+	rgbwTexture->SetMagFilter(GL_LINEAR);
 	unsigned char data[] = {
 		255, 255, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 255, 255, 255, 255,
 		0, 255, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 0, 255,
@@ -81,12 +84,12 @@ static void SetUpTexturedScene(
 		std::make_shared<GraphicsObject>();
 	std::shared_ptr<VertexBuffer> texturedBuffer1 =
 		std::make_shared<VertexBuffer>(8);
-	texturedBuffer1->AddVertexData(8,-20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f);
+	texturedBuffer1->AddVertexData(8,-20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 3.0f);
 	texturedBuffer1->AddVertexData(8,-20.0f,-20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
-	texturedBuffer1->AddVertexData(8, 20.0f,-20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f);
-	texturedBuffer1->AddVertexData(8,-20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f);
-	texturedBuffer1->AddVertexData(8, 20.0f,-20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f);
-	texturedBuffer1->AddVertexData(8, 20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+	texturedBuffer1->AddVertexData(8, 20.0f,-20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 3.0f, 0.0f);
+	texturedBuffer1->AddVertexData(8,-20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 3.0f);
+	texturedBuffer1->AddVertexData(8, 20.0f,-20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 3.0f, 0.0f);
+	texturedBuffer1->AddVertexData(8, 20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 3.0f, 3.0f);
 	texturedBuffer1->AddVertexAttribute("position", 0, 3, 0);
 	texturedBuffer1->AddVertexAttribute("vertexColor", 1, 3, 3);
 	texturedBuffer1->AddVertexAttribute("texCoord", 2, 2, 6);
@@ -94,6 +97,26 @@ static void SetUpTexturedScene(
 	texturedSquare1->SetVertexBuffer(texturedBuffer1);
 	texturedSquare1->SetPosition(glm::vec3(-40, -20, 0));
 	textureScene->AddObject(texturedSquare1);
+
+	std::shared_ptr<Texture> pngTexture = std::make_shared<Texture>();
+	pngTexture->LoadTextureDataFromFile("stairsAged_S.png");
+	std::shared_ptr<GraphicsObject> texturedRect =
+		std::make_shared<GraphicsObject>();
+	std::shared_ptr<VertexBuffer> texturedBuffer2 =
+		std::make_shared<VertexBuffer>(8);
+	texturedBuffer2->AddVertexData(8, -12.0f, 25.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f);
+	texturedBuffer2->AddVertexData(8, -12.0f, -25.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
+	texturedBuffer2->AddVertexData(8, 13.0f, -25.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f);
+	texturedBuffer2->AddVertexData(8, -12.0f, 25.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f);
+	texturedBuffer2->AddVertexData(8, 13.0f, -25.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f);
+	texturedBuffer2->AddVertexData(8, 13.0f, 25.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+	texturedBuffer2->AddVertexAttribute("position", 0, 3, 0);
+	texturedBuffer2->AddVertexAttribute("vertexColor", 1, 3, 3);
+	texturedBuffer2->AddVertexAttribute("texCoord", 2, 2, 6);
+	texturedBuffer2->SetTexture(pngTexture);
+	texturedRect->SetVertexBuffer(texturedBuffer2);
+	texturedRect->SetPosition(glm::vec3(40, 20, 0));
+	textureScene->AddObject(texturedRect);
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -118,6 +141,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glViewport(0, 0, 1200, 800);
 	glfwSetFramebufferSizeCallback(window, OnWindowSizeChanged);

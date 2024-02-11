@@ -102,4 +102,9 @@
     <None Include="texture.vert.glsl" />
     <None Include="texture.frag.glsl" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="stairsAged_S.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

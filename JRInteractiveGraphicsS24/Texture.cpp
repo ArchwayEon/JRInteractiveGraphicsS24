@@ -1,6 +1,10 @@
 #include "Texture.h"
 #include <glad/glad.h> 
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+
 Texture::Texture() : textureData(nullptr), isLoadedFromFile(false)
 {
 	glGenTextures(1, &textureId);
@@ -12,6 +16,7 @@ Texture::Texture() : textureData(nullptr), isLoadedFromFile(false)
 	wrapT = GL_REPEAT;
 	minFilter = GL_NEAREST;
 	magFilter = GL_NEAREST;
+	numberOfChannels = 4;
 }
 
 Texture::~Texture()
@@ -58,11 +63,28 @@ void Texture::Allocate()
 	glGenerateMipmap(type);
 }
 
+void Texture::LoadTextureDataFromFile(const std::string& filepath)
+{
+	CleanUp();
+	int width, height;
+	stbi_set_flip_vertically_on_load(true);
+	textureData = stbi_load(filepath.c_str(), &width, &height, &numberOfChannels, 0);
+	this->width = width;
+	this->height = height;
+	if (numberOfChannels == 3) {
+		sourceFormat = GL_RGB;
+	}
+	isLoadedFromFile = true;
+}
+
 void Texture::CleanUp()
 {
 	if (textureData == nullptr) return;
 	if (isLoadedFromFile == false) {
 		delete[] textureData;
+	}
+	else {
+		stbi_image_free(textureData);
 	}
 	textureData = nullptr;
 }
