@@ -22,7 +22,7 @@ public:
 	inline const std::shared_ptr<VertexBuffer>& GetVertexBuffer() const {
 		return buffer;
 	}
-	void StaticAllocateVertexBuffer();
+	void AllocateVertexBuffer();
 
 	void AddChild(std::shared_ptr<GraphicsObject> child);
 	inline const std::vector<std::shared_ptr<GraphicsObject>>& GetChildren() const {

@@ -26,9 +26,11 @@ protected:
 	std::unordered_map<std::string, VertexAttribute> attributeMap;
 	int textureUnit;
 	std::shared_ptr<Texture> texture;
+	bool isDynamic;
+	size_t maxNumberOfVertices;
 
 public:
-	VertexBuffer(unsigned int numElementsPerVertex = 3);
+	VertexBuffer(unsigned int numElementsPerVertex = 3, size_t maxNumberOfVertices=0);
 	~VertexBuffer();
 
 	inline void Select() { glBindBuffer(GL_ARRAY_BUFFER, vboId); }
@@ -36,10 +38,16 @@ public:
 	inline unsigned int GetNumberOfVertices() const { return numberOfVertices; }
 	inline int GetPrimitiveType() const { return primitiveType; }
 	inline void SetPrimitiveType(int primitiveType) { this->primitiveType = primitiveType; }
+	//void SetVertexDataValue(int index, const std::string& attributeName, ...);
+	float GetVertexDataValue(int vertexIndex, int elementIndex);
+	void SetVertexDataValue(int vertexIndex, int elementIndex, float value);
+	bool IsDynamic() const { return isDynamic; }
 
 	// Variadic function
 	void AddVertexData(unsigned int count, ...);
 	void StaticAllocate();
+	void SetUpAsDynamic();
+	void SendDynamicVertexData();
 	void AddVertexAttribute(
 		const std::string& name, unsigned int index, 
 		unsigned int numberOfElements, unsigned int offsetCount=0);

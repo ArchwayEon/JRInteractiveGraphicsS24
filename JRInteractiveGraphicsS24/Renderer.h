@@ -14,7 +14,7 @@ private:
 
 public:
     Renderer(std::shared_ptr<Shader> shader);
-    void StaticAllocateVertexBuffers(const std::vector<std::shared_ptr<GraphicsObject>>& objects);
+    void AllocateVertexBuffers(const std::vector<std::shared_ptr<GraphicsObject>>& objects);
     inline const std::shared_ptr<Shader>& GetShader() const { return shader; }
     void RenderScene(std::shared_ptr<Scene> scene, const glm::mat4& view);
 

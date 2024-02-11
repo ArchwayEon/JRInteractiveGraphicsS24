@@ -2,7 +2,7 @@
 #include <cstdarg>
 
 
-VertexBuffer::VertexBuffer(unsigned int numElementsPerVertex)
+VertexBuffer::VertexBuffer(unsigned int numElementsPerVertex, size_t maxNumberOfVertices)
 {
 	numberOfElementsPerVertex = numElementsPerVertex;
 	numberOfVertices = 0;
@@ -10,11 +10,28 @@ VertexBuffer::VertexBuffer(unsigned int numElementsPerVertex)
 	glGenBuffers(1, &vboId);
 	textureUnit = 0;
 	texture = nullptr;
+	this->maxNumberOfVertices = maxNumberOfVertices;
+	this->isDynamic = false;
+	if (maxNumberOfVertices > 0) {
+		this->isDynamic = true;
+	}
 }
 
 VertexBuffer::~VertexBuffer()
 {
 	glDeleteBuffers(1, &vboId);
+}
+
+float VertexBuffer::GetVertexDataValue(int vertexIndex, int elementIndex)
+{	
+	int position = vertexIndex * numberOfElementsPerVertex + elementIndex;
+	return vertexData[position];
+}
+
+void VertexBuffer::SetVertexDataValue(int vertexIndex, int elementIndex, float value)
+{
+	int position = vertexIndex * numberOfElementsPerVertex + elementIndex;
+	vertexData[position] = value;
 }
 
 void VertexBuffer::AddVertexData(unsigned int count, ...)
@@ -36,12 +53,32 @@ void VertexBuffer::AddVertexData(unsigned int count, ...)
 
 void VertexBuffer::StaticAllocate()
 {
+	if (isDynamic == true) return;
 	unsigned long long bytesToAllocate = vertexData.size() * sizeof(float);
 	glBufferData(
 		GL_ARRAY_BUFFER, bytesToAllocate, vertexData.data(), GL_STATIC_DRAW);
 	if (texture != nullptr) {
 		texture->Allocate();
 	}
+}
+
+void VertexBuffer::SetUpAsDynamic()
+{
+	if (isDynamic == false) return;
+	vertexData.reserve(maxNumberOfVertices * numberOfElementsPerVertex);
+	unsigned long long bytesToAllocate =
+		maxNumberOfVertices * numberOfElementsPerVertex * sizeof(float);
+	glBufferData(
+		GL_ARRAY_BUFFER, bytesToAllocate, nullptr, GL_DYNAMIC_DRAW);
+	if (texture != nullptr) {
+		texture->Allocate();
+	}
+}
+
+void VertexBuffer::SendDynamicVertexData()
+{
+	auto sizeOfData = vertexData.size() * sizeof(float);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeOfData, vertexData.data());
 }
 
 void VertexBuffer::AddVertexAttribute(

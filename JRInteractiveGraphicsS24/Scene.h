@@ -16,5 +16,7 @@ public:
 	}
 	void AddObject(std::shared_ptr<GraphicsObject> object);
 	void Update(float angle, float childAngle);
+
+	const std::shared_ptr<GraphicsObject>& GetGraphicsObject(int index);
 };
 

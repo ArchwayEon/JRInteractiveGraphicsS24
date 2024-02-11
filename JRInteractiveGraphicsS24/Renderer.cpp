@@ -7,11 +7,11 @@ Renderer::Renderer(std::shared_ptr<Shader> shader)
     glGenVertexArrays(1, &vaoId);
 }
 
-void Renderer::StaticAllocateVertexBuffers(const std::vector<std::shared_ptr<GraphicsObject>>& objects)
+void Renderer::AllocateVertexBuffers(const std::vector<std::shared_ptr<GraphicsObject>>& objects)
 {
 	glBindVertexArray(vaoId);
 	for (auto& object : objects) {
-		object->StaticAllocateVertexBuffer();
+		object->AllocateVertexBuffer();
 	}
 	glBindVertexArray(0);
 }
@@ -38,6 +38,9 @@ void Renderer::RenderObject(const GraphicsObject& object)
 
 	auto& buffer = object.GetVertexBuffer();
 	buffer->Select();
+	if (buffer->IsDynamic()) {
+		buffer->SendDynamicVertexData();
+	}
 	if (buffer->HasTexture()) {
 		shader->SendIntUniform("tex", buffer->GetTextureUnit());
 		buffer->GetTexture()->SelectToRender();

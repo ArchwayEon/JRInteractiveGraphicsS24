@@ -67,9 +67,9 @@ static void SetUpTexturedScene(
 
 	std::shared_ptr<Texture> rgbwTexture = std::make_shared<Texture>();
 	rgbwTexture->SetDimension(4, 4);
-	rgbwTexture->SetWrapS(GL_CLAMP_TO_EDGE);
-	rgbwTexture->SetWrapT(GL_CLAMP_TO_EDGE);
-	rgbwTexture->SetMagFilter(GL_LINEAR);
+	//rgbwTexture->SetWrapS(GL_CLAMP_TO_EDGE);
+	//rgbwTexture->SetWrapT(GL_CLAMP_TO_EDGE);
+	//rgbwTexture->SetMagFilter(GL_LINEAR);
 	unsigned char data[] = {
 		255, 255, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 255, 255, 255, 255,
 		0, 255, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 0, 255,
@@ -83,13 +83,13 @@ static void SetUpTexturedScene(
 	std::shared_ptr<GraphicsObject> texturedSquare1 =
 		std::make_shared<GraphicsObject>();
 	std::shared_ptr<VertexBuffer> texturedBuffer1 =
-		std::make_shared<VertexBuffer>(8);
-	texturedBuffer1->AddVertexData(8,-20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 3.0f);
+		std::make_shared<VertexBuffer>(8, 10);
+	texturedBuffer1->AddVertexData(8,-20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f);
 	texturedBuffer1->AddVertexData(8,-20.0f,-20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
-	texturedBuffer1->AddVertexData(8, 20.0f,-20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 3.0f, 0.0f);
-	texturedBuffer1->AddVertexData(8,-20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 3.0f);
-	texturedBuffer1->AddVertexData(8, 20.0f,-20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 3.0f, 0.0f);
-	texturedBuffer1->AddVertexData(8, 20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 3.0f, 3.0f);
+	texturedBuffer1->AddVertexData(8, 20.0f,-20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f);
+	texturedBuffer1->AddVertexData(8,-20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f);
+	texturedBuffer1->AddVertexData(8, 20.0f,-20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f);
+	texturedBuffer1->AddVertexData(8, 20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 	texturedBuffer1->AddVertexAttribute("position", 0, 3, 0);
 	texturedBuffer1->AddVertexAttribute("vertexColor", 1, 3, 3);
 	texturedBuffer1->AddVertexAttribute("texCoord", 2, 2, 6);
@@ -219,13 +219,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	triangle->AddChild(line);
 
 	Renderer renderer(shader);
-	renderer.StaticAllocateVertexBuffers(scene->GetObjects());
+	renderer.AllocateVertexBuffers(scene->GetObjects());
 
 	std::shared_ptr<Shader> textureShader;
 	std::shared_ptr<Scene> textureScene;
 	SetUpTexturedScene(textureShader, textureScene);
 	Renderer textureRenderer(textureShader);
-	textureRenderer.StaticAllocateVertexBuffers(textureScene->GetObjects());
+	textureRenderer.AllocateVertexBuffers(textureScene->GetObjects());
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -255,6 +255,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		);
 
 		scene->Update(angle, childAngle);
+
+		auto& object = textureScene->GetGraphicsObject(0);
+		auto& buffer = object->GetVertexBuffer();
+		auto numVertices = buffer->GetNumberOfVertices();
+		for (unsigned v = 0; v < numVertices; v++) {
+			auto s = buffer->GetVertexDataValue(v, 6);
+			s += .01f;
+			if (s == 1.0f) s = 0.0f;
+			buffer->SetVertexDataValue(v, 6, s);
+		}
 
 		// Render the scene
 		if (isShaderProgramCreated) {

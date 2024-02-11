@@ -17,3 +17,9 @@ void Scene::Update(float angle, float childAngle)
 	}
 }
 
+const std::shared_ptr<GraphicsObject>& Scene::GetGraphicsObject(int index)
+{
+	return objects[index];
+}
+
+
