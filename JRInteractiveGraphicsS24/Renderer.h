@@ -11,12 +11,19 @@ class Renderer : public BaseObject
 private:
     unsigned int vaoId;
     std::shared_ptr<Shader> shader;
+    std::shared_ptr<Scene> scene;
+    glm::mat4 view;
+    glm::mat4 projection;
 
 public:
     Renderer(std::shared_ptr<Shader> shader);
-    void StaticAllocateVertexBuffers(const std::vector<std::shared_ptr<GraphicsObject>>& objects);
+    void StaticAllocateVertexBuffers();
     inline const std::shared_ptr<Shader>& GetShader() const { return shader; }
-    void RenderScene(std::shared_ptr<Scene> scene, const glm::mat4& view);
+    inline void SetScene(std::shared_ptr<Scene> scene) { this->scene = scene; }
+    inline void SetView(const glm::mat4& view) { this->view = view; }
+    inline void SetProjection(const glm::mat4& projection) { this->projection = projection; }
+    inline const std::shared_ptr<Scene>& GetScene() const { return scene; }
+    void RenderScene();
 
 private:
     void RenderObject(const GraphicsObject& object);

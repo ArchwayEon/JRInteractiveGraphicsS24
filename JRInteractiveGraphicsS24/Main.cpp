@@ -18,29 +18,6 @@
 #include "TextFile.h"
 #include "GraphicsEnvironment.h"
 
-void ProcessInput(GLFWwindow* window)
-{
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-		glfwSetWindowShouldClose(window, true);
-	}
-}
-
-static glm::mat4 CreateViewMatrix(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& up)
-{
-	glm::vec3 right = glm::cross(direction, up);
-	right = glm::normalize(right);
-
-	glm::vec3 vUp = glm::cross(right, direction);
-	vUp = glm::normalize(vUp);
-
-	glm::mat4 view(1.0f);
-	view[0] = glm::vec4(right, 0.0f);
-	view[1] = glm::vec4(up, 0.0f);
-	view[2] = glm::vec4(direction, 0.0f);
-	view[3] = glm::vec4(position, 1.0f);
-	return glm::inverse(view);
-}
-
 static void SetUpTexturedScene(
 	std::shared_ptr<Shader>& textureShader, 
 	std::shared_ptr<Scene>& textureScene)
@@ -113,25 +90,10 @@ static void SetUpTexturedScene(
 	textureScene->AddObject(texturedRect);
 }
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPWSTR    lpCmdLine,
-	_In_ int       nCmdShow)
+static void SetUpScene1(
+	std::shared_ptr<Shader>& shader,
+	std::shared_ptr<Scene>& scene)
 {
-	GraphicsEnvironment glfw;
-	glfw.Init(4, 3);
-
-	bool created = glfw.SetWindow(
-		1200, 800, "ETSU Computing Interactive Graphics");
-	if (created == false) return -1;
-
-	bool loaded = glfw.InitGlad();
-	if (loaded == false) return -1;
-
-	glfw.SetupGraphics();
-
-	GLFWwindow* window = glfw.GetWindow();
-
 	bool success;
 	std::string vertexSource, fragmentSource;
 	TextFile file;
@@ -139,33 +101,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	vertexSource = file.GetData();
 	success = file.Read("basic.frag.glsl");
 	fragmentSource = file.GetData();
-	if (success == false) {
-		glfwTerminate();
-		return -1;
-	}
+	if (success == false) return;
 
-	std::shared_ptr<Shader> shader = std::make_shared<Shader>(vertexSource, fragmentSource);
+	shader = std::make_shared<Shader>(vertexSource, fragmentSource);
 	shader->AddUniform("projection");
 	shader->AddUniform("world");
 	shader->AddUniform("view");
 
-	bool isShaderProgramCreated = shader->IsCreated();
-	unsigned int shaderProgram = shader->GetShaderProgram();
-
-	int width, height;
-	glfwGetWindowSize(window, &width, &height);
-	float aspectRatio = width / (height * 1.0f);
-
-	float left = -50.0f;
-	float right = 50.0f;
-	float bottom = -50.0f;
-	float top = 50.0f;
-	left *= aspectRatio;
-	right *= aspectRatio;
-	glm::mat4 projection = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
-
-	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-
+	scene = std::make_shared<Scene>();
 	std::shared_ptr<GraphicsObject> square = std::make_shared<GraphicsObject>();
 	std::shared_ptr<VertexBuffer> buffer = std::make_shared<VertexBuffer>(6);
 	buffer->AddVertexData(6, -5.0f, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
@@ -201,69 +144,40 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	line->SetPosition(glm::vec3(5.0f, -10.0f, 0.0f));
 	triangle->AddChild(line);
 
-	Renderer renderer(shader);
-	renderer.StaticAllocateVertexBuffers(scene->GetObjects());
+}
+
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+	_In_opt_ HINSTANCE hPrevInstance,
+	_In_ LPWSTR    lpCmdLine,
+	_In_ int       nCmdShow)
+{
+	GraphicsEnvironment glfw;
+	glfw.Init(4, 3);
+
+	bool created = glfw.SetWindow(
+		1200, 800, "ETSU Computing Interactive Graphics");
+	if (created == false) return -1;
+
+	bool loaded = glfw.InitGlad();
+	if (loaded == false) return -1;
+
+	glfw.SetupGraphics();
+
+	std::shared_ptr<Shader> shader;
+	std::shared_ptr<Scene> scene;
+	SetUpScene1(shader, scene);
 
 	std::shared_ptr<Shader> textureShader;
 	std::shared_ptr<Scene> textureScene;
 	SetUpTexturedScene(textureShader, textureScene);
-	Renderer textureRenderer(textureShader);
-	textureRenderer.StaticAllocateVertexBuffers(textureScene->GetObjects());
 
-	renderer.GetShader()->SendMat4Uniform("projection", projection);
-	textureRenderer.GetShader()->SendMat4Uniform("projection", projection);
+	glfw.CreateRenderer("renderer", shader);
+	glfw.GetRenderer("renderer")->SetScene(scene);
+	glfw.CreateRenderer("textureRenderer", textureShader);
+	glfw.GetRenderer("textureRenderer")->SetScene(textureScene);
+	glfw.StaticAllocate();
 
-	glm::vec3 clearColor = { 0.2f, 0.3f, 0.3f };
-	float angle = 0, childAngle = 0;
-	float cameraX = -10, cameraY = 0;
-	glm::mat4 view;
-
-	ImGuiIO& io = ImGui::GetIO();
-	while (!glfwWindowShouldClose(window)) {
-		ProcessInput(window);
-
-		glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		view = CreateViewMatrix(
-			glm::vec3(cameraX, cameraY, 1.0f),
-			glm::vec3(0.0f, 0.0f, -1.0f),
-			glm::vec3(0.0f, 1.0f, 0.0f)
-		);
-
-		scene->Update(angle, childAngle);
-
-		// Render the scene
-		if (isShaderProgramCreated) {
-			renderer.RenderScene(scene, view);
-		}
-		textureRenderer.RenderScene(textureScene, view);
-
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-		ImGui::Begin("Computing Interactive Graphics");
-		ImGui::Text(shader->GetLog().c_str());
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-			1000.0f / io.Framerate, io.Framerate);
-		ImGui::ColorEdit3("Background color", (float*)&clearColor.r);
-		ImGui::SliderFloat("Angle", &angle, 0, 360);
-		ImGui::SliderFloat("Child Angle", &childAngle, 0, 360);
-		ImGui::SliderFloat("Camera X", &cameraX, left, right);
-		ImGui::SliderFloat("Camera Y", &cameraY, bottom, top);
-		ImGui::End();
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
-
-	glfwTerminate();
+	glfw.Run();
 	return 0;
 }
 
