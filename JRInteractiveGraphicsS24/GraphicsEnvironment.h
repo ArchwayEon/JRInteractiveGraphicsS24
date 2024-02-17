@@ -34,7 +34,8 @@ public:
 	std::shared_ptr<Renderer> GetRenderer(const std::string& name);
 	void StaticAllocate();
 	void Render();
-	void Run();
+	void Run2D();
+	void Run3D();
 	void SetRendererProjectionAndView(const glm::mat4& projection, const glm::mat4& view);
 public:
 	static void OnWindowSizeChanged(GLFWwindow* window, int width, int height);

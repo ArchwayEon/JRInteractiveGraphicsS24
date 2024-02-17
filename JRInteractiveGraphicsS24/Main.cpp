@@ -146,6 +146,85 @@ static void SetUpScene1(
 
 }
 
+static void SetUp3DScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene)
+{
+	TextFile textFile;
+	bool chk;
+	chk = textFile.Read("texture.vert.glsl");
+	if (chk == false) return;
+	std::string vs = textFile.GetData();
+	chk = textFile.Read("texture.frag.glsl");
+	if (chk == false) return;
+	std::string fs = textFile.GetData();
+	shader = std::make_shared<Shader>(vs, fs);
+	shader->AddUniform("projection");
+	shader->AddUniform("world");
+	shader->AddUniform("view");
+	shader->AddUniform("texUnit");
+
+	std::shared_ptr<Texture> rgbwTexture = std::make_shared<Texture>();
+	rgbwTexture->SetDimension(4, 4);
+	unsigned char data[] = {
+		255, 255, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 255, 255, 255, 255,
+		0, 255, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 0, 255,
+		0, 255, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 0, 255,
+		255, 255, 255, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 255, 255, 255
+	};
+	rgbwTexture->SetTextureData(64, data);
+
+	scene = std::make_shared<Scene>();
+
+	std::shared_ptr<GraphicsObject> texturedCube = std::make_shared<GraphicsObject>();
+	std::shared_ptr<VertexBuffer> buffer = std::make_shared<VertexBuffer>(8);
+	buffer->AddVertexData(8, -5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // A
+	buffer->AddVertexData(8, -5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);// B 
+	buffer->AddVertexData(8, 5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // C
+	buffer->AddVertexData(8, -5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // A
+	buffer->AddVertexData(8, 5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // C
+	buffer->AddVertexData(8, 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);  // D
+
+	buffer->AddVertexData(8, 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // E
+	buffer->AddVertexData(8, 5.0f,-5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f); // F
+	buffer->AddVertexData(8, 5.0f,-5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // G
+	buffer->AddVertexData(8, 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // E
+	buffer->AddVertexData(8, 5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // G
+	buffer->AddVertexData(8, 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f); // H
+
+	buffer->AddVertexData(8, 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // I
+	buffer->AddVertexData(8, 5.0f,-5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f); // J
+	buffer->AddVertexData(8,-5.0f,-5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // K
+	buffer->AddVertexData(8, 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // I
+	buffer->AddVertexData(8, -5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // K
+	buffer->AddVertexData(8,-5.0f, 5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f); // L
+
+	buffer->AddVertexData(8, -5.0f, 5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // M
+	buffer->AddVertexData(8, -5.0f,-5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f); // N
+	buffer->AddVertexData(8, -5.0f,-5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // O
+	buffer->AddVertexData(8, -5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // M
+	buffer->AddVertexData(8, -5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // O
+	buffer->AddVertexData(8, -5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f); // P
+
+	buffer->AddVertexData(8, -5.0f, 5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // P
+	buffer->AddVertexData(8, -5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f); // Q
+	buffer->AddVertexData(8,  5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // R
+	buffer->AddVertexData(8, -5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // P
+	buffer->AddVertexData(8, 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // R
+	buffer->AddVertexData(8,  5.0f, 5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f); // S
+
+	buffer->AddVertexData(8,  5.0f,-5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // U
+	buffer->AddVertexData(8,  5.0f,-5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f); // V
+	buffer->AddVertexData(8, -5.0f,-5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // W
+	buffer->AddVertexData(8, 5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // U
+	buffer->AddVertexData(8, -5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // W
+	buffer->AddVertexData(8, -5.0f,-5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f); // X
+
+	buffer->AddVertexAttribute("position", 0, 3, 0);
+	buffer->AddVertexAttribute("vertexColor", 1, 3, 3);
+	buffer->AddVertexAttribute("texCoord", 2, 2, 6);
+	buffer->SetTexture(rgbwTexture);
+	texturedCube->SetVertexBuffer(buffer);
+	scene->AddObject(texturedCube);
+}
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
@@ -165,19 +244,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	std::shared_ptr<Shader> shader;
 	std::shared_ptr<Scene> scene;
-	SetUpScene1(shader, scene);
+	SetUp3DScene1(shader, scene);
 
-	std::shared_ptr<Shader> textureShader;
-	std::shared_ptr<Scene> textureScene;
-	SetUpTexturedScene(textureShader, textureScene);
+	//std::shared_ptr<Shader> textureShader;
+	//std::shared_ptr<Scene> textureScene;
+	//SetUpTexturedScene(textureShader, textureScene);
 
 	glfw.CreateRenderer("renderer", shader);
 	glfw.GetRenderer("renderer")->SetScene(scene);
-	glfw.CreateRenderer("textureRenderer", textureShader);
-	glfw.GetRenderer("textureRenderer")->SetScene(textureScene);
+	//glfw.CreateRenderer("textureRenderer", textureShader);
+	//glfw.GetRenderer("textureRenderer")->SetScene(textureScene);
 	glfw.StaticAllocate();
 
-	glfw.Run();
+	glfw.Run3D();
 	return 0;
 }
 

@@ -17,6 +17,9 @@ public:
 	virtual ~GraphicsObject();
 
 	const glm::mat4 GetReferenceFrame() const;
+	inline void SetReferenceFrame(const glm::mat4& referenceFrame) {
+		this->referenceFrame = referenceFrame;
+	}
 	void CreateVertexBuffer(unsigned int numberOfElementsPerVertex);
 	void SetVertexBuffer(std::shared_ptr<VertexBuffer> buffer);
 	inline const std::shared_ptr<VertexBuffer>& GetVertexBuffer() const {
