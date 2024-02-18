@@ -8,11 +8,10 @@
 #include <imgui_impl_opengl3.h>
 #include "Renderer.h"
 
-class GraphicsEnvironment
+class GraphicsEnvironment : public BaseObject
 {
 private:
 	GLFWwindow* window;
-	std::stringstream logger;
 	std::unordered_map<std::string, std::shared_ptr<Renderer>> rendererMap;
 
 public:
@@ -21,9 +20,6 @@ public:
 
 	GLFWwindow* GetWindow() const { return window; }
 	void Init(unsigned int majorVersion, unsigned int minorVersion);
-	inline const std::string GetLog() const {
-		return logger.str();
-	}
 	bool SetWindow(unsigned int width, unsigned int height, const std::string& title);
 	bool InitGlad();
 	void SetupGraphics();
@@ -41,6 +37,7 @@ public:
 	static void OnWindowSizeChanged(GLFWwindow* window, int width, int height);
 
 private:
+	void ShutDown();
 	void ProcessInput();
 	static glm::mat4 CreateViewMatrix(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& up);
 };

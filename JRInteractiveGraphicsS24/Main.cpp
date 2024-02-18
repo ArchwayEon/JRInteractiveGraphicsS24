@@ -17,6 +17,7 @@
 #include "Renderer.h"
 #include "TextFile.h"
 #include "GraphicsEnvironment.h"
+#include "Generate.h"
 
 static void SetUpTexturedScene(
 	std::shared_ptr<Shader>& textureShader, 
@@ -175,55 +176,38 @@ static void SetUp3DScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene
 	scene = std::make_shared<Scene>();
 
 	std::shared_ptr<GraphicsObject> texturedCube = std::make_shared<GraphicsObject>();
-	std::shared_ptr<VertexBuffer> buffer = std::make_shared<VertexBuffer>(8);
-	buffer->AddVertexData(8, -5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // A
-	buffer->AddVertexData(8, -5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);// B 
-	buffer->AddVertexData(8, 5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // C
-	buffer->AddVertexData(8, -5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // A
-	buffer->AddVertexData(8, 5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // C
-	buffer->AddVertexData(8, 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);  // D
-
-	buffer->AddVertexData(8, 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // E
-	buffer->AddVertexData(8, 5.0f,-5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f); // F
-	buffer->AddVertexData(8, 5.0f,-5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // G
-	buffer->AddVertexData(8, 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // E
-	buffer->AddVertexData(8, 5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // G
-	buffer->AddVertexData(8, 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f); // H
-
-	buffer->AddVertexData(8, 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // I
-	buffer->AddVertexData(8, 5.0f,-5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f); // J
-	buffer->AddVertexData(8,-5.0f,-5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // K
-	buffer->AddVertexData(8, 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // I
-	buffer->AddVertexData(8, -5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // K
-	buffer->AddVertexData(8,-5.0f, 5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f); // L
-
-	buffer->AddVertexData(8, -5.0f, 5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // M
-	buffer->AddVertexData(8, -5.0f,-5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f); // N
-	buffer->AddVertexData(8, -5.0f,-5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // O
-	buffer->AddVertexData(8, -5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // M
-	buffer->AddVertexData(8, -5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // O
-	buffer->AddVertexData(8, -5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f); // P
-
-	buffer->AddVertexData(8, -5.0f, 5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // P
-	buffer->AddVertexData(8, -5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f); // Q
-	buffer->AddVertexData(8,  5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // R
-	buffer->AddVertexData(8, -5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // P
-	buffer->AddVertexData(8, 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // R
-	buffer->AddVertexData(8,  5.0f, 5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f); // S
-
-	buffer->AddVertexData(8,  5.0f,-5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // U
-	buffer->AddVertexData(8,  5.0f,-5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f); // V
-	buffer->AddVertexData(8, -5.0f,-5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // W
-	buffer->AddVertexData(8, 5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f); // U
-	buffer->AddVertexData(8, -5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f); // W
-	buffer->AddVertexData(8, -5.0f,-5.0f,-5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f); // X
-
+	std::shared_ptr<VertexBuffer> buffer = Generate::Cuboid(10.0f, 5.0f, 5.0f);
 	buffer->AddVertexAttribute("position", 0, 3, 0);
 	buffer->AddVertexAttribute("vertexColor", 1, 3, 3);
 	buffer->AddVertexAttribute("texCoord", 2, 2, 6);
 	buffer->SetTexture(rgbwTexture);
 	texturedCube->SetVertexBuffer(buffer);
 	scene->AddObject(texturedCube);
+
+	std::shared_ptr<Texture> crateTexture = std::make_shared<Texture>();
+	crateTexture->LoadTextureDataFromFile("crate.jpg");
+	std::shared_ptr<GraphicsObject> crate = std::make_shared<GraphicsObject>();
+	buffer = Generate::Cuboid(10.0f, 10.0f, 10.0f);
+	buffer->AddVertexAttribute("position", 0, 3, 0);
+	buffer->AddVertexAttribute("vertexColor", 1, 3, 3);
+	buffer->AddVertexAttribute("texCoord", 2, 2, 6);
+	buffer->SetTexture(crateTexture);
+	crate->SetVertexBuffer(buffer);
+	crate->SetPosition(glm::vec3(-20.0f, 5.0f, -5.0f));
+	scene->AddObject(crate);
+
+	std::shared_ptr<Texture> floorTexture = std::make_shared<Texture>();
+	floorTexture->LoadTextureDataFromFile("floor.jpg");
+	std::shared_ptr<GraphicsObject> floor = std::make_shared<GraphicsObject>();
+	buffer = Generate::XZPlane(50.0f, 50.0f, {1.0f, 1.0f, 1.0f}, {10.0f, 10.0f});
+	buffer->AddVertexAttribute("position", 0, 3, 0);
+	buffer->AddVertexAttribute("vertexColor", 1, 3, 3);
+	buffer->AddVertexAttribute("texCoord", 2, 2, 6);
+	buffer->SetTexture(floorTexture);
+	floor->SetVertexBuffer(buffer);
+	floor->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	scene->AddObject(floor);
+
 }
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -246,14 +230,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	std::shared_ptr<Scene> scene;
 	SetUp3DScene1(shader, scene);
 
-	//std::shared_ptr<Shader> textureShader;
-	//std::shared_ptr<Scene> textureScene;
-	//SetUpTexturedScene(textureShader, textureScene);
-
 	glfw.CreateRenderer("renderer", shader);
 	glfw.GetRenderer("renderer")->SetScene(scene);
-	//glfw.CreateRenderer("textureRenderer", textureShader);
-	//glfw.GetRenderer("textureRenderer")->SetScene(textureScene);
 	glfw.StaticAllocate();
 
 	glfw.Run3D();

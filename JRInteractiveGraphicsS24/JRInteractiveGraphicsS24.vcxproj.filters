@@ -72,6 +72,9 @@
     <ClCompile Include="GraphicsEnvironment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Generate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseObject.h">
@@ -101,6 +104,9 @@
     <ClInclude Include="GraphicsEnvironment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Generate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="basic.frag.glsl" />
@@ -110,6 +116,12 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="stairsAged_S.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="crate.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="floor.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -3,8 +3,9 @@
 #include <memory>
 
 #include "VertexBuffer.h"
+#include "BaseObject.h"
 
-class GraphicsObject
+class GraphicsObject : public BaseObject
 {
 protected:
 	glm::mat4 referenceFrame;

@@ -17,6 +17,7 @@ void GraphicsEnvironment::Init(
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, majorVersion);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minorVersion);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_SAMPLES, 4);
 }
 
 bool GraphicsEnvironment::SetWindow(unsigned int width, unsigned int height, const std::string& title)
@@ -24,7 +25,7 @@ bool GraphicsEnvironment::SetWindow(unsigned int width, unsigned int height, con
     window = glfwCreateWindow(
         width, height, title.c_str(), nullptr, nullptr);
     if (window == nullptr) {
-        logger << "Failed to create GLFW window" << std::endl;
+        _log << "Failed to create GLFW window" << std::endl;
         return false;
     }
     glfwMakeContextCurrent(window);
@@ -34,7 +35,7 @@ bool GraphicsEnvironment::SetWindow(unsigned int width, unsigned int height, con
 bool GraphicsEnvironment::InitGlad()
 {
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        logger << "Failed to initialize GLAD" << std::endl;
+        _log << "Failed to initialize GLAD" << std::endl;
         return false;
     }
     return true;
@@ -55,6 +56,8 @@ void GraphicsEnvironment::SetupGraphics()
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LEQUAL);
     glDepthRange(0.0f, 1.0f);
+
+    glEnable(GL_MULTISAMPLE);
 
     glViewport(0, 0, 1200, 800);
     glfwSetFramebufferSizeCallback(window, OnWindowSizeChanged);
@@ -159,9 +162,14 @@ void GraphicsEnvironment::Run2D()
 		glfwPollEvents();
 	}
 
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
+    ShutDown();
+}
+
+void GraphicsEnvironment::ShutDown()
+{
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 }
 
 void GraphicsEnvironment::Run3D()
@@ -177,7 +185,7 @@ void GraphicsEnvironment::Run3D()
 
     float aspectRatio;
     float nearPlane = 1.0f;
-    float farPlane = 50.0f;
+    float farPlane = 100.0f;
     float fieldOfView = 60;
 
     glm::vec3 cameraPosition(15.0f, 15.0f, 20.0f);
@@ -187,7 +195,7 @@ void GraphicsEnvironment::Run3D()
     glm::mat4 view;
     glm::mat4 projection;
     glm::mat4 referenceFrame(1.0f);
-    glm::vec3 clearColor = { 0.2f, 0.3f, 0.3f };
+    glm::vec3 clearColor = { 0.0f, 0.0f, 0.0f };
 
     auto& scene = GetRenderer("renderer")->GetScene();
     auto& cube = scene->GetObjects()[0];
@@ -243,9 +251,7 @@ void GraphicsEnvironment::Run3D()
         glfwPollEvents();
     }
 
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    ShutDown();
 }
 
 void GraphicsEnvironment::SetRendererProjectionAndView(const glm::mat4& projection, const glm::mat4& view)
