@@ -1,5 +1,6 @@
 #include "GraphicsEnvironment.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include "Timer.h"
 
 GraphicsEnvironment::GraphicsEnvironment() : window(nullptr)
 {
@@ -200,8 +201,11 @@ void GraphicsEnvironment::Run3D()
     auto& scene = GetRenderer("renderer")->GetScene();
     auto& cube = scene->GetObjects()[0];
 
+    double elapsedSeconds;
+    Timer timer;
     ImGuiIO& io = ImGui::GetIO();
     while (!glfwWindowShouldClose(window)) {
+        elapsedSeconds = timer.GetElapsedTimeInSeconds();
         ProcessInput();
         glfwGetWindowSize(window, &width, &height);
 
