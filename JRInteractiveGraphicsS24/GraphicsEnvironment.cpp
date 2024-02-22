@@ -4,6 +4,7 @@
 
 GraphicsEnvironment::GraphicsEnvironment() : window(nullptr)
 {
+    objectManager = std::make_shared<ObjectManager>();
 }
 
 GraphicsEnvironment::~GraphicsEnvironment()
@@ -264,6 +265,11 @@ void GraphicsEnvironment::SetRendererProjectionAndView(const glm::mat4& projecti
 		renderer->SetProjection(projection);
 		renderer->SetView(view);
 	}
+}
+
+void GraphicsEnvironment::AddObject(const std::string& name, std::shared_ptr<GraphicsObject> object)
+{
+    objectManager->AddObject(name, object);
 }
 
 

@@ -7,11 +7,13 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include "Renderer.h"
+#include "ObjectManager.h"
 
 class GraphicsEnvironment : public BaseObject
 {
 private:
 	GLFWwindow* window;
+	std::shared_ptr<ObjectManager> objectManager;
 	std::unordered_map<std::string, std::shared_ptr<Renderer>> rendererMap;
 
 public:
@@ -33,6 +35,7 @@ public:
 	void Run2D();
 	void Run3D();
 	void SetRendererProjectionAndView(const glm::mat4& projection, const glm::mat4& view);
+	void AddObject(const std::string& name, std::shared_ptr<GraphicsObject> object);
 public:
 	static void OnWindowSizeChanged(GLFWwindow* window, int width, int height);
 

@@ -147,7 +147,8 @@ static void SetUpScene1(
 
 }
 
-static void SetUp3DScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene)
+static void SetUp3DScene1(
+	std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, GraphicsEnvironment& env)
 {
 	TextFile textFile;
 	bool chk;
@@ -183,6 +184,7 @@ static void SetUp3DScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene
 	buffer->SetTexture(rgbwTexture);
 	texturedCube->SetVertexBuffer(buffer);
 	scene->AddObject(texturedCube);
+	env.AddObject("TexturedCube", texturedCube);
 
 	std::shared_ptr<Texture> crateTexture = std::make_shared<Texture>();
 	crateTexture->LoadTextureDataFromFile("crate.jpg");
@@ -195,6 +197,7 @@ static void SetUp3DScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene
 	crate->SetVertexBuffer(buffer);
 	crate->SetPosition(glm::vec3(-20.0f, 5.0f, -5.0f));
 	scene->AddObject(crate);
+	env.AddObject("Crate", crate);
 
 	std::shared_ptr<Texture> floorTexture = std::make_shared<Texture>();
 	floorTexture->LoadTextureDataFromFile("floor.jpg");
@@ -207,6 +210,7 @@ static void SetUp3DScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene
 	floor->SetVertexBuffer(buffer);
 	floor->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	scene->AddObject(floor);
+	env.AddObject("Floor", floor);
 
 }
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -228,7 +232,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	std::shared_ptr<Shader> shader;
 	std::shared_ptr<Scene> scene;
-	SetUp3DScene1(shader, scene);
+	SetUp3DScene1(shader, scene, glfw);
 
 	glfw.CreateRenderer("renderer", shader);
 	glfw.GetRenderer("renderer")->SetScene(scene);

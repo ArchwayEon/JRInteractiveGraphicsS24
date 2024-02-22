@@ -144,6 +144,7 @@
     <ClCompile Include="GraphicsEnvironment.cpp" />
     <ClCompile Include="GraphicsObject.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="Generate.h" />
     <ClInclude Include="GraphicsEnvironment.h" />
     <ClInclude Include="GraphicsObject.h" />
+    <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
