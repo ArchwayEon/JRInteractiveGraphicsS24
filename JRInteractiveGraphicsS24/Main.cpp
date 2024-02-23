@@ -147,7 +147,8 @@ static void SetUpScene1(
 
 }
 
-static void SetUp3DScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene)
+static void SetUp3DScene1(
+	std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene)
 {
 	TextFile textFile;
 	bool chk;
