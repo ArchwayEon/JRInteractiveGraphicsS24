@@ -1,6 +1,7 @@
 #include "GraphicsEnvironment.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include "Timer.h"
+#include "RotateAnimation.h"
 
 GraphicsEnvironment::GraphicsEnvironment() : window(nullptr)
 {
@@ -63,7 +64,7 @@ void GraphicsEnvironment::SetupGraphics()
 
     glViewport(0, 0, 1200, 800);
     glfwSetFramebufferSizeCallback(window, OnWindowSizeChanged);
-    //glfwMaximizeWindow(window);
+    glfwMaximizeWindow(window);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -202,6 +203,11 @@ void GraphicsEnvironment::Run3D()
     auto& scene = GetRenderer("renderer")->GetScene();
     auto& cube = scene->GetObjects()[0];
 
+    std::shared_ptr<RotateAnimation> rotateAnimation = 
+        std::make_shared<RotateAnimation>();
+    rotateAnimation->SetObject(objectManager->GetObject("Crate"));
+    objectManager->GetObject("Crate")->SetAnimation(rotateAnimation);
+
     double elapsedSeconds;
     Timer timer;
     ImGuiIO& io = ImGui::GetIO();
@@ -232,6 +238,7 @@ void GraphicsEnvironment::Run3D()
         
         cube->SetReferenceFrame(referenceFrame);
 
+        objectManager->Update(elapsedSeconds);
         Render();
 
         ImGui_ImplOpenGL3_NewFrame();

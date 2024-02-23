@@ -143,9 +143,11 @@
     <ClCompile Include="Generate.cpp" />
     <ClCompile Include="GraphicsEnvironment.cpp" />
     <ClCompile Include="GraphicsObject.cpp" />
+    <ClCompile Include="IAnimation.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="RotateAnimation.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="TextFile.cpp" />
@@ -158,8 +160,10 @@
     <ClInclude Include="Generate.h" />
     <ClInclude Include="GraphicsEnvironment.h" />
     <ClInclude Include="GraphicsObject.h" />
+    <ClInclude Include="IAnimation.h" />
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RotateAnimation.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="TextFile.h" />

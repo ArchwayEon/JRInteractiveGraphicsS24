@@ -81,6 +81,12 @@
     <ClCompile Include="ObjectManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IAnimation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RotateAnimation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseObject.h">
@@ -117,6 +123,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ObjectManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IAnimation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RotateAnimation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

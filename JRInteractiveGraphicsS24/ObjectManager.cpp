@@ -11,3 +11,10 @@ std::shared_ptr<GraphicsObject> ObjectManager::GetObject(const std::string& name
     if (objectMap.contains(name) == false) return nullptr;
     return objectMap[name];
 }
+
+void ObjectManager::Update(double elapsedSeconds)
+{
+    for (auto& [name, object] : objectMap) {
+        object->Update(elapsedSeconds);
+    }
+}
