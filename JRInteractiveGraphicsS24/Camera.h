@@ -12,6 +12,7 @@ private:
 public:
 	Camera() : lookFrame(1.0f), referenceFrame(1.0f) {}
 
+	void SetLookFrame(glm::mat4 lookFrame) { this->lookFrame = lookFrame; }
 	void SetMoveSpeed(float moveSpeed) { this->moveSpeed = moveSpeed; }
 	void SetPosition(glm::vec3 position);
 	glm::mat4 LookForward() const;

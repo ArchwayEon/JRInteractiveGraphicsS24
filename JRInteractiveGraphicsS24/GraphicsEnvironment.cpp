@@ -3,9 +3,12 @@
 #include "Timer.h"
 #include "RotateAnimation.h"
 
+GraphicsEnvironment* GraphicsEnvironment::self;
+
 GraphicsEnvironment::GraphicsEnvironment() : window(nullptr)
 {
     objectManager = std::make_shared<ObjectManager>();
+    self = this;
 }
 
 GraphicsEnvironment::~GraphicsEnvironment()
@@ -64,6 +67,7 @@ void GraphicsEnvironment::SetupGraphics()
 
     glViewport(0, 0, 1200, 800);
     glfwSetFramebufferSizeCallback(window, OnWindowSizeChanged);
+    glfwSetCursorPosCallback(window, OnMouseMove);
     glfwMaximizeWindow(window);
 
     IMGUI_CHECKVERSION();
@@ -216,6 +220,8 @@ void GraphicsEnvironment::Run3D()
         elapsedSeconds = timer.GetElapsedTimeInSeconds();
         ProcessInput(elapsedSeconds);
         glfwGetWindowSize(window, &width, &height);
+        mouse.windowWidth = width;
+        mouse.windowHeight = height;
 
         glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -224,6 +230,7 @@ void GraphicsEnvironment::Run3D()
         referenceFrame = glm::rotate(referenceFrame, glm::radians(cubeXAngle), glm::vec3(1.0f, 0.0f, 0.0f));
         referenceFrame = glm::rotate(referenceFrame, glm::radians(cubeZAngle), glm::vec3(0.0f, 0.0f, 1.0f));
 
+        camera.SetLookFrame(mouse.spherical.ToMat4());
         //view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
         //view = camera.LookAt(cameraTarget);
         view = camera.LookForward();
@@ -286,6 +293,19 @@ void GraphicsEnvironment::AddObject(const std::string& name, std::shared_ptr<Gra
 void GraphicsEnvironment::OnWindowSizeChanged(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+}
+
+void GraphicsEnvironment::OnMouseMove(GLFWwindow* window, double mouseX, double mouseY)
+{
+    MouseParams& mouse = self->GetMouseParams();
+    mouse.x = mouseX;
+    mouse.y = mouseY;
+
+    float xPercent = static_cast<float>(mouse.x / mouse.windowWidth);
+    float yPercent = static_cast<float>(mouse.y / mouse.windowHeight);
+
+    mouse.spherical.theta = 90.0f - (xPercent * 180); // left/right
+    mouse.spherical.phi = 180.0f - (yPercent * 180); // up/down
 }
 
 void GraphicsEnvironment::ProcessInput(double elapsedSeconds)

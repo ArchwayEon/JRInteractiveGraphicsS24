@@ -9,15 +9,22 @@ void Camera::SetPosition(glm::vec3 position)
 glm::mat4 Camera::LookForward() const
 {
     glm::vec3 cameraPosition = referenceFrame[3];
-    glm::vec3 cameraForward = -referenceFrame[2];
+    glm::vec3 cameraForward = -lookFrame[2];
     glm::vec3 cameraTarget = cameraPosition + cameraForward;
-    glm::vec3 cameraUp = referenceFrame[1];
+    glm::vec3 cameraUp = lookFrame[1];
 	return glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+}
+
+glm::mat4 Camera::LookAt(glm::vec3 target) const
+{
+    glm::vec3 cameraPosition = referenceFrame[3];
+    glm::vec3 cameraUp = lookFrame[1];
+    return glm::lookAt(cameraPosition, target, cameraUp);
 }
 
 void Camera::MoveBackward(double elapsedSeconds)
 {
-    glm::vec3 backward = referenceFrame[2];
+    glm::vec3 backward = lookFrame[2];
     glm::vec3 position = referenceFrame[3];
     backward = backward * static_cast<float>(moveSpeed * elapsedSeconds);
     position = position + backward;
@@ -26,7 +33,7 @@ void Camera::MoveBackward(double elapsedSeconds)
 
 void Camera::MoveForward(double elapsedSeconds)
 {
-    glm::vec3 forward = -referenceFrame[2];
+    glm::vec3 forward = -lookFrame[2];
     glm::vec3 position = referenceFrame[3];
     forward = forward * static_cast<float>(moveSpeed * elapsedSeconds);
     position = position + forward;
@@ -35,7 +42,7 @@ void Camera::MoveForward(double elapsedSeconds)
 
 void Camera::MoveLeft(double elapsedSeconds)
 {
-    glm::vec3 toLeft = -referenceFrame[0];
+    glm::vec3 toLeft = -lookFrame[0];
     glm::vec3 position = referenceFrame[3];
     toLeft = toLeft * static_cast<float>(moveSpeed * elapsedSeconds);
     position = position + toLeft;
@@ -44,7 +51,7 @@ void Camera::MoveLeft(double elapsedSeconds)
 
 void Camera::MoveRight(double elapsedSeconds)
 {
-    glm::vec3 toRight = referenceFrame[0];
+    glm::vec3 toRight = lookFrame[0];
     glm::vec3 position = referenceFrame[3];
     toRight = toRight * static_cast<float>(moveSpeed * elapsedSeconds);
     position = position + toRight;
@@ -69,9 +76,4 @@ void Camera::MoveDown(double elapsedSeconds)
     referenceFrame[3] = glm::vec4(position, 1.0f);
 }
 
-glm::mat4 Camera::LookAt(glm::vec3 target) const
-{
-    glm::vec3 cameraPosition = referenceFrame[3];
-    glm::vec3 cameraUp = referenceFrame[1];
-    return glm::lookAt(cameraPosition, target, cameraUp);
-}
+
