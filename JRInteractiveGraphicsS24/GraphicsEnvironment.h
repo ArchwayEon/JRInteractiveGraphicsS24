@@ -8,6 +8,7 @@
 #include <imgui_impl_opengl3.h>
 #include "Renderer.h"
 #include "ObjectManager.h"
+#include "Camera.h"
 
 class GraphicsEnvironment : public BaseObject
 {
@@ -15,6 +16,7 @@ private:
 	GLFWwindow* window;
 	std::shared_ptr<ObjectManager> objectManager;
 	std::unordered_map<std::string, std::shared_ptr<Renderer>> rendererMap;
+	Camera camera;
 
 public:
 	GraphicsEnvironment();
@@ -41,7 +43,7 @@ public:
 
 private:
 	void ShutDown();
-	void ProcessInput();
+	void ProcessInput(double elapsedSeconds);
 	static glm::mat4 CreateViewMatrix(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& up);
 };
 

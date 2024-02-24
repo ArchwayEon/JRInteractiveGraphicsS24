@@ -117,7 +117,7 @@ void GraphicsEnvironment::Run2D()
 
 	ImGuiIO& io = ImGui::GetIO();
 	while (!glfwWindowShouldClose(window)) {
-		ProcessInput();
+		ProcessInput(0);
 		glfwGetWindowSize(window, &width, &height);
 
 		glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
@@ -191,9 +191,10 @@ void GraphicsEnvironment::Run3D()
     float farPlane = 100.0f;
     float fieldOfView = 60;
 
-    glm::vec3 cameraPosition(15.0f, 15.0f, 20.0f);
+    camera.SetPosition(glm::vec3(15.0f, 5.0f, 20.0f));
+    //glm::vec3 cameraPosition(15.0f, 15.0f, 20.0f);
     glm::vec3 cameraTarget(0.0f, 0.0f, 0.0f);
-    glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
+    //glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
     glm::mat4 view;
     glm::mat4 projection;
@@ -213,7 +214,7 @@ void GraphicsEnvironment::Run3D()
     ImGuiIO& io = ImGui::GetIO();
     while (!glfwWindowShouldClose(window)) {
         elapsedSeconds = timer.GetElapsedTimeInSeconds();
-        ProcessInput();
+        ProcessInput(elapsedSeconds);
         glfwGetWindowSize(window, &width, &height);
 
         glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
@@ -223,7 +224,9 @@ void GraphicsEnvironment::Run3D()
         referenceFrame = glm::rotate(referenceFrame, glm::radians(cubeXAngle), glm::vec3(1.0f, 0.0f, 0.0f));
         referenceFrame = glm::rotate(referenceFrame, glm::radians(cubeZAngle), glm::vec3(0.0f, 0.0f, 1.0f));
 
-        view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+        //view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+        //view = camera.LookAt(cameraTarget);
+        view = camera.LookForward();
 
         if (width >= height) {
             aspectRatio = width / (height * 1.0f);
@@ -252,9 +255,9 @@ void GraphicsEnvironment::Run3D()
         ImGui::SliderFloat("X Angle", &cubeXAngle, 0, 360);
         ImGui::SliderFloat("Y Angle", &cubeYAngle, 0, 360);
         ImGui::SliderFloat("Z Angle", &cubeZAngle, 0, 360);
-        ImGui::SliderFloat("Camera X", &cameraPosition.x, left, right);
-        ImGui::SliderFloat("Camera Y", &cameraPosition.y, bottom, top);
-        ImGui::SliderFloat("Camera Z", &cameraPosition.z, 20, 50);
+        //ImGui::SliderFloat("Camera X", &cameraPosition.x, left, right);
+        //ImGui::SliderFloat("Camera Y", &cameraPosition.y, bottom, top);
+        //ImGui::SliderFloat("Camera Z", &cameraPosition.z, 20, 50);
         ImGui::End();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -285,10 +288,35 @@ void GraphicsEnvironment::OnWindowSizeChanged(GLFWwindow* window, int width, int
     glViewport(0, 0, width, height);
 }
 
-void GraphicsEnvironment::ProcessInput()
+void GraphicsEnvironment::ProcessInput(double elapsedSeconds)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
+        return;
+    }
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        camera.MoveForward(elapsedSeconds);
+        return;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        camera.MoveBackward(elapsedSeconds);
+        return;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        camera.MoveLeft(elapsedSeconds);
+        return;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        camera.MoveRight(elapsedSeconds);
+        return;
+    }
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+        camera.MoveUp(elapsedSeconds);
+        return;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        camera.MoveDown(elapsedSeconds);
+        return;
     }
 }
 
