@@ -226,9 +226,15 @@ void GraphicsEnvironment::Run3D()
         glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        referenceFrame = glm::rotate(glm::mat4(1.0f), glm::radians(cubeYAngle), glm::vec3(0.0f, 1.0f, 0.0f));
-        referenceFrame = glm::rotate(referenceFrame, glm::radians(cubeXAngle), glm::vec3(1.0f, 0.0f, 0.0f));
-        referenceFrame = glm::rotate(referenceFrame, glm::radians(cubeZAngle), glm::vec3(0.0f, 0.0f, 1.0f));
+        referenceFrame = 
+            glm::rotate(
+                glm::mat4(1.0f), glm::radians(cubeYAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+        referenceFrame = 
+            glm::rotate(
+                referenceFrame, glm::radians(cubeXAngle), glm::vec3(1.0f, 0.0f, 0.0f));
+        referenceFrame = 
+            glm::rotate(
+                referenceFrame, glm::radians(cubeZAngle), glm::vec3(0.0f, 0.0f, 1.0f));
 
         camera.SetLookFrame(mouse.spherical.ToMat4());
         //view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
