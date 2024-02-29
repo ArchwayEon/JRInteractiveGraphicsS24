@@ -146,6 +146,8 @@
     <None Include="basic.vert.glsl" />
     <None Include="texture.vert.glsl" />
     <None Include="texture.frag.glsl" />
+    <None Include="lighting.frag.glsl" />
+    <None Include="lighting.vert.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="stairsAged_S.png">
