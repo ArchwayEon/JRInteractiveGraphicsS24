@@ -20,7 +20,7 @@ private:
 	Camera camera;
 	MouseParams mouse;
 	static GraphicsEnvironment* self;
-	bool canLookAround = true;
+	bool lookWithMouse = true;
 
 public:
 	GraphicsEnvironment();

@@ -241,7 +241,7 @@ void GraphicsEnvironment::Run3D()
             glm::rotate(
                 referenceFrame, glm::radians(cubeZAngle), glm::vec3(0.0f, 0.0f, 1.0f));
 
-        if (canLookAround) {
+        if (lookWithMouse) {
             camera.SetLookFrame(mouse.spherical.ToMat4());
         }
         
@@ -352,6 +352,41 @@ void GraphicsEnvironment::ProcessInput(double elapsedSeconds)
     }
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
         camera.MoveDown(elapsedSeconds);
+        return;
+    }
+    if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) {
+        lookWithMouse = !lookWithMouse;
+        return;
+    }
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+        glm::mat4 lookFrame(1.0f);
+        camera.SetPosition({0.0f, 5.0f, 30.0f});
+        camera.SetLookFrame(lookFrame);
+        lookWithMouse = false;
+        return;
+    }
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+        glm::mat4 lookFrame(1.0f);
+        lookFrame = glm::rotate(lookFrame, glm::radians(90.0f), { 0, 1, 0 });
+        camera.SetPosition({30.0f, 5.0f, 0.0f });
+        camera.SetLookFrame(lookFrame);
+        lookWithMouse = false;
+        return;
+    }
+    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+        glm::mat4 lookFrame(1.0f);
+        lookFrame = glm::rotate(lookFrame, glm::radians(180.0f), { 0, 1, 0 });
+        camera.SetPosition({ 0.0f, 5.0f, -30.0f });
+        camera.SetLookFrame(lookFrame);
+        lookWithMouse = false;
+        return;
+    }
+    if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) {
+        glm::mat4 lookFrame(1.0f);
+        lookFrame = glm::rotate(lookFrame, glm::radians(-90.0f), { 0, 1, 0 });
+        camera.SetPosition({-30.0f, 5.0f, 0.0f });
+        camera.SetLookFrame(lookFrame);
+        lookWithMouse = false;
         return;
     }
 }
