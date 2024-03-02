@@ -290,12 +290,43 @@ static void SetUp3DScene2(
 	buffer->SetTexture(floorTexture);
 	floor->SetVertexBuffer(buffer);
 	floor->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-	floor->GetMaterial().ambientIntensity = 0.1f;
 	scene->AddObject(floor);
 	env.AddObject("Floor", floor);
 
 	scene->GetLocalLight().position = { 0.0f, 5.0f, 5.0f };
+}
 
+static void SetUpLightBulbScene(
+	std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, GraphicsEnvironment& env)
+{
+	TextFile textFile;
+	bool chk;
+	chk = textFile.Read("texture.vert.glsl");
+	if (chk == false) return;
+	std::string vs = textFile.GetData();
+	chk = textFile.Read("texture.frag.glsl");
+	if (chk == false) return;
+	std::string fs = textFile.GetData();
+	shader = std::make_shared<Shader>(vs, fs);
+	shader->AddUniform("projection");
+	shader->AddUniform("world");
+	shader->AddUniform("view");
+	shader->AddUniform("texUnit");
+	scene = std::make_shared<Scene>();
+
+	std::shared_ptr<Texture> lightBulbTexture = std::make_shared<Texture>();
+	lightBulbTexture->LoadTextureDataFromFile("lightbulb.png");
+	std::shared_ptr<GraphicsObject> lightBulb = 
+		std::make_shared<GraphicsObject>();
+	std::shared_ptr<VertexBuffer> buffer = 
+		Generate::XYPlane(2.0f, 2.0f);
+	buffer->AddVertexAttribute("position", 0, 3, 0);
+	buffer->AddVertexAttribute("vertexColor", 1, 3, 3);
+	buffer->AddVertexAttribute("texCoord", 2, 2, 6);
+	buffer->SetTexture(lightBulbTexture);
+	lightBulb->SetVertexBuffer(buffer);
+	scene->AddObject(lightBulb);
+	env.AddObject("LightBulb", lightBulb);
 }
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -316,11 +347,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	std::shared_ptr<Shader> shader;
 	std::shared_ptr<Scene> scene;
-	//SetUp3DScene1(shader, scene, glfw);
 	SetUp3DScene2(shader, scene, glfw);
+
+	std::shared_ptr<Shader> basicShader;
+	std::shared_ptr<Scene> basicScene;
+	SetUpLightBulbScene(basicShader, basicScene, glfw);
 
 	glfw.CreateRenderer("LightingRenderer", shader);
 	glfw.GetRenderer("LightingRenderer")->SetScene(scene);
+
+	glfw.CreateRenderer("BasicRenderer", basicShader);
+	glfw.GetRenderer("BasicRenderer")->SetScene(basicScene);
+
 	glfw.StaticAllocate();
 
 	glfw.Run3D();

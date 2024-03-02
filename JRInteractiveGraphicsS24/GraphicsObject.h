@@ -47,5 +47,6 @@ public:
 	void SetAnimation(std::shared_ptr<IAnimation> animation);
 
 	Material& GetMaterial() { return material; }
+	void PointAt(const glm::vec3& target);
 };
 

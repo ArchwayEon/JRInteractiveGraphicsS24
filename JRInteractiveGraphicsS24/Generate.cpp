@@ -120,6 +120,22 @@ std::shared_ptr<VertexBuffer> Generate::XZPlane(float width, float depth, glm::v
     return buffer;
 }
 
+std::shared_ptr<VertexBuffer> Generate::XYPlane(float width, float height, glm::vec3 color, glm::vec2 tex)
+{
+    float hw = width / 2;
+    float hh = height / 2;
+    float hd = 0.0f;
+    std::shared_ptr<VertexBuffer> buffer = std::make_shared<VertexBuffer>(8);
+    // Top                                                       
+    buffer->AddVertexData(8, -hw, hh, hd, color.r, color.g, color.b, 0.0f, tex.t); // P
+    buffer->AddVertexData(8, -hw,-hh, hd, color.r, color.g, color.b, 0.0f, 0.0f); // Q
+    buffer->AddVertexData(8, hw, -hh, hd, color.r, color.g, color.b, tex.s, 0.0f); // R
+    buffer->AddVertexData(8, -hw, hh, hd, color.r, color.g, color.b, 0.0f, tex.t); // P
+    buffer->AddVertexData(8, hw, -hh, hd, color.r, color.g, color.b, tex.s, 0.0f); // R
+    buffer->AddVertexData(8, hw, hh, hd, color.r, color.g, color.b, tex.s, tex.t); // S
+    return buffer;
+}
+
 std::shared_ptr<VertexBuffer> Generate::XZPlaneWithNormals(float width, float depth, glm::vec4 color, glm::vec2 tex)
 {
     float hw = width / 2;

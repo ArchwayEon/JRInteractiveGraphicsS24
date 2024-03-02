@@ -185,6 +185,7 @@
   <ItemGroup>
     <Image Include="crate.jpg" />
     <Image Include="floor.jpg" />
+    <Image Include="lightbulb.png" />
     <Image Include="stairsAged_S.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

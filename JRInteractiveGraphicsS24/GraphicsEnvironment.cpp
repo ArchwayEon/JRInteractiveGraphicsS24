@@ -209,6 +209,7 @@ void GraphicsEnvironment::Run3D()
 
     //auto& scene = GetRenderer("renderer")->GetScene();
     auto cube = objectManager->GetObject("TexturedCube");
+    auto lightBulb = objectManager->GetObject("LightBulb");
 
     std::shared_ptr<RotateAnimation> rotateAnimation = 
         std::make_shared<RotateAnimation>();
@@ -227,6 +228,13 @@ void GraphicsEnvironment::Run3D()
         glfwGetWindowSize(window, &width, &height);
         mouse.windowWidth = width;
         mouse.windowHeight = height;
+
+        if (correctGamma) {
+            glEnable(GL_FRAMEBUFFER_SRGB);
+        }
+        else {
+            glDisable(GL_FRAMEBUFFER_SRGB);
+        }
 
         glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -261,6 +269,8 @@ void GraphicsEnvironment::Run3D()
         SetRendererProjectionAndView(projection, view);
         
         cube->SetReferenceFrame(referenceFrame);
+        lightBulb->SetPosition(localLight.position);
+        lightBulb->PointAt(camera.GetPosition());
 
         objectManager->Update(elapsedSeconds);
         Render();
@@ -273,12 +283,12 @@ void GraphicsEnvironment::Run3D()
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
             1000.0f / io.Framerate, io.Framerate);
         ImGui::ColorEdit3("Background color", (float*)&clearColor.r);
+        ImGui::DragFloat3("Local light position", 
+            (float*)&localLight.position, 0.1f);
+        ImGui::Checkbox("Correct gamma", &correctGamma);
         ImGui::SliderFloat("X Angle", &cubeXAngle, 0, 360);
         ImGui::SliderFloat("Y Angle", &cubeYAngle, 0, 360);
         ImGui::SliderFloat("Z Angle", &cubeZAngle, 0, 360);
-        //ImGui::SliderFloat("Camera X", &cameraPosition.x, left, right);
-        //ImGui::SliderFloat("Camera Y", &cameraPosition.y, bottom, top);
-        //ImGui::SliderFloat("Camera Z", &cameraPosition.z, 20, 50);
         ImGui::SliderFloat("Global Intensity", &globalLight.intensity, 0, 1);
         ImGui::SliderFloat("Local Intensity", &localLight.intensity, 0, 1);
         ImGui::End();

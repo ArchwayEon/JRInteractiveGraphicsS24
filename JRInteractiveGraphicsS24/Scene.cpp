@@ -4,11 +4,11 @@ Scene::Scene()
 {
 	globalLight.attenuationCoef = 0;
 	globalLight.color = { 1.0f, 1.0f, 1.0f };
-	globalLight.intensity = 0.5f;
+	globalLight.intensity = 0.05f;
 	globalLight.position = glm::vec3(100.0f, 100.0f, 0.0f);
 	localLight.attenuationCoef = 0;
 	localLight.color = { 1.0f, 1.0f, 1.0f };
-	localLight.intensity = 0.1f;
+	localLight.intensity = 0.01f;
 	localLight.position = glm::vec3(0.0f, 5.0f, 5.0f);
 }
 

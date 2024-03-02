@@ -28,23 +28,26 @@ void Shader::AddUniform(const std::string& uniformName)
 
 void Shader::SendMat4Uniform(const std::string& uniformName, const glm::mat4& mat)
 {
-	glUseProgram(shaderProgram);
+	if (uniformMap.contains(uniformName) == false) return;
 	glUniformMatrix4fv(uniformMap[uniformName], 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 void Shader::SendIntUniform(const std::string& uniformName, int value)
 {
+	if (uniformMap.contains(uniformName) == false) return;
 	glUniform1i(uniformMap[uniformName], value);
 }
 
 void Shader::SendVec3Uniform(
 	const std::string& uniformName, const glm::vec3& vec)
 {
+	if (uniformMap.contains(uniformName) == false) return;
 	glUniform3fv(uniformMap[uniformName], 1, glm::value_ptr(vec));
 }
 
 void Shader::SendFloatUniform(const std::string& uniformName, float value)
 {
+	if (uniformMap.contains(uniformName) == false) return;
 	glUniform1f(uniformMap[uniformName], value);
 }
 

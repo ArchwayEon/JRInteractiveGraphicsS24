@@ -21,6 +21,7 @@ private:
 	MouseParams mouse;
 	static GraphicsEnvironment* self;
 	bool lookWithMouse = true;
+	bool correctGamma = false;
 
 public:
 	GraphicsEnvironment();

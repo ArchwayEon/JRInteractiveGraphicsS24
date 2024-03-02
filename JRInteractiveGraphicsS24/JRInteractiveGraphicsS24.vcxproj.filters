@@ -159,5 +159,8 @@
     <Image Include="floor.jpg">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="lightbulb.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
