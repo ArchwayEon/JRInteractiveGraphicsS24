@@ -99,7 +99,7 @@ void GraphicsEnvironment::StaticAllocate()
 void GraphicsEnvironment::Render()
 {
     for (const auto& [key, renderer] : rendererMap) {
-        renderer->RenderScene();
+        renderer->RenderScene(camera);
     }
 }
 
@@ -120,6 +120,7 @@ void GraphicsEnvironment::Run2D()
 	glm::mat4 view;
 
 	ImGuiIO& io = ImGui::GetIO();
+
 	while (!glfwWindowShouldClose(window)) {
 		ProcessInput(0);
 		glfwGetWindowSize(window, &width, &height);
@@ -161,6 +162,7 @@ void GraphicsEnvironment::Run2D()
 		ImGui::SliderFloat("Child Angle", &childAngle, 0, 360);
 		ImGui::SliderFloat("Camera X", &cameraX, left, right);
 		ImGui::SliderFloat("Camera Y", &cameraY, bottom, top);
+
 		ImGui::End();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -205,8 +207,8 @@ void GraphicsEnvironment::Run3D()
     glm::mat4 referenceFrame(1.0f);
     glm::vec3 clearColor = { 0.0f, 0.0f, 0.0f };
 
-    auto& scene = GetRenderer("renderer")->GetScene();
-    auto& cube = scene->GetObjects()[0];
+    //auto& scene = GetRenderer("renderer")->GetScene();
+    auto cube = objectManager->GetObject("TexturedCube");
 
     std::shared_ptr<RotateAnimation> rotateAnimation = 
         std::make_shared<RotateAnimation>();
@@ -216,6 +218,9 @@ void GraphicsEnvironment::Run3D()
     double elapsedSeconds;
     Timer timer;
     ImGuiIO& io = ImGui::GetIO();
+    auto mainScene = GetRenderer("LightingRenderer")->GetScene();
+    auto& globalLight = mainScene->GetGlobalLight();
+    auto& localLight = mainScene->GetLocalLight();
     while (!glfwWindowShouldClose(window)) {
         elapsedSeconds = timer.GetElapsedTimeInSeconds();
         ProcessInput(elapsedSeconds);
@@ -236,7 +241,10 @@ void GraphicsEnvironment::Run3D()
             glm::rotate(
                 referenceFrame, glm::radians(cubeZAngle), glm::vec3(0.0f, 0.0f, 1.0f));
 
-        camera.SetLookFrame(mouse.spherical.ToMat4());
+        if (canLookAround) {
+            camera.SetLookFrame(mouse.spherical.ToMat4());
+        }
+        
         //view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
         //view = camera.LookAt(cameraTarget);
         view = camera.LookForward();
@@ -271,6 +279,8 @@ void GraphicsEnvironment::Run3D()
         //ImGui::SliderFloat("Camera X", &cameraPosition.x, left, right);
         //ImGui::SliderFloat("Camera Y", &cameraPosition.y, bottom, top);
         //ImGui::SliderFloat("Camera Z", &cameraPosition.z, 20, 50);
+        ImGui::SliderFloat("Global Intensity", &globalLight.intensity, 0, 1);
+        ImGui::SliderFloat("Local Intensity", &localLight.intensity, 0, 1);
         ImGui::End();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

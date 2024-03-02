@@ -290,8 +290,11 @@ static void SetUp3DScene2(
 	buffer->SetTexture(floorTexture);
 	floor->SetVertexBuffer(buffer);
 	floor->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	floor->GetMaterial().ambientIntensity = 0.1f;
 	scene->AddObject(floor);
 	env.AddObject("Floor", floor);
+
+	scene->GetLocalLight().position = { 0.0f, 5.0f, 5.0f };
 
 }
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -313,10 +316,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	std::shared_ptr<Shader> shader;
 	std::shared_ptr<Scene> scene;
-	SetUp3DScene1(shader, scene, glfw);
+	//SetUp3DScene1(shader, scene, glfw);
+	SetUp3DScene2(shader, scene, glfw);
 
-	glfw.CreateRenderer("renderer", shader);
-	glfw.GetRenderer("renderer")->SetScene(scene);
+	glfw.CreateRenderer("LightingRenderer", shader);
+	glfw.GetRenderer("LightingRenderer")->SetScene(scene);
 	glfw.StaticAllocate();
 
 	glfw.Run3D();

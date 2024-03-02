@@ -60,47 +60,47 @@ std::shared_ptr<VertexBuffer> Generate::CuboidWithNormals(
     float hd = depth / 2;
     std::shared_ptr<VertexBuffer> buffer = std::make_shared<VertexBuffer>(12);
     // Front
-    buffer->AddVertexData(12, -hw, hh, hd, color.r, color.g, color.b, color.a, 0, 0, 1, 0.0f, tex.t); // A
-    buffer->AddVertexData(12, -hw, -hh, hd, color.r, color.g, color.b,color.a, 0, 0, 1, 0.0f, 0.0f);// B 
-    buffer->AddVertexData(12, hw, -hh, hd, color.r, color.g, color.b, color.a, 0, 0, 1, tex.s, 0.0f); // C
-    buffer->AddVertexData(12, -hw, hh, hd, color.r, color.g, color.b, color.a, 0, 0, 1, 0.0f, tex.t); // A
-    buffer->AddVertexData(12, hw, -hh, hd, color.r, color.g, color.b, color.a, 0, 0, 1, tex.s, 0.0f); // C
-    buffer->AddVertexData(12, hw, hh, hd, color.r, color.g, color.b,  color.a, 0, 0, 1, tex.s, tex.t);  // D
+    buffer->AddVertexData(12, -hw, hh, hd, color.r, color.g, color.b, color.a, 0.0, 0.0, 1.0, 0.0f, tex.t); // A
+    buffer->AddVertexData(12, -hw, -hh, hd, color.r, color.g, color.b,color.a, 0.0, 0.0, 1.0, 0.0f, 0.0f);// B 
+    buffer->AddVertexData(12, hw, -hh, hd, color.r, color.g, color.b, color.a, 0.0, 0.0, 1.0, tex.s, 0.0f); // C
+    buffer->AddVertexData(12, -hw, hh, hd, color.r, color.g, color.b, color.a, 0.0, 0.0, 1.0, 0.0f, tex.t); // A
+    buffer->AddVertexData(12, hw, -hh, hd, color.r, color.g, color.b, color.a, 0.0, 0.0, 1.0, tex.s, 0.0f); // C
+    buffer->AddVertexData(12, hw, hh, hd, color.r, color.g, color.b,  color.a, 0.0, 0.0, 1.0, tex.s, tex.t);  // D
     // Right                                                       
-    buffer->AddVertexData(12, hw, hh, hd, color.r, color.g, color.b,  color.a, 1, 0, 0, 0.0f, tex.t); // E
-    buffer->AddVertexData(12, hw, -hh, hd, color.r, color.g, color.b, color.a, 1, 0, 0, 0.0f, 0.0f); // F
-    buffer->AddVertexData(12, hw, -hh, -hd, color.r, color.g, color.b,color.a, 1, 0, 0, tex.s, 0.0f); // G
-    buffer->AddVertexData(12, hw, hh, hd, color.r, color.g, color.b,  color.a, 1, 0, 0, 0.0f, tex.t); // E
-    buffer->AddVertexData(12, hw, -hh, -hd, color.r, color.g, color.b,color.a, 1, 0, 0, tex.s, 0.0f); // G
-    buffer->AddVertexData(12, hw, hh, -hd, color.r, color.g, color.b, color.a, 1, 0, 0, tex.s, tex.t); // H
+    buffer->AddVertexData(12, hw, hh, hd, color.r, color.g, color.b,  color.a, 1.0, 0.0, 0.0, 0.0f, tex.t); // E
+    buffer->AddVertexData(12, hw, -hh, hd, color.r, color.g, color.b, color.a, 1.0, 0.0, 0.0, 0.0f, 0.0f); // F
+    buffer->AddVertexData(12, hw, -hh, -hd, color.r, color.g, color.b,color.a, 1.0, 0.0, 0.0, tex.s, 0.0f); // G
+    buffer->AddVertexData(12, hw, hh, hd, color.r, color.g, color.b,  color.a, 1.0, 0.0, 0.0, 0.0f, tex.t); // E
+    buffer->AddVertexData(12, hw, -hh, -hd, color.r, color.g, color.b,color.a, 1.0, 0.0, 0.0, tex.s, 0.0f); // G
+    buffer->AddVertexData(12, hw, hh, -hd, color.r, color.g, color.b, color.a, 1.0, 0.0, 0.0, tex.s, tex.t); // H
     // Back                                                       
-    buffer->AddVertexData(12, hw, hh, -hd, color.r, color.g, color.b,   color.a, 0, 0, -1, 0.0f, tex.t); // I
-    buffer->AddVertexData(12, hw, -hh, -hd, color.r, color.g, color.b,  color.a, 0, 0, -1, 0.0f, 0.0f); // J
-    buffer->AddVertexData(12, -hw, -hh, -hd, color.r, color.g, color.b, color.a, 0, 0, -1, tex.s, 0.0f); // K
-    buffer->AddVertexData(12, hw, hh, -hd, color.r, color.g, color.b,   color.a, 0, 0, -1, 0.0f, tex.t); // I
-    buffer->AddVertexData(12, -hw, -hh, -hd, color.r, color.g, color.b, color.a, 0, 0, -1, tex.s, 0.0f); // 
-    buffer->AddVertexData(12, -hw, hh, -hd, color.r, color.g, color.b,  color.a, 0, 0, -1, tex.s, tex.t); // L
+    buffer->AddVertexData(12, hw, hh, -hd, color.r, color.g, color.b,   color.a, 0.0, 0.0, -1.0, 0.0f, tex.t); // I
+    buffer->AddVertexData(12, hw, -hh, -hd, color.r, color.g, color.b,  color.a, 0.0, 0.0, -1.0, 0.0f, 0.0f); // J
+    buffer->AddVertexData(12, -hw, -hh, -hd, color.r, color.g, color.b, color.a, 0.0, 0.0, -1.0, tex.s, 0.0f); // K
+    buffer->AddVertexData(12, hw, hh, -hd, color.r, color.g, color.b,   color.a, 0.0, 0.0, -1.0, 0.0f, tex.t); // I
+    buffer->AddVertexData(12, -hw, -hh, -hd, color.r, color.g, color.b, color.a, 0.0, 0.0, -1.0, tex.s, 0.0f); // 
+    buffer->AddVertexData(12, -hw, hh, -hd, color.r, color.g, color.b,  color.a, 0.0, 0.0, -1.0, tex.s, tex.t); // L
     // Left                                                       
-    buffer->AddVertexData(12, -hw, hh, -hd, color.r, color.g, color.b,  color.a, -1, 0, 0, 0.0f, tex.t); // M
-    buffer->AddVertexData(12, -hw, -hh, -hd, color.r, color.g, color.b, color.a, -1, 0, 0, 0.0f, 0.0f); // N
-    buffer->AddVertexData(12, -hw, -hh, hd, color.r, color.g, color.b,  color.a, -1, 0, 0, tex.s, 0.0f); // O
-    buffer->AddVertexData(12, -hw, hh, -hd, color.r, color.g, color.b,  color.a, -1, 0, 0, 0.0f, tex.t); // M
-    buffer->AddVertexData(12, -hw, -hh, hd, color.r, color.g, color.b,  color.a, -1, 0, 0, tex.s, 0.0f); // O
-    buffer->AddVertexData(12, -hw, hh, hd, color.r, color.g, color.b,   color.a, -1, 0, 0, tex.s, tex.t); // P
+    buffer->AddVertexData(12, -hw, hh, -hd, color.r, color.g, color.b,  color.a, -1.0, 0.0, 0.0, 0.0f, tex.t); // M
+    buffer->AddVertexData(12, -hw, -hh, -hd, color.r, color.g, color.b, color.a, -1.0, 0.0, 0.0, 0.0f, 0.0f); // N
+    buffer->AddVertexData(12, -hw, -hh, hd, color.r, color.g, color.b,  color.a, -1.0, 0.0, 0.0, tex.s, 0.0f); // O
+    buffer->AddVertexData(12, -hw, hh, -hd, color.r, color.g, color.b,  color.a, -1.0, 0.0, 0.0, 0.0f, tex.t); // M
+    buffer->AddVertexData(12, -hw, -hh, hd, color.r, color.g, color.b,  color.a, -1.0, 0.0, 0.0, tex.s, 0.0f); // O
+    buffer->AddVertexData(12, -hw, hh, hd, color.r, color.g, color.b,   color.a, -1.0, 0.0, 0.0, tex.s, tex.t); // P
     // Top                                                       
-    buffer->AddVertexData(12, -hw, hh, -hd, color.r, color.g, color.b, color.a, 0, 1, 0, 0.0f, tex.t); // P
-    buffer->AddVertexData(12, -hw, hh, hd, color.r, color.g, color.b,  color.a, 0, 1, 0, 0.0f, 0.0f); // Q
-    buffer->AddVertexData(12, hw, hh, hd, color.r, color.g, color.b,   color.a, 0, 1, 0, tex.s, 0.0f); // R
-    buffer->AddVertexData(12, -hw, hh, -hd, color.r, color.g, color.b, color.a, 0, 1, 0, 0.0f, tex.t); // P
-    buffer->AddVertexData(12, hw, hh, hd, color.r, color.g, color.b,   color.a, 0, 1, 0, tex.s, 0.0f); // R
-    buffer->AddVertexData(12, hw, hh, -hd, color.r, color.g, color.b,  color.a, 0, 1, 0, tex.s, tex.t); // S
+    buffer->AddVertexData(12, -hw, hh, -hd, color.r, color.g, color.b, color.a, 0.0, 1.0, 0.0, 0.0f, tex.t); // P
+    buffer->AddVertexData(12, -hw, hh, hd, color.r, color.g, color.b,  color.a, 0.0, 1.0, 0.0, 0.0f, 0.0f); // Q
+    buffer->AddVertexData(12, hw, hh, hd, color.r, color.g, color.b,   color.a, 0.0, 1.0, 0.0, tex.s, 0.0f); // R
+    buffer->AddVertexData(12, -hw, hh, -hd, color.r, color.g, color.b, color.a, 0.0, 1.0, 0.0, 0.0f, tex.t); // P
+    buffer->AddVertexData(12, hw, hh, hd, color.r, color.g, color.b,   color.a, 0.0, 1.0, 0.0, tex.s, 0.0f); // R
+    buffer->AddVertexData(12, hw, hh, -hd, color.r, color.g, color.b,  color.a, 0.0, 1.0, 0.0, tex.s, tex.t); // S
     // Bottom                                                       
-    buffer->AddVertexData(12, hw, -hh, -hd, color.r, color.g, color.b, color.a, 0, -1, 0, 0.0f, tex.t); // U
-    buffer->AddVertexData(12, hw, -hh, hd, color.r, color.g, color.b,  color.a, 0, -1, 0, 0.0f, 0.0f); // V
-    buffer->AddVertexData(12, -hw, -hh, hd, color.r, color.g, color.b, color.a, 0, -1, 0, tex.s, 0.0f); // W
-    buffer->AddVertexData(12, hw, -hh, -hd, color.r, color.g, color.b, color.a, 0, -1, 0, 0.0f, tex.t); // U
-    buffer->AddVertexData(12, -hw, -hh, hd, color.r, color.g, color.b, color.a, 0, -1, 0, tex.s, 0.0f); // W
-    buffer->AddVertexData(12, -hw, -hh, -hd, color.r, color.g, color.b,color.a, 0, -1, 0, tex.s, tex.t); // X
+    buffer->AddVertexData(12, hw, -hh, -hd, color.r, color.g, color.b, color.a, 0.0, -1.0, 0.0, 0.0f, tex.t); // U
+    buffer->AddVertexData(12, hw, -hh, hd, color.r, color.g, color.b,  color.a, 0.0, -1.0, 0.0, 0.0f, 0.0f); // V
+    buffer->AddVertexData(12, -hw, -hh, hd, color.r, color.g, color.b, color.a, 0.0, -1.0, 0.0, tex.s, 0.0f); // W
+    buffer->AddVertexData(12, hw, -hh, -hd, color.r, color.g, color.b, color.a, 0.0, -1.0, 0.0, 0.0f, tex.t); // U
+    buffer->AddVertexData(12, -hw, -hh, hd, color.r, color.g, color.b, color.a, 0.0, -1.0, 0.0, tex.s, 0.0f); // W
+    buffer->AddVertexData(12, -hw, -hh, -hd, color.r, color.g, color.b,color.a, 0.0, -1.0, 0.0, tex.s, tex.t); // X
     return buffer;
 }
 
@@ -127,11 +127,11 @@ std::shared_ptr<VertexBuffer> Generate::XZPlaneWithNormals(float width, float de
     float hd = depth / 2;
     std::shared_ptr<VertexBuffer> buffer = std::make_shared<VertexBuffer>(12);
     // Top                                                       
-    buffer->AddVertexData(12, -hw, hh, -hd, color.r, color.g, color.b, 0, 1, 0, 0.0f, tex.t); // P
-    buffer->AddVertexData(12, -hw, hh, hd, color.r, color.g, color.b,  0, 1, 0, 0.0f, 0.0f); // Q
-    buffer->AddVertexData(12, hw, hh, hd, color.r, color.g, color.b,   0, 1, 0, tex.s, 0.0f); // R
-    buffer->AddVertexData(12, -hw, hh, -hd, color.r, color.g, color.b, 0, 1, 0, 0.0f, tex.t); // P
-    buffer->AddVertexData(12, hw, hh, hd, color.r, color.g, color.b,   0, 1, 0, tex.s, 0.0f); // R
-    buffer->AddVertexData(12, hw, hh, -hd, color.r, color.g, color.b,  0, 1, 0, tex.s, tex.t); // S
+    buffer->AddVertexData(12, -hw, hh, -hd, color.r, color.g, color.b, color.a, 0.0, 1.0, 0.0, 0.0f, tex.t); // P
+    buffer->AddVertexData(12, -hw, hh,  hd, color.r, color.g, color.b, color.a, 0.0, 1.0, 0.0, 0.0f, 0.0f); // Q
+    buffer->AddVertexData(12,  hw, hh,  hd, color.r, color.g, color.b, color.a, 0.0, 1.0, 0.0, tex.s, 0.0f); // R
+    buffer->AddVertexData(12, -hw, hh, -hd, color.r, color.g, color.b, color.a, 0.0, 1.0, 0.0, 0.0f, tex.t); // P
+    buffer->AddVertexData(12,  hw, hh,  hd, color.r, color.g, color.b, color.a, 0.0, 1.0, 0.0, tex.s, 0.0f); // R
+    buffer->AddVertexData(12,  hw, hh, -hd, color.r, color.g, color.b, color.a, 0.0, 1.0, 0.0, tex.s, tex.t); // S
     return buffer;
 }

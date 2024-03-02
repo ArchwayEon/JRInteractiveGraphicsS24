@@ -4,6 +4,7 @@
 
 #include "VertexBuffer.h"
 #include "BaseObject.h"
+#include "GraphicsStructures.h"
 
 class IAnimation;
 
@@ -15,6 +16,7 @@ protected:
 	GraphicsObject* parent;
 	std::vector<std::shared_ptr<GraphicsObject>> children;
 	std::shared_ptr<IAnimation> animation = nullptr;
+	Material material{};
 
 public:
 	GraphicsObject();
@@ -43,5 +45,7 @@ public:
 
 	void Update(double elapsedSeconds);
 	void SetAnimation(std::shared_ptr<IAnimation> animation);
+
+	Material& GetMaterial() { return material; }
 };
 

@@ -15,6 +15,7 @@ public:
 	void SetLookFrame(glm::mat4 lookFrame) { this->lookFrame = lookFrame; }
 	void SetMoveSpeed(float moveSpeed) { this->moveSpeed = moveSpeed; }
 	void SetPosition(glm::vec3 position);
+	glm::vec3 GetPosition() const;
 	glm::mat4 LookForward() const;
 	glm::mat4 LookAt(glm::vec3 target) const;
 	void MoveForward(double elapsedSeconds);

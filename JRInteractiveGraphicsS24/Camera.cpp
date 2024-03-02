@@ -15,6 +15,11 @@ glm::mat4 Camera::LookForward() const
 	return glm::lookAt(cameraPosition, cameraTarget, cameraUp);
 }
 
+glm::vec3 Camera::GetPosition() const
+{
+    return glm::vec3(referenceFrame[3]);
+}
+
 glm::mat4 Camera::LookAt(glm::vec3 target) const
 {
     glm::vec3 cameraPosition = referenceFrame[3];

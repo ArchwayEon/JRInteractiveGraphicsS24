@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include <memory>
 #include <vector>
+#include "Camera.h"
 
 class Renderer : public BaseObject
 {
@@ -20,12 +21,13 @@ public:
     void StaticAllocateVertexBuffers();
     inline const std::shared_ptr<Shader>& GetShader() const { return shader; }
     inline void SetScene(std::shared_ptr<Scene> scene) { this->scene = scene; }
+    std::shared_ptr<Scene> GetScene() { return scene;  }
     inline void SetView(const glm::mat4& view) { this->view = view; }
     inline void SetProjection(const glm::mat4& projection) { this->projection = projection; }
     inline const std::shared_ptr<Scene>& GetScene() const { return scene; }
-    void RenderScene();
+    void RenderScene(const Camera& camera);
 
 private:
-    void RenderObject(const GraphicsObject& object);
+    void RenderObject(GraphicsObject& object);
 };
 
