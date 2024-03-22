@@ -157,7 +157,7 @@ std::shared_ptr<VertexBuffer> Generate::XZLineCircle(
 {
     std::shared_ptr<VertexBuffer> buffer = std::make_shared<VertexBuffer>(6);
     float thetaRadians, x, z;
-    for (float theta = 0; theta < 360.0f, theta += steps) {
+    for (float theta = 0; theta < 360.0f; theta += steps) {
         thetaRadians = glm::radians(theta);
         x = radius * cosf(thetaRadians);
         z = radius * sinf(thetaRadians);

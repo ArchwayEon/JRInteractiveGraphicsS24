@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "..\JRInteractiveGraphicsS24\Texture.h"
+#include "..\JRInteractiveGraphicsS24\IndexBuffer.h"
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h>
 
@@ -41,6 +42,18 @@ namespace igtesting
 		EXPECT_TRUE(SetUpGraphics());
 		Texture sut;
 		EXPECT_TRUE(sut.GetTextureId() != 0);
+		glfwTerminate();
+	}
+
+	TEST(AnIndexBuffer, CanAddMultipleIndexData) {
+		EXPECT_TRUE(SetUpGraphics());
+		IndexBuffer sut;
+		EXPECT_TRUE(sut.GetBufferId() != 0);
+		sut.AddIndexData(3, 1, 2, 3);
+		auto& indexData = sut.GetIndexData();
+		EXPECT_TRUE(indexData[0] == 1);
+		EXPECT_TRUE(indexData[1] == 2);
+		EXPECT_TRUE(indexData[2] == 3);
 		glfwTerminate();
 	}
 
