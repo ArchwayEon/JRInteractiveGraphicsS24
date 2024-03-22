@@ -151,3 +151,17 @@ std::shared_ptr<VertexBuffer> Generate::XZPlaneWithNormals(float width, float de
     buffer->AddVertexData(12,  hw, hh, -hd, color.r, color.g, color.b, color.a, 0.0, 1.0, 0.0, tex.s, tex.t); // S
     return buffer;
 }
+
+std::shared_ptr<VertexBuffer> Generate::XZLineCircle(
+    float radius, glm::vec3 color, int steps)
+{
+    std::shared_ptr<VertexBuffer> buffer = std::make_shared<VertexBuffer>(6);
+    float thetaRadians, x, z;
+    for (float theta = 0; theta < 360.0f, theta += steps) {
+        thetaRadians = glm::radians(theta);
+        x = radius * cosf(thetaRadians);
+        z = radius * sinf(thetaRadians);
+        buffer->AddVertexData(6, x, 0.0f, z, color.r, color.g, color.b);
+    }
+    return buffer;
+}
