@@ -30,7 +30,8 @@ public:
 		float width, float depth,
 		glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f },
 		glm::vec2 tex = { 1.0f, 1.0 });
-	static std::shared_ptr<VertexBuffer> XZLineCircle(
+	static void XZLineCircle(
+		std::shared_ptr<VertexBuffer>& bufferToFill, 
 		float radius, glm::vec3 color = { 1.0f, 1.0f, 1.0f }, int steps = 10);
 };
 
