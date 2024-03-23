@@ -14,7 +14,7 @@ void Renderer::StaticAllocateVertexBuffers()
 	glBindVertexArray(vaoId);
 	auto& objects = scene->GetObjects();
 	for (auto& object : objects) {
-		object->StaticAllocateVertexBuffer();
+		object->StaticAllocateBuffers();
 	}
 	glBindVertexArray(0);
 }
@@ -60,7 +60,16 @@ void Renderer::RenderObject(GraphicsObject& object)
 		buffer->GetTexture()->SelectToRender();
 	}
 	buffer->SetUpAttributeInterpretration();
-	glDrawArrays(buffer->GetPrimitiveType(), 0, buffer->GetNumberOfVertices());
+	if (object.IsIndexed()) {
+		auto& indexBuffer = object.GetIndexBuffer();
+		indexBuffer->Select();
+		int numberOfIndexes = (int)indexBuffer->GetNumberOfIndexes();
+		glDrawElements(buffer->GetPrimitiveType(), numberOfIndexes, 
+			GL_UNSIGNED_SHORT, (void*)0);
+	}
+	else {
+		glDrawArrays(buffer->GetPrimitiveType(), 0, buffer->GetNumberOfVertices());
+	}
 
 	// Recursively render the children
 	auto& children = object.GetChildren();

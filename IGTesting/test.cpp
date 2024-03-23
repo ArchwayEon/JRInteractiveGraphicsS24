@@ -1,8 +1,10 @@
 #include "pch.h"
 #include "..\JRInteractiveGraphicsS24\Texture.h"
 #include "..\JRInteractiveGraphicsS24\IndexBuffer.h"
+#include "..\JRInteractiveGraphicsS24\Generate.h"
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h>
+#include <memory>
 
 namespace igtesting
 {
@@ -57,5 +59,15 @@ namespace igtesting
 		glfwTerminate();
 	}
 
+	TEST(Generate, CanFillALineCircleIndexBuffer) {
+		EXPECT_TRUE(SetUpGraphics());
+		std::shared_ptr<IndexBuffer> sut = std::make_shared<IndexBuffer>();
+		Generate::LineCircleIndexes(sut, 6, true);
+		auto& indexData = sut->GetIndexData();
+		EXPECT_TRUE(indexData.size() == 12);
+		EXPECT_TRUE(indexData[0] == 0);
+		EXPECT_TRUE(indexData[11] == 0);
+		glfwTerminate();
+	}
 
 }

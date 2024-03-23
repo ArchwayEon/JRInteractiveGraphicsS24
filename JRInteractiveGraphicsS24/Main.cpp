@@ -294,10 +294,12 @@ static void SetUp3DScene2(
 	env.AddObject("Floor", floor);
 
 	scene->GetLocalLight().position = { 0.0f, 5.0f, 5.0f };
+	scene->GetLocalLight().intensity = 0.5f;
 }
 
 static void SetUpLightBulbScene(
-	std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, GraphicsEnvironment& env)
+	std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, 
+	GraphicsEnvironment& env)
 {
 	TextFile textFile;
 	bool chk;
@@ -329,6 +331,42 @@ static void SetUpLightBulbScene(
 	env.AddObject("LightBulb", lightBulb);
 }
 
+static void SetUpPCObjectsScene(
+	std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene,
+	GraphicsEnvironment& env) 
+{
+	TextFile textFile;
+	bool chk;
+	chk = textFile.Read("basic.vert.glsl");
+	if (chk == false) return;
+	std::string vs = textFile.GetData();
+	chk = textFile.Read("basic.frag.glsl");
+	if (chk == false) return;
+	std::string fs = textFile.GetData();
+	shader = std::make_shared<Shader>(vs, fs);
+	shader->AddUniform("projection");
+	shader->AddUniform("world");
+	shader->AddUniform("view");
+
+	scene = std::make_shared<Scene>();
+
+	std::shared_ptr<GraphicsObject> pcLinesCircle =
+		std::make_shared<GraphicsObject>();
+	pcLinesCircle->CreateVertexBuffer(6);
+	pcLinesCircle->CreateIndexBuffer();
+	auto& vertexBuffer = pcLinesCircle->GetVertexBuffer();
+	vertexBuffer->SetPrimitiveType(GL_LINES);
+	auto& indexBuffer = pcLinesCircle->GetIndexBuffer();
+	Generate::XZLineCircle(vertexBuffer, 2.0f, { 1.0f, 1.0f, 1.0f }, 10);
+	vertexBuffer->AddVertexAttribute("position", 0, 3, 0);
+	vertexBuffer->AddVertexAttribute("color", 1, 3, 3);
+	Generate::LineCircleIndexes(indexBuffer, 36, true);
+	pcLinesCircle->SetPosition({ 0.0f, 1.0f, 7.0f });
+	scene->AddObject(pcLinesCircle);
+	env.AddObject("PCLinesCircle", pcLinesCircle);
+
+}
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
@@ -354,11 +392,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	std::shared_ptr<Scene> basicScene;
 	SetUpLightBulbScene(basicShader, basicScene, glfw);
 
+	std::shared_ptr<Shader> pcShader;
+	std::shared_ptr<Scene> pcScene;
+	SetUpPCObjectsScene(pcShader, pcScene, glfw);
+
 	glfw.CreateRenderer("LightingRenderer", shader);
 	glfw.GetRenderer("LightingRenderer")->SetScene(scene);
 
 	glfw.CreateRenderer("BasicRenderer", basicShader);
 	glfw.GetRenderer("BasicRenderer")->SetScene(basicScene);
+
+	glfw.CreateRenderer("PCRenderer", pcShader);
+	glfw.GetRenderer("PCRenderer")->SetScene(pcScene);
 
 	glfw.StaticAllocate();
 

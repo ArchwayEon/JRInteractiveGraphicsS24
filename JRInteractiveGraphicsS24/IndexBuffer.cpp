@@ -16,3 +16,12 @@ void IndexBuffer::AddIndexData(unsigned int count, ...)
 	}
 	va_end(args);
 }
+
+void IndexBuffer::StaticAllocate()
+{
+	unsigned long long bytesToAllocate = 
+		indexData.size() * sizeof(unsigned short);
+	glBufferData(
+		GL_ELEMENT_ARRAY_BUFFER, bytesToAllocate, indexData.data(), 
+		GL_STATIC_DRAW);
+}

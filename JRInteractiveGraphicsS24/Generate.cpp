@@ -164,3 +164,20 @@ void Generate::XZLineCircle(
         bufferToFill->AddVertexData(6, x, 0.0f, z, color.r, color.g, color.b);
     }
 }
+
+void Generate::LineCircleIndexes(
+    std::shared_ptr<IndexBuffer>& bufferToFill, int numberOfLineSegments, 
+    bool isClosed)
+{
+    unsigned short index, nextIndex;
+    unsigned short stopIndex = numberOfLineSegments;
+    if (isClosed == false) stopIndex = numberOfLineSegments - 1;
+    for (index = 0; index < stopIndex; ++index) {
+        nextIndex = index + 1;
+        if (isClosed) {
+            nextIndex = 
+                nextIndex % static_cast<unsigned short>(numberOfLineSegments);
+        }
+        bufferToFill->AddIndexData(2, index, nextIndex);
+    }
+}

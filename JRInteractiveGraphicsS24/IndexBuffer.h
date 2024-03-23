@@ -18,9 +18,12 @@ public:
     inline void Select() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboId); }
     inline void Deselect() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
 
-    const std::vector<unsigned short>& GetIndexData() const { return indexData; }
+    std::vector<unsigned short>& GetIndexData() { return indexData; }
     inline std::size_t GetNumberOfIndexes() const { return indexData.size(); }
 
     void AddIndexData(unsigned int count, ...);
+    void AddIndexData(unsigned short index) { indexData.push_back(index); }
+
+    void StaticAllocate();
 };
 
