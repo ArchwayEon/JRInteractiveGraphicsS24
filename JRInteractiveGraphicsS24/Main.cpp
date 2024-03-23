@@ -357,13 +357,29 @@ static void SetUpPCObjectsScene(
 	auto& vertexBuffer = pcLinesCircle->GetVertexBuffer();
 	vertexBuffer->SetPrimitiveType(GL_LINES);
 	auto& indexBuffer = pcLinesCircle->GetIndexBuffer();
-	Generate::XZLineCircle(vertexBuffer, 2.0f, { 1.0f, 1.0f, 1.0f }, 10);
+	Generate::XZLineCircle(vertexBuffer, 2.0f, { 1.0f, 1.0f, 0.0f }, 0.0f, 10);
 	vertexBuffer->AddVertexAttribute("position", 0, 3, 0);
 	vertexBuffer->AddVertexAttribute("color", 1, 3, 3);
 	Generate::LineCircleIndexes(indexBuffer, 36, true);
 	pcLinesCircle->SetPosition({ 0.0f, 1.0f, 7.0f });
 	scene->AddObject(pcLinesCircle);
 	env.AddObject("PCLinesCircle", pcLinesCircle);
+
+	std::shared_ptr<GraphicsObject> pcLinesCylinder =
+		std::make_shared<GraphicsObject>();
+	pcLinesCylinder->CreateVertexBuffer(6);
+	pcLinesCylinder->CreateIndexBuffer();
+	auto& cylinderVertexBuffer = pcLinesCylinder->GetVertexBuffer();
+	cylinderVertexBuffer->SetPrimitiveType(GL_LINES);
+	Generate::LineCylinder(cylinderVertexBuffer, 4.0f, 2.0f, { 1.0f, 0.0f, 1.0f }, 10);
+	cylinderVertexBuffer->AddVertexAttribute("position", 0, 3, 0);
+	cylinderVertexBuffer->AddVertexAttribute("color", 1, 3, 3);
+
+	auto& cylinderIndexBuffer = pcLinesCylinder->GetIndexBuffer(); 
+	Generate::LineCylinderIndexes(cylinderIndexBuffer, 36);
+	pcLinesCylinder->SetPosition({ 5.0f, 2.0f, 7.0f });
+	scene->AddObject(pcLinesCylinder);
+	env.AddObject("PCLinesCylinder", pcLinesCylinder);
 
 }
 

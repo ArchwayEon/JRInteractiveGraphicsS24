@@ -30,9 +30,22 @@ public:
 
 	static void XZLineCircle(
 		std::shared_ptr<VertexBuffer>& bufferToFill, 
-		float radius, glm::vec3 color = { 1.0f, 1.0f, 1.0f }, int steps = 10);
-	static void LineCircleIndexes(
+		float radius, glm::vec3 color = { 1.0f, 1.0f, 1.0f }, 
+		float offset = 0.0f,
+		int steps = 10);
+	// Returns the highest index
+	static int LineCircleIndexes(
 		std::shared_ptr<IndexBuffer>& bufferToFill, 
-		int numberOfLineSegments, bool isClosed = true);
+		int numberOfLineSegments, bool isClosed = true, int startIndex = 0);
+
+	static void LineCylinder(
+		std::shared_ptr<VertexBuffer>& bufferToFill,
+		float height, float radius, glm::vec3 color = { 1.0f, 1.0f, 1.0f }, 
+		int steps = 10);
+
+	
+	static void LineCylinderIndexes(
+		std::shared_ptr<IndexBuffer>& bufferToFill,	
+		int numberOfCircleLineSegments);
 };
 

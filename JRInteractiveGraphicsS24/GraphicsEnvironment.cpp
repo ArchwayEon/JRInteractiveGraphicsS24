@@ -197,7 +197,7 @@ void GraphicsEnvironment::Run3D()
     float farPlane = 100.0f;
     float fieldOfView = 60;
 
-    camera.SetPosition(glm::vec3(15.0f, 5.0f, 20.0f));
+    camera.SetPosition(glm::vec3(0.0f, 5.0f, 20.0f));
     //glm::vec3 cameraPosition(15.0f, 15.0f, 20.0f);
     glm::vec3 cameraTarget(0.0f, 0.0f, 0.0f);
     //glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
