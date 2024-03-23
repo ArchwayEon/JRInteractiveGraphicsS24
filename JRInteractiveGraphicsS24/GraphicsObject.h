@@ -47,6 +47,7 @@ public:
 	}
 
 	void SetPosition(const glm::vec3& position);
+	const glm::vec3 GetPosition() { return glm::vec3(referenceFrame[3]); }
 	void ResetOrientation();
 	void RotateLocalZ(float degrees);
 

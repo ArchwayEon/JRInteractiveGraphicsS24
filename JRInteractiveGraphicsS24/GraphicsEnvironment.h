@@ -10,6 +10,7 @@
 #include "ObjectManager.h"
 #include "Camera.h"
 #include "GraphicsStructures.h"
+#include "Ray.h"
 
 class GraphicsEnvironment : public BaseObject
 {
@@ -45,6 +46,8 @@ public:
 	void AddObject(const std::string& name, std::shared_ptr<GraphicsObject> object);
 
 	MouseParams& GetMouseParams() { return mouse; }
+
+	Ray GetMouseRay(const glm::mat4& projection, const glm::mat4& view);
 public:
 	static void OnWindowSizeChanged(GLFWwindow* window, int width, int height);
 	static void OnMouseMove(GLFWwindow* window, double mouseX, double mouseY);
