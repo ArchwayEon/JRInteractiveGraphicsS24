@@ -67,6 +67,6 @@ public:
 
 	void AddBehavior(std::string name, std::shared_ptr<IBehavior> behavior);
 	void SetBehaviorDefaults();
-	void SetBehaviorParameters(std::string name, IParams params);
+	void SetBehaviorParameters(std::string name, IParams& params);
 };
 

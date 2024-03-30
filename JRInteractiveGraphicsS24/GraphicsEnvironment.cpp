@@ -292,29 +292,13 @@ void GraphicsEnvironment::Run3D()
             cylinder->SetPosition({ point.x, y, point.z });
         }
 
-        HighlightParams hp = { {}, mouseRay };
-        objectManager->GetObject("TexturedCube")
-            ->SetBehaviorParameters("highlight", hp);
-        objectManager->GetObject("Crate")
-            ->SetBehaviorParameters("highlight", hp);
+        HighlightParams hp = { {}, &mouseRay };
+        objectManager->GetObject("TexturedCube")->
+            SetBehaviorParameters("highlight", hp);
+        objectManager->GetObject("Crate")->
+            SetBehaviorParameters("highlight", hp);
+
         objectManager->Update(elapsedSeconds);
-
-        //auto tcObj = objectManager->GetObject("TexturedCube");
-        //if (tcObj->IsIntersectingWithRay(mouseRay)){
-        //    tcObj->GetMaterial().ambientIntensity = 1.0f;
-        //}
-        //else {
-        //    tcObj->GetMaterial().ambientIntensity = tcIntensity;
-        //}
-
-        //auto cObj = objectManager->GetObject("Crate");
-        //if (cObj->IsIntersectingWithRay(mouseRay)) {
-        //    cObj->GetMaterial().ambientIntensity = 1.0f;
-        //}
-        //else {
-        //    cObj->GetMaterial().ambientIntensity = cIntensity;
-        //}
-
 
         Render();
 

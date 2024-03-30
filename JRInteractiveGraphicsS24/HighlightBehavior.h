@@ -9,7 +9,7 @@ protected:
 	float ambientIntensity = 0.0;
 public:
 	void StoreDefaults() override;
-	void SetParameter(IParams params) override;
+	void SetParameter(IParams& params) override;
 	void Update(double elapsedSeconds) override;
 };
 

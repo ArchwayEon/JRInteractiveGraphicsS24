@@ -50,5 +50,5 @@ struct Light {
 struct IParams{};
 
 struct HighlightParams : IParams {
-    Ray ray;
+    Ray* ray;
 };
