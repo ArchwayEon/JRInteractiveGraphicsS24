@@ -151,3 +151,57 @@ std::shared_ptr<VertexBuffer> Generate::XZPlaneWithNormals(float width, float de
     buffer->AddVertexData(12,  hw, hh, -hd, color.r, color.g, color.b, color.a, 0.0, 1.0, 0.0, tex.s, tex.t); // S
     return buffer;
 }
+
+void Generate::XZLineCircle(
+    std::shared_ptr<VertexBuffer>& bufferToFill, 
+    float radius, glm::vec3 color, float offset, int steps)
+{
+    float thetaRadians, x, z;
+    for (float theta = 0; theta < 360.0f; theta += steps) {
+        thetaRadians = glm::radians(theta);
+        x = radius * cosf(thetaRadians);
+        z = radius * sinf(thetaRadians);
+        bufferToFill->AddVertexData(6, x, offset, z, color.r, color.g, color.b);
+    }
+}
+
+int Generate::LineCircleIndexes(
+    std::shared_ptr<IndexBuffer>& bufferToFill, int numberOfLineSegments, 
+    bool isClosed, int startIndex)
+{
+    unsigned short index, nextIndex = 0, highestIndex = 0;
+    unsigned short stopIndex = numberOfLineSegments;
+    if (isClosed == false) stopIndex = numberOfLineSegments - 1;
+    for (index = 0; index < stopIndex; ++index) {
+        nextIndex = index + 1;
+        if (isClosed) {
+            nextIndex = 
+                nextIndex % static_cast<unsigned short>(numberOfLineSegments);
+        }
+        if (nextIndex > highestIndex) highestIndex = nextIndex;
+        bufferToFill->AddIndexData(2, index + startIndex, nextIndex + startIndex);
+    }
+    return highestIndex + startIndex;
+}
+
+void Generate::LineCylinder(std::shared_ptr<VertexBuffer>& bufferToFill, 
+    float height, float radius, glm::vec3 color, int steps)
+{
+    float hh = height / 2;
+    Generate::XZLineCircle(bufferToFill, radius, color, hh, steps);
+    Generate::XZLineCircle(bufferToFill, radius, color, -hh, steps);
+}
+
+void Generate::LineCylinderIndexes(std::shared_ptr<IndexBuffer>& bufferToFill, 
+    int numberOfCircleLineSegments)
+{
+    int highestIndexC1 = Generate::LineCircleIndexes(bufferToFill, 
+        numberOfCircleLineSegments, true, 0);
+    Generate::LineCircleIndexes(bufferToFill, numberOfCircleLineSegments, true, 
+        highestIndexC1 + 1);
+    unsigned short index, nextIndex;
+    for (index = 0; index < numberOfCircleLineSegments; ++index) {
+        nextIndex = index + highestIndexC1 + 1;
+        bufferToFill->AddIndexData(2, index, nextIndex);
+    }
+}

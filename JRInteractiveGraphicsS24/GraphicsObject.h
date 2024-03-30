@@ -5,6 +5,7 @@
 #include "VertexBuffer.h"
 #include "BaseObject.h"
 #include "GraphicsStructures.h"
+#include "IndexBuffer.h"
 
 class IAnimation;
 
@@ -12,7 +13,8 @@ class GraphicsObject : public BaseObject
 {
 protected:
 	glm::mat4 referenceFrame;
-	std::shared_ptr<VertexBuffer> buffer;
+	std::shared_ptr<VertexBuffer> vertexBuffer = nullptr;
+	std::shared_ptr<IndexBuffer> indexBuffer = nullptr;
 	GraphicsObject* parent;
 	std::vector<std::shared_ptr<GraphicsObject>> children;
 	std::shared_ptr<IAnimation> animation = nullptr;
@@ -28,11 +30,16 @@ public:
 		this->referenceFrame = referenceFrame;
 	}
 	void CreateVertexBuffer(unsigned int numberOfElementsPerVertex);
+	void CreateIndexBuffer();
 	void SetVertexBuffer(std::shared_ptr<VertexBuffer> buffer);
-	inline const std::shared_ptr<VertexBuffer>& GetVertexBuffer() const {
-		return buffer;
+	std::shared_ptr<VertexBuffer>& GetVertexBuffer(){
+		return vertexBuffer;
 	}
-	void StaticAllocateVertexBuffer();
+	std::shared_ptr<IndexBuffer>& GetIndexBuffer(){
+		return indexBuffer;
+	}
+	bool IsIndexed() const { return indexBuffer != nullptr; }
+	void StaticAllocateBuffers();
 
 	void AddChild(std::shared_ptr<GraphicsObject> child);
 	inline const std::vector<std::shared_ptr<GraphicsObject>>& GetChildren() const {
@@ -40,6 +47,7 @@ public:
 	}
 
 	void SetPosition(const glm::vec3& position);
+	const glm::vec3 GetPosition() { return glm::vec3(referenceFrame[3]); }
 	void ResetOrientation();
 	void RotateLocalZ(float degrees);
 

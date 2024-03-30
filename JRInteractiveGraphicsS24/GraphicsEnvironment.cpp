@@ -2,6 +2,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Timer.h"
 #include "RotateAnimation.h"
+#include "GeometricPlane.h"
 
 GraphicsEnvironment* GraphicsEnvironment::self;
 
@@ -197,7 +198,7 @@ void GraphicsEnvironment::Run3D()
     float farPlane = 100.0f;
     float fieldOfView = 60;
 
-    camera.SetPosition(glm::vec3(15.0f, 5.0f, 20.0f));
+    camera.SetPosition(glm::vec3(0.0f, 5.0f, 20.0f));
     //glm::vec3 cameraPosition(15.0f, 15.0f, 20.0f);
     glm::vec3 cameraTarget(0.0f, 0.0f, 0.0f);
     //glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
@@ -216,6 +217,9 @@ void GraphicsEnvironment::Run3D()
     rotateAnimation->SetObject(objectManager->GetObject("Crate"));
     objectManager->GetObject("Crate")->SetAnimation(rotateAnimation);
 
+    Ray mouseRay;
+    GeometricPlane floorPlane;
+    float offset;
     double elapsedSeconds;
     Timer timer;
     ImGuiIO& io = ImGui::GetIO();
@@ -272,6 +276,17 @@ void GraphicsEnvironment::Run3D()
         lightBulb->SetPosition(localLight.position);
         lightBulb->PointAt(camera.GetPosition());
 
+        auto& position = objectManager->GetObject("Floor")->GetPosition();
+        floorPlane.Set({ 0.0f, 1.0f, 0.0f }, position.y);
+        mouseRay = GetMouseRay(projection, view);
+        offset = floorPlane.GetIntersectionOffset(mouseRay);
+        if (offset >= 0) {
+            glm::vec3 point = mouseRay.GetPoint(offset);
+            auto cylinder = objectManager->GetObject("PCLinesCylinder");
+            float y = cylinder->GetPosition().y;
+            cylinder->SetPosition({ point.x, y, point.z });
+        }
+
         objectManager->Update(elapsedSeconds);
         Render();
 
@@ -282,6 +297,7 @@ void GraphicsEnvironment::Run3D()
         ImGui::Text(GetLog().c_str());
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
             1000.0f / io.Framerate, io.Framerate);
+        ImGui::Text("Offset: %.3f", offset);
         ImGui::ColorEdit3("Background color", (float*)&clearColor.r);
         ImGui::DragFloat3("Local light position", 
             (float*)&localLight.position, 0.1f);
@@ -316,12 +332,36 @@ void GraphicsEnvironment::AddObject(const std::string& name, std::shared_ptr<Gra
 }
 
 
+Ray GraphicsEnvironment::GetMouseRay(const glm::mat4& projection, const glm::mat4& view)
+{
+    Ray ray;
+    auto projInverse = glm::inverse(projection);
+    auto viewInverse = glm::inverse(view);
+
+    glm::vec4 rayDirClip = { mouse.nsx, mouse.nsy, -1, 1 };
+    glm::vec4 rayDirEye = projInverse * rayDirClip;
+    rayDirEye.z = -1.0f; // Forward, down the -ve z
+    rayDirEye.w = 0.0f; // This is a direction vector
+    glm::vec3 dir = glm::vec3(glm::normalize(viewInverse * rayDirEye));
+
+    glm::vec4 rayStartClip = { mouse.nsx, mouse.nsy, 1, 1 };
+    glm::vec4 rayStartEye = projInverse * rayStartClip;
+    rayStartEye.z = 1.0f; 
+    rayStartEye.w = 1.0f; // This is a position vector
+    glm::vec3 start = glm::vec3(viewInverse * rayStartEye);
+
+    ray.SetStartPoint(start);
+    ray.SetDirection(dir);
+    return ray;
+}
+
 void GraphicsEnvironment::OnWindowSizeChanged(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
 
-void GraphicsEnvironment::OnMouseMove(GLFWwindow* window, double mouseX, double mouseY)
+void GraphicsEnvironment::OnMouseMove(
+    GLFWwindow* window, double mouseX, double mouseY)
 {
     MouseParams& mouse = self->GetMouseParams();
     mouse.x = mouseX;
@@ -332,6 +372,9 @@ void GraphicsEnvironment::OnMouseMove(GLFWwindow* window, double mouseX, double 
 
     mouse.spherical.theta = 90.0f - (xPercent * 180); // left/right
     mouse.spherical.phi = 180.0f - (yPercent * 180); // up/down
+
+    mouse.nsx = xPercent * 2.0f - 1.0f;
+    mouse.nsy = -(yPercent * 2.0f - 1.0f);
 }
 
 void GraphicsEnvironment::ProcessInput(double elapsedSeconds)

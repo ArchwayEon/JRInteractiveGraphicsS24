@@ -23,21 +23,31 @@ const glm::mat4 GraphicsObject::GetReferenceFrame() const
 
 void GraphicsObject::CreateVertexBuffer(unsigned int numberOfElementsPerVertex)
 {
-	buffer = std::make_shared<VertexBuffer>(numberOfElementsPerVertex);
+	vertexBuffer = std::make_shared<VertexBuffer>(numberOfElementsPerVertex);
+}
+
+void GraphicsObject::CreateIndexBuffer()
+{
+	indexBuffer = std::make_shared<IndexBuffer>();
 }
 
 void GraphicsObject::SetVertexBuffer(std::shared_ptr<VertexBuffer> buffer)
 {
-	this->buffer = buffer;
+	this->vertexBuffer = buffer;
 }
 
-void GraphicsObject::StaticAllocateVertexBuffer()
+void GraphicsObject::StaticAllocateBuffers()
 {
-	buffer->Select();
-	buffer->StaticAllocate();
-	buffer->Deselect();
+	vertexBuffer->Select();
+	vertexBuffer->StaticAllocate();
+	vertexBuffer->Deselect();
+	if (indexBuffer != nullptr) {
+		indexBuffer->Select();
+		indexBuffer->StaticAllocate();
+		indexBuffer->Deselect();
+	}
 	for (auto& child : children) {
-		child->StaticAllocateVertexBuffer();
+		child->StaticAllocateBuffers();
 	}
 }
 
