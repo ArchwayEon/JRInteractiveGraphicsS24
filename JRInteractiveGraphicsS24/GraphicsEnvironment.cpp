@@ -226,6 +226,10 @@ void GraphicsEnvironment::Run3D()
     auto mainScene = GetRenderer("LightingRenderer")->GetScene();
     auto& globalLight = mainScene->GetGlobalLight();
     auto& localLight = mainScene->GetLocalLight();
+    float tcIntensity = 
+        objectManager->GetObject("TexturedCube")->GetMaterial().ambientIntensity;
+    float cIntensity =
+        objectManager->GetObject("Crate")->GetMaterial().ambientIntensity;
     while (!glfwWindowShouldClose(window)) {
         elapsedSeconds = timer.GetElapsedTimeInSeconds();
         ProcessInput(elapsedSeconds);
@@ -288,6 +292,24 @@ void GraphicsEnvironment::Run3D()
         }
 
         objectManager->Update(elapsedSeconds);
+
+        auto tcObj = objectManager->GetObject("TexturedCube");
+        if (tcObj->IsIntersectingWithRay(mouseRay)){
+            tcObj->GetMaterial().ambientIntensity = 1.0f;
+        }
+        else {
+            tcObj->GetMaterial().ambientIntensity = tcIntensity;
+        }
+
+        auto cObj = objectManager->GetObject("Crate");
+        if (cObj->IsIntersectingWithRay(mouseRay)) {
+            cObj->GetMaterial().ambientIntensity = 1.0f;
+        }
+        else {
+            cObj->GetMaterial().ambientIntensity = cIntensity;
+        }
+
+
         Render();
 
         ImGui_ImplOpenGL3_NewFrame();

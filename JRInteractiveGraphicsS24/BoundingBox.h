@@ -26,6 +26,11 @@ public:
 		frame = frameIn;
 		invFrame = glm::inverse(frame);
 	}
-	void Create(float width, float height, float);
+	const glm::mat4& GetReferenceFrame() const { return frame; }
+	const glm::vec3& GetIntersectionPoint() const { 
+		return intersectionPoint; 
+	}
+	void Create(float width, float height, float depth);
+	bool IsIntersectingWithRay(const Ray& ray);
 };
 

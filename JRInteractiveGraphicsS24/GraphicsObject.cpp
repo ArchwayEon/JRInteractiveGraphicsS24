@@ -7,6 +7,7 @@ GraphicsObject::GraphicsObject() : referenceFrame(1.0f), parent(nullptr)
 	material.ambientIntensity = 0.01f;
 	material.specularIntensity = 0.01f;
 	material.shininess = 16.0f;
+	CreateBoundingBox(1.0f, 1.0f, 1.0f);
 }
 
 GraphicsObject::~GraphicsObject()
@@ -100,4 +101,17 @@ void GraphicsObject::PointAt(const glm::vec3& target)
 	referenceFrame[0] = glm::vec4(xAxis, 0.0f);
 	referenceFrame[1] = glm::vec4(yAxis, 0.0f);
 	referenceFrame[2] = glm::vec4(zAxis, 0.0f);
+}
+
+void GraphicsObject::CreateBoundingBox(float width, float height, float depth)
+{
+	boundingBox = std::make_shared<BoundingBox>();
+	boundingBox->SetReferenceFrame(referenceFrame);
+	boundingBox->Create(width, height, depth);
+}
+
+bool GraphicsObject::IsIntersectingWithRay(const Ray& ray) const
+{
+	boundingBox->SetReferenceFrame(referenceFrame);
+	return boundingBox->IsIntersectingWithRay(ray);
 }

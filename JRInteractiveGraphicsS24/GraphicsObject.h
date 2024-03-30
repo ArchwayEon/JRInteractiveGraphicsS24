@@ -6,6 +6,7 @@
 #include "BaseObject.h"
 #include "GraphicsStructures.h"
 #include "IndexBuffer.h"
+#include "BoundingBox.h"
 
 class IAnimation;
 
@@ -19,6 +20,7 @@ protected:
 	std::vector<std::shared_ptr<GraphicsObject>> children;
 	std::shared_ptr<IAnimation> animation = nullptr;
 	Material material{};
+	std::shared_ptr<BoundingBox> boundingBox = nullptr;
 
 public:
 	GraphicsObject();
@@ -56,5 +58,9 @@ public:
 
 	Material& GetMaterial() { return material; }
 	void PointAt(const glm::vec3& target);
+
+	void CreateBoundingBox(float width, float height, float depth);
+	const BoundingBox& GetBoundingBox() const { return *boundingBox; }
+	bool IsIntersectingWithRay(const Ray& ray) const;
 };
 

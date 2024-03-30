@@ -183,6 +183,7 @@ static void SetUp3DScene1(
 	buffer->AddVertexAttribute("texCoord", 2, 2, 6);
 	buffer->SetTexture(rgbwTexture);
 	texturedCube->SetVertexBuffer(buffer);
+	texturedCube->CreateBoundingBox(10.0f, 5.0f, 5.0f);
 	scene->AddObject(texturedCube);
 	env.AddObject("TexturedCube", texturedCube);
 
@@ -195,6 +196,7 @@ static void SetUp3DScene1(
 	buffer->AddVertexAttribute("texCoord", 2, 2, 6);
 	buffer->SetTexture(crateTexture);
 	crate->SetVertexBuffer(buffer);
+	crate->CreateBoundingBox(10.0f, 10.0f, 10.0f);
 	crate->SetPosition(glm::vec3(-20.0f, 5.0f, -5.0f));
 	scene->AddObject(crate);
 	env.AddObject("Crate", crate);
@@ -262,6 +264,7 @@ static void SetUp3DScene2(
 	buffer->AddVertexAttribute("texCoord", 3, 2, 10);
 	buffer->SetTexture(rgbwTexture);
 	texturedCube->SetVertexBuffer(buffer);
+	texturedCube->CreateBoundingBox(10.0f, 5.0f, 5.0f);
 	scene->AddObject(texturedCube);
 	env.AddObject("TexturedCube", texturedCube);
 
@@ -275,6 +278,7 @@ static void SetUp3DScene2(
 	buffer->AddVertexAttribute("texCoord", 3, 2, 10);
 	buffer->SetTexture(crateTexture);
 	crate->SetVertexBuffer(buffer);
+	crate->CreateBoundingBox(10.0f, 10.0f, 10.0f);
 	crate->SetPosition(glm::vec3(-20.0f, 5.0f, -5.0f));
 	scene->AddObject(crate);
 	env.AddObject("Crate", crate);
