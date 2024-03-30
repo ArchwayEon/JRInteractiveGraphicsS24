@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /JRInteractiveGraphicsS24/imgui.ini
+/JRInteractiveGraphicsS24/3rdParty/imgui.ini
