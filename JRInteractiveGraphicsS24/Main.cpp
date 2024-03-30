@@ -18,6 +18,7 @@
 #include "TextFile.h"
 #include "GraphicsEnvironment.h"
 #include "Generate.h"
+#include "HighlightBehavior.h"
 
 static void SetUpTexturedScene(
 	std::shared_ptr<Shader>& textureShader, 
@@ -265,6 +266,9 @@ static void SetUp3DScene2(
 	buffer->SetTexture(rgbwTexture);
 	texturedCube->SetVertexBuffer(buffer);
 	texturedCube->CreateBoundingBox(10.0f, 5.0f, 5.0f);
+	auto hb1 = std::make_shared<HighlightBehavior>();
+	hb1->SetObject(texturedCube);
+	texturedCube->AddBehavior("highlight", hb1);
 	scene->AddObject(texturedCube);
 	env.AddObject("TexturedCube", texturedCube);
 
@@ -279,6 +283,9 @@ static void SetUp3DScene2(
 	buffer->SetTexture(crateTexture);
 	crate->SetVertexBuffer(buffer);
 	crate->CreateBoundingBox(10.0f, 10.0f, 10.0f);
+	auto hb2 = std::make_shared<HighlightBehavior>();
+	hb2->SetObject(crate);
+	crate->AddBehavior("highlight", hb2);
 	crate->SetPosition(glm::vec3(-20.0f, 5.0f, -5.0f));
 	scene->AddObject(crate);
 	env.AddObject("Crate", crate);

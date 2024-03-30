@@ -16,5 +16,6 @@ public:
     void AddObject(const std::string& name, std::shared_ptr<GraphicsObject> object);
     std::shared_ptr<GraphicsObject> GetObject(const std::string& name);
     void Update(double elapsedSeconds);
+    void SetBehaviorDefaults();
 };
 

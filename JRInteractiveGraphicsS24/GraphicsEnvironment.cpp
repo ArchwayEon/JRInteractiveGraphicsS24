@@ -226,10 +226,11 @@ void GraphicsEnvironment::Run3D()
     auto mainScene = GetRenderer("LightingRenderer")->GetScene();
     auto& globalLight = mainScene->GetGlobalLight();
     auto& localLight = mainScene->GetLocalLight();
-    float tcIntensity = 
-        objectManager->GetObject("TexturedCube")->GetMaterial().ambientIntensity;
-    float cIntensity =
-        objectManager->GetObject("Crate")->GetMaterial().ambientIntensity;
+    //float tcIntensity = 
+    //    objectManager->GetObject("TexturedCube")->GetMaterial().ambientIntensity;
+    //float cIntensity =
+    //    objectManager->GetObject("Crate")->GetMaterial().ambientIntensity;
+    objectManager->SetBehaviorDefaults();
     while (!glfwWindowShouldClose(window)) {
         elapsedSeconds = timer.GetElapsedTimeInSeconds();
         ProcessInput(elapsedSeconds);
@@ -291,23 +292,28 @@ void GraphicsEnvironment::Run3D()
             cylinder->SetPosition({ point.x, y, point.z });
         }
 
+        HighlightParams hp = { {}, mouseRay };
+        objectManager->GetObject("TexturedCube")
+            ->SetBehaviorParameters("highlight", hp);
+        objectManager->GetObject("Crate")
+            ->SetBehaviorParameters("highlight", hp);
         objectManager->Update(elapsedSeconds);
 
-        auto tcObj = objectManager->GetObject("TexturedCube");
-        if (tcObj->IsIntersectingWithRay(mouseRay)){
-            tcObj->GetMaterial().ambientIntensity = 1.0f;
-        }
-        else {
-            tcObj->GetMaterial().ambientIntensity = tcIntensity;
-        }
+        //auto tcObj = objectManager->GetObject("TexturedCube");
+        //if (tcObj->IsIntersectingWithRay(mouseRay)){
+        //    tcObj->GetMaterial().ambientIntensity = 1.0f;
+        //}
+        //else {
+        //    tcObj->GetMaterial().ambientIntensity = tcIntensity;
+        //}
 
-        auto cObj = objectManager->GetObject("Crate");
-        if (cObj->IsIntersectingWithRay(mouseRay)) {
-            cObj->GetMaterial().ambientIntensity = 1.0f;
-        }
-        else {
-            cObj->GetMaterial().ambientIntensity = cIntensity;
-        }
+        //auto cObj = objectManager->GetObject("Crate");
+        //if (cObj->IsIntersectingWithRay(mouseRay)) {
+        //    cObj->GetMaterial().ambientIntensity = 1.0f;
+        //}
+        //else {
+        //    cObj->GetMaterial().ambientIntensity = cIntensity;
+        //}
 
 
         Render();

@@ -1,19 +1,15 @@
 #pragma once
-#include "BaseObject.h"
 #include <memory>
+#include "IBehavior.h"
 
 class GraphicsObject; // Forward declaration
 
-class IAnimation : public BaseObject
+class IAnimation : public IBehavior
 {
 protected:
-	std::shared_ptr<GraphicsObject> object;
 
 public:
-	IAnimation() : object(nullptr) {}
+	IAnimation() : IBehavior() {}
 	virtual ~IAnimation() = default;
-
-	void SetObject(std::shared_ptr<GraphicsObject> object);
-	virtual void Update(double elapsedSeconds) = 0;
 };
 

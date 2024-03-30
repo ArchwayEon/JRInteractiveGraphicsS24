@@ -18,3 +18,10 @@ void ObjectManager::Update(double elapsedSeconds)
         object->Update(elapsedSeconds);
     }
 }
+
+void ObjectManager::SetBehaviorDefaults()
+{
+    for (auto& [name, object] : objectMap) {
+        object->SetBehaviorDefaults();
+    }
+}

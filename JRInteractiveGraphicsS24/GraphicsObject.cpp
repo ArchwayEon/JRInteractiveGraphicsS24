@@ -84,6 +84,9 @@ void GraphicsObject::Update(double elapsedSeconds)
 	if (animation != nullptr) {
 		animation->Update(elapsedSeconds);
 	}
+	for (auto& [name, behavior] : behaviorMap) {
+		behavior->Update(elapsedSeconds);
+	}
 }
 
 void GraphicsObject::SetAnimation(std::shared_ptr<IAnimation> animation)
@@ -114,4 +117,24 @@ bool GraphicsObject::IsIntersectingWithRay(const Ray& ray) const
 {
 	boundingBox->SetReferenceFrame(referenceFrame);
 	return boundingBox->IsIntersectingWithRay(ray);
+}
+
+void GraphicsObject::AddBehavior(
+	std::string name, std::shared_ptr<IBehavior> behavior)
+{
+	if (behaviorMap.contains(name)) return;
+	behaviorMap[name] = behavior;
+}
+
+void GraphicsObject::SetBehaviorDefaults()
+{
+	for (auto& [name, behavior] : behaviorMap) {
+		behavior->StoreDefaults();
+	}
+}
+
+void GraphicsObject::SetBehaviorParameters(std::string name, IParams params)
+{
+	if (!behaviorMap.contains(name)) return;
+	behaviorMap[name]->SetParameter(params);
 }

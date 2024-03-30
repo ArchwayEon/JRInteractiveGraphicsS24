@@ -7,6 +7,7 @@
 #include "GraphicsStructures.h"
 #include "IndexBuffer.h"
 #include "BoundingBox.h"
+#include "IBehavior.h"
 
 class IAnimation;
 
@@ -19,6 +20,7 @@ protected:
 	GraphicsObject* parent;
 	std::vector<std::shared_ptr<GraphicsObject>> children;
 	std::shared_ptr<IAnimation> animation = nullptr;
+	std::unordered_map<std::string, std::shared_ptr<IBehavior>> behaviorMap;
 	Material material{};
 	std::shared_ptr<BoundingBox> boundingBox = nullptr;
 
@@ -62,5 +64,9 @@ public:
 	void CreateBoundingBox(float width, float height, float depth);
 	const BoundingBox& GetBoundingBox() const { return *boundingBox; }
 	bool IsIntersectingWithRay(const Ray& ray) const;
+
+	void AddBehavior(std::string name, std::shared_ptr<IBehavior> behavior);
+	void SetBehaviorDefaults();
+	void SetBehaviorParameters(std::string name, IParams params);
 };
 
