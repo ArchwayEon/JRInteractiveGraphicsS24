@@ -297,6 +297,8 @@ void GraphicsEnvironment::Run3D()
             SetBehaviorParameters("highlight", hp);
         objectManager->GetObject("Crate")->
             SetBehaviorParameters("highlight", hp);
+        objectManager->GetObject("World")->
+            SetBehaviorParameters("highlight", hp);
 
         objectManager->Update(elapsedSeconds);
 

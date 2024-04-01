@@ -198,5 +198,8 @@
     <Image Include="lightbulb.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="world.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

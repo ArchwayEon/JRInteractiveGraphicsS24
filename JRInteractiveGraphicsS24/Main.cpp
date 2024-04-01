@@ -290,6 +290,24 @@ static void SetUp3DScene2(
 	scene->AddObject(crate);
 	env.AddObject("Crate", crate);
 
+	std::shared_ptr<Texture> worldTexture = std::make_shared<Texture>();
+	worldTexture->LoadTextureDataFromFile("world.jpg");
+	std::shared_ptr<GraphicsObject> world = std::make_shared<GraphicsObject>();
+	buffer = Generate::CuboidWithNormals(3.0f, 3.0f, 3.0f);
+	buffer->AddVertexAttribute("position", 0, 3, 0);
+	buffer->AddVertexAttribute("vertexColor", 1, 4, 3);
+	buffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
+	buffer->AddVertexAttribute("texCoord", 3, 2, 10);
+	buffer->SetTexture(worldTexture);
+	world->SetVertexBuffer(buffer);
+	world->CreateBoundingBox(3.0f, 3.0f, 3.0f);
+	auto hb3 = std::make_shared<HighlightBehavior>();
+	hb3->SetObject(world);
+	world->AddBehavior("highlight", hb3);
+	world->SetPosition(glm::vec3(20.0f, 1.5f, 22.0f));
+	scene->AddObject(world);
+	env.AddObject("World", world);
+
 	std::shared_ptr<Texture> floorTexture = std::make_shared<Texture>();
 	floorTexture->LoadTextureDataFromFile("floor.jpg");
 	std::shared_ptr<GraphicsObject> floor = std::make_shared<GraphicsObject>();
