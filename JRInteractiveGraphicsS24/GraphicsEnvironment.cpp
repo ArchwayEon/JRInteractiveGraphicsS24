@@ -3,6 +3,7 @@
 #include "Timer.h"
 #include "RotateAnimation.h"
 #include "GeometricPlane.h"
+#include "MoveAnimation.h"
 
 GraphicsEnvironment* GraphicsEnvironment::self;
 
@@ -69,6 +70,7 @@ void GraphicsEnvironment::SetupGraphics()
     glViewport(0, 0, 1200, 800);
     glfwSetFramebufferSizeCallback(window, OnWindowSizeChanged);
     glfwSetCursorPosCallback(window, OnMouseMove);
+    glfwSetMouseButtonCallback(window, OnMouseButton);
     glfwMaximizeWindow(window);
 
     IMGUI_CHECKVERSION();
@@ -203,8 +205,6 @@ void GraphicsEnvironment::Run3D()
     glm::vec3 cameraTarget(0.0f, 0.0f, 0.0f);
     //glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
-    glm::mat4 view;
-    glm::mat4 projection;
     glm::mat4 referenceFrame(1.0f);
     glm::vec3 clearColor = { 0.0f, 0.0f, 0.0f };
 
@@ -217,7 +217,12 @@ void GraphicsEnvironment::Run3D()
     rotateAnimation->SetObject(objectManager->GetObject("Crate"));
     objectManager->GetObject("Crate")->SetAnimation(rotateAnimation);
 
-    Ray mouseRay;
+    std::shared_ptr<MoveAnimation> moveAnimation = 
+        std::make_shared<MoveAnimation>();
+    moveAnimation->SetObject(objectManager->GetObject("World"));
+    objectManager->GetObject("World")->SetAnimation(moveAnimation);
+
+    
     GeometricPlane floorPlane;
     float offset;
     double elapsedSeconds;
@@ -321,6 +326,7 @@ void GraphicsEnvironment::Run3D()
         ImGui::SliderFloat("Z Angle", &cubeZAngle, 0, 360);
         ImGui::SliderFloat("Global Intensity", &globalLight.intensity, 0, 1);
         ImGui::SliderFloat("Local Intensity", &localLight.intensity, 0, 1);
+        ImGui::Text("Test String: %s", testStr.c_str());
         ImGui::End();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -389,6 +395,25 @@ void GraphicsEnvironment::OnMouseMove(
 
     mouse.nsx = xPercent * 2.0f - 1.0f;
     mouse.nsy = -(yPercent * 2.0f - 1.0f);
+}
+
+void GraphicsEnvironment::OnMouseButton(
+    GLFWwindow* window, int button, int action, int mods)
+{
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        if (self->GetObject("World")->IsIntersectingWithRay(self->mouseRay)) {
+            auto animation =
+                std::dynamic_pointer_cast<MoveAnimation>(
+                    self->GetObject("World")->GetAnimation());
+            if (animation->GetState() == MoveAnimation::NOT_MOVING) {
+                animation->SetState(MoveAnimation::MOVING);
+            }
+            else {
+                animation->SetState(MoveAnimation::NOT_MOVING);
+            }
+            self->testStr = "World!";
+        }
+    }
 }
 
 void GraphicsEnvironment::ProcessInput(double elapsedSeconds)

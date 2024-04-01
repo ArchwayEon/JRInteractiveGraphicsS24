@@ -151,6 +151,7 @@
     <ClCompile Include="IBehavior.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MoveAnimation.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="IAnimation.h" />
     <ClInclude Include="IBehavior.h" />
     <ClInclude Include="IndexBuffer.h" />
+    <ClInclude Include="MoveAnimation.h" />
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Renderer.h" />

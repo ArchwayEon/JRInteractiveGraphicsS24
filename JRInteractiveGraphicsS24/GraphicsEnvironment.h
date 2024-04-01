@@ -23,6 +23,10 @@ private:
 	static GraphicsEnvironment* self;
 	bool lookWithMouse = true;
 	bool correctGamma = false;
+	glm::mat4 view;
+	glm::mat4 projection;
+	Ray mouseRay;
+	std::string testStr;
 
 public:
 	GraphicsEnvironment();
@@ -44,13 +48,19 @@ public:
 	void Run3D();
 	void SetRendererProjectionAndView(const glm::mat4& projection, const glm::mat4& view);
 	void AddObject(const std::string& name, std::shared_ptr<GraphicsObject> object);
+	std::shared_ptr<GraphicsObject> GetObject(const std::string& name) {
+		return objectManager->GetObject(name);
+	}
 
 	MouseParams& GetMouseParams() { return mouse; }
 
 	Ray GetMouseRay(const glm::mat4& projection, const glm::mat4& view);
+	const Ray& GetMouseRay() const { return mouseRay; }
+
 public:
 	static void OnWindowSizeChanged(GLFWwindow* window, int width, int height);
 	static void OnMouseMove(GLFWwindow* window, double mouseX, double mouseY);
+	static void OnMouseButton(GLFWwindow* window, int button, int action, int mods);
 
 private:
 	void ShutDown();
