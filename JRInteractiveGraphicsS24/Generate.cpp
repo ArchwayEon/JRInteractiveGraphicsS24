@@ -205,3 +205,77 @@ void Generate::LineCylinderIndexes(std::shared_ptr<IndexBuffer>& bufferToFill,
         bufferToFill->AddIndexData(2, index, nextIndex);
     }
 }
+
+void Generate::LineSphere(
+    std::shared_ptr<VertexBuffer>& bufferToFill, 
+    float radius, int slices, int stacks, glm::vec3 color)
+{
+    float sliceStep = 360.0f / slices;
+    float stackStep = 180.0f / stacks;
+    float phi;
+    float rho;
+    float x = 0.0f, y = 0.0f, z = 0.0f;
+    float theta, thetaRad, sinTheta, cosTheta, phiRad, sinPhi, cosPhi;
+
+    // North pole
+    bufferToFill->AddVertexData(6, x, radius, z, color.r, color.g, color.b);
+
+    // Middle circles
+    phi = stackStep;
+    rho = radius;
+    int middleStackCount = stacks - 1;
+    for (int stack = 0; stack < middleStackCount; stack++) {
+        for (theta = 0.0f; theta < 360.0f; theta += sliceStep) {
+            thetaRad = glm::radians(theta);
+            sinTheta = sinf(thetaRad);
+            cosTheta = cosf(thetaRad);
+            phiRad = glm::radians(phi);
+            sinPhi = sinf(phiRad);
+            cosPhi = cosf(phiRad);
+            x = rho * sinTheta * sinPhi;
+            y = rho * cosPhi;
+            z = rho * cosTheta * sinPhi;
+            bufferToFill->AddVertexData(6, x, y, z, color.r, color.g, color.b);
+        }
+        phi += stackStep;
+    }
+
+    // South pole
+    bufferToFill->AddVertexData(6, 0.0f, -radius, 0.0f, color.r, color.g, color.b);
+
+}
+
+void Generate::LineSphereIndexes(
+    std::shared_ptr<IndexBuffer>& bufferToFill, int slices, int stacks, int numberOfVertices)
+{
+    int index, nextIndex, si = 1;
+    int middleStackCount = stacks - 1;
+    for (int stack = 0; stack < middleStackCount; stack++) {
+        for (index = si; index < si + slices; index++) {
+            nextIndex = index + 1;
+            if (nextIndex >= si + slices) nextIndex = si;
+            bufferToFill->AddIndexData(2, index, nextIndex);
+        }
+        si = index;
+    }
+    int lastIndex = numberOfVertices - 1;
+    for (int slice = 0; slice < slices; slice++) {
+        for (int stack = 0; stack < stacks; stack++) {
+            if (stack == 0) {
+                index = 0; // North pole
+                nextIndex = slice + 1;
+            }
+            else {
+                index = si;
+                if (stack == stacks - 1) {
+                    nextIndex = lastIndex; // South pole
+                }
+                else {
+                    nextIndex = index + slices;
+                }
+            }
+            si = nextIndex;
+            bufferToFill->AddIndexData(2, index, nextIndex);
+        }
+    }
+}

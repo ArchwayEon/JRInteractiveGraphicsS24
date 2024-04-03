@@ -7,7 +7,8 @@
 
 GraphicsEnvironment* GraphicsEnvironment::self;
 
-GraphicsEnvironment::GraphicsEnvironment() : window(nullptr)
+GraphicsEnvironment::GraphicsEnvironment() : 
+    window(nullptr), projection(1.0f), view(1.0f)
 {
     objectManager = std::make_shared<ObjectManager>();
     self = this;
