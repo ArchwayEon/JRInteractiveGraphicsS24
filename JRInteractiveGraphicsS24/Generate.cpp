@@ -248,34 +248,24 @@ void Generate::LineSphere(
 void Generate::LineSphereIndexes(
     std::shared_ptr<IndexBuffer>& bufferToFill, int slices, int stacks, int numberOfVertices)
 {
-    int index, nextIndex, si = 1;
-    int middleStackCount = stacks - 1;
-    for (int stack = 0; stack < middleStackCount; stack++) {
-        for (index = si; index < si + slices; index++) {
+    int index, nextIndex, stack, slice;
+    for (stack = 0; stack < stacks - 1; stack++) {
+        for (slice = 0; slice < slices; slice++) {
+            index = (stack * slices + slice) + 1;
             nextIndex = index + 1;
-            if (nextIndex >= si + slices) nextIndex = si;
+            if (slice == slices - 1) nextIndex = stack * slices + 1;
             bufferToFill->AddIndexData(2, index, nextIndex);
         }
-        si = index;
     }
     int lastIndex = numberOfVertices - 1;
-    for (int slice = 0; slice < slices; slice++) {
-        for (int stack = 0; stack < stacks; stack++) {
-            if (stack == 0) {
-                index = 0; // North pole
-                nextIndex = slice + 1;
-            }
-            else {
-                index = si;
-                if (stack == stacks - 1) {
-                    nextIndex = lastIndex; // South pole
-                }
-                else {
-                    nextIndex = index + slices;
-                }
-            }
-            si = nextIndex;
+    for (slice = 0; slice < slices; slice++) {
+        bufferToFill->AddIndexData(2, 0, slice + 1);
+        for (stack = 1; stack < stacks - 1; stack++) {
+            index = (stack - 1) * slices + slice + 1;
+            nextIndex = index + slices;
             bufferToFill->AddIndexData(2, index, nextIndex);
         }
+        index = (stack - 1) * slices + slice + 1;
+        bufferToFill->AddIndexData(2, index, lastIndex);
     }
 }
