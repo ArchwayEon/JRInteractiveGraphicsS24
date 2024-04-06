@@ -8,8 +8,10 @@
 #include "IndexBuffer.h"
 #include "BoundingBox.h"
 #include "IBehavior.h"
+#include "BoundingSphere.h"
 
 class IAnimation;
+class IGenerator;
 
 class GraphicsObject : public BaseObject
 {
@@ -23,6 +25,8 @@ protected:
 	std::unordered_map<std::string, std::shared_ptr<IBehavior>> behaviorMap;
 	Material material{};
 	std::shared_ptr<BoundingBox> boundingBox = nullptr;
+	std::shared_ptr<BoundingSphere> boundingSphere = nullptr;
+	std::shared_ptr<IGenerator> generator = nullptr;
 
 public:
 	GraphicsObject();
@@ -63,6 +67,10 @@ public:
 
 	void CreateBoundingBox(float width, float height, float depth);
 	const BoundingBox& GetBoundingBox() const { return *boundingBox; }
+	void CreateBoundingSphere(float radius);
+	std::shared_ptr<BoundingSphere> GetBoundingSphere() const { 
+		return boundingSphere; 
+	}
 	bool IsIntersectingWithRay(const Ray& ray) const;
 
 	void AddBehavior(std::string name, std::shared_ptr<IBehavior> behavior);
@@ -70,5 +78,14 @@ public:
 	void SetBehaviorParameters(std::string name, IParams& params);
 
 	std::shared_ptr<IAnimation> GetAnimation() { return animation; }
+
+	void SetGenerator(std::shared_ptr<IGenerator> generator) {
+		this->generator = generator;
+	}
+	std::shared_ptr<IGenerator> GetGenerator() {
+		return generator;
+	}
+
+	void Generate();
 };
 

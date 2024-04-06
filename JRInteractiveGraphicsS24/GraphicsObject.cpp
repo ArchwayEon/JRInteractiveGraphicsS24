@@ -1,6 +1,7 @@
 #include "GraphicsObject.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include "IAnimation.h"
+#include "IGenerator.h"
 
 GraphicsObject::GraphicsObject() : referenceFrame(1.0f), parent(nullptr)
 {
@@ -113,6 +114,12 @@ void GraphicsObject::CreateBoundingBox(float width, float height, float depth)
 	boundingBox->Create(width, height, depth);
 }
 
+void GraphicsObject::CreateBoundingSphere(float radius)
+{
+	boundingSphere= std::make_shared<BoundingSphere>(radius);
+	boundingSphere->SetPosition(referenceFrame[3]);
+}
+
 bool GraphicsObject::IsIntersectingWithRay(const Ray& ray) const
 {
 	boundingBox->SetReferenceFrame(referenceFrame);
@@ -137,4 +144,11 @@ void GraphicsObject::SetBehaviorParameters(std::string name, IParams& params)
 {
 	if (!behaviorMap.contains(name)) return;
 	behaviorMap[name]->SetParameter(params);
+}
+
+void GraphicsObject::Generate()
+{
+	if (generator != nullptr) {
+		generator->Generate();
+	}
 }

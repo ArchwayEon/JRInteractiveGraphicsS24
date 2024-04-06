@@ -19,6 +19,7 @@
 #include "GraphicsEnvironment.h"
 #include "Generate.h"
 #include "HighlightBehavior.h"
+#include "PCSphereGenerator.h"
 
 static void SetUpTexturedScene(
 	std::shared_ptr<Shader>& textureShader, 
@@ -412,19 +413,18 @@ static void SetUpPCObjectsScene(
 
 	std::shared_ptr<GraphicsObject> pcLinesSphere =
 		std::make_shared<GraphicsObject>();
-	pcLinesSphere->CreateVertexBuffer(6);
-	pcLinesSphere->CreateIndexBuffer();
-	auto& sphereVertexBuffer = pcLinesSphere->GetVertexBuffer();
-	sphereVertexBuffer->SetPrimitiveType(GL_LINES);
-	Generate::LineSphere(sphereVertexBuffer, 2.0f, 20, 20, { 0.0f, 1.0f, 0.0f });
-	sphereVertexBuffer->AddVertexAttribute("position", 0, 3, 0);
-	sphereVertexBuffer->AddVertexAttribute("color", 1, 3, 3);
-	auto& sphereIndexBuffer = pcLinesSphere->GetIndexBuffer();
-	Generate::LineSphereIndexes(sphereIndexBuffer, 20, 20, sphereVertexBuffer->GetNumberOfVertices());
+	pcLinesSphere->SetGenerator(
+		std::make_shared<PCSphereGenerator>(pcLinesSphere));
+	auto params = std::make_shared<PCSphereParams>();
+	params->radius = 2.0f;
+	params->slices = 20;
+	params->stacks = 20;
+	params->color = { 0.0f, 1.0f, 0.0f };
+	pcLinesSphere->GetGenerator()->SetParameters(params);
+	pcLinesSphere->Generate();
 	pcLinesSphere->SetPosition({ 0.0f, 2.0f, 9.0f });
 	scene->AddObject(pcLinesSphere);
 	env.AddObject("PCLinesSphere", pcLinesSphere);
-
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,

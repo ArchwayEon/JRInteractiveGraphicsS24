@@ -5,7 +5,7 @@
 class HighlightBehavior :  public IBehavior
 {
 protected:
-	HighlightParams params;
+	HighlightParams params{};
 	float ambientIntensity = 0.0;
 public:
 	void StoreDefaults() override;

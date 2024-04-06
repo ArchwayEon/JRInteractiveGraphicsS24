@@ -141,6 +141,7 @@
     <ClCompile Include="..\3rdparty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="BaseObject.cpp" />
     <ClCompile Include="BoundingBox.cpp" />
+    <ClCompile Include="BoundingSphere.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Generate.cpp" />
     <ClCompile Include="GeometricPlane.cpp" />
@@ -149,10 +150,12 @@
     <ClCompile Include="HighlightBehavior.cpp" />
     <ClCompile Include="IAnimation.cpp" />
     <ClCompile Include="IBehavior.cpp" />
+    <ClCompile Include="IGenerator.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MoveAnimation.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
+    <ClCompile Include="PCSphereGenerator.cpp" />
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RotateAnimation.cpp" />
@@ -166,6 +169,7 @@
   <ItemGroup>
     <ClInclude Include="BaseObject.h" />
     <ClInclude Include="BoundingBox.h" />
+    <ClInclude Include="BoundingSphere.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Generate.h" />
     <ClInclude Include="GeometricPlane.h" />
@@ -175,9 +179,11 @@
     <ClInclude Include="HighlightBehavior.h" />
     <ClInclude Include="IAnimation.h" />
     <ClInclude Include="IBehavior.h" />
+    <ClInclude Include="IGenerator.h" />
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="MoveAnimation.h" />
     <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="PCSphereGenerator.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RotateAnimation.h" />
