@@ -120,6 +120,18 @@ void GraphicsObject::CreateBoundingSphere(float radius)
 	boundingSphere->SetPosition(referenceFrame[3]);
 }
 
+bool GraphicsObject::OverlapsWith(const GraphicsObject& otherObject) const
+{
+	if (boundingSphere != nullptr) {
+		if (otherObject.boundingSphere != nullptr) {
+			boundingSphere->SetPosition(GetPosition());
+			otherObject.boundingSphere->SetPosition(otherObject.GetPosition());
+			return boundingSphere->OverlapsWith(*otherObject.boundingSphere);
+		}
+	}
+	return false;
+}
+
 bool GraphicsObject::IsIntersectingWithRay(const Ray& ray) const
 {
 	boundingBox->SetReferenceFrame(referenceFrame);

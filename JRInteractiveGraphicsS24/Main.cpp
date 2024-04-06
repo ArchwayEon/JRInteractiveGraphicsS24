@@ -411,20 +411,37 @@ static void SetUpPCObjectsScene(
 	scene->AddObject(pcLinesCylinder);
 	env.AddObject("PCLinesCylinder", pcLinesCylinder);
 
-	std::shared_ptr<GraphicsObject> pcLinesSphere =
+	std::shared_ptr<GraphicsObject> pcLinesSphere1 =
 		std::make_shared<GraphicsObject>();
-	pcLinesSphere->SetGenerator(
-		std::make_shared<PCSphereGenerator>(pcLinesSphere));
+	pcLinesSphere1->SetGenerator(
+		std::make_shared<PCSphereGenerator>(pcLinesSphere1));
 	auto params = std::make_shared<PCSphereParams>();
 	params->radius = 2.0f;
-	params->slices = 20;
-	params->stacks = 20;
+	params->slices = 10;
+	params->stacks = 10;
 	params->color = { 0.0f, 1.0f, 0.0f };
-	pcLinesSphere->GetGenerator()->SetParameters(params);
-	pcLinesSphere->Generate();
-	pcLinesSphere->SetPosition({ 0.0f, 2.0f, 9.0f });
-	scene->AddObject(pcLinesSphere);
-	env.AddObject("PCLinesSphere", pcLinesSphere);
+	pcLinesSphere1->GetGenerator()->SetParameters(params);
+	pcLinesSphere1->Generate();
+	pcLinesSphere1->SetPosition({ -5.0f, 2.0f, 15.0f });
+	pcLinesSphere1->CreateBoundingSphere(2.0f);
+	scene->AddObject(pcLinesSphere1);
+	env.AddObject("PCLinesSphere1", pcLinesSphere1);
+
+	std::shared_ptr<GraphicsObject> pcLinesSphere2 =
+		std::make_shared<GraphicsObject>();
+	pcLinesSphere2->SetGenerator(
+		std::make_shared<PCSphereGenerator>(pcLinesSphere2));
+	params = std::make_shared<PCSphereParams>();
+	params->radius = 2.0f;
+	params->slices = 10;
+	params->stacks = 10;
+	params->color = { 0.0f, 1.0f, 0.0f };
+	pcLinesSphere2->GetGenerator()->SetParameters(params);
+	pcLinesSphere2->Generate();
+	pcLinesSphere2->SetPosition({ 5.0f, 2.0f, 15.0f });
+	pcLinesSphere2->CreateBoundingSphere(2.0f);
+	scene->AddObject(pcLinesSphere2);
+	env.AddObject("PCLinesSphere2", pcLinesSphere2);
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,

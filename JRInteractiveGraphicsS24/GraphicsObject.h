@@ -55,7 +55,7 @@ public:
 	}
 
 	void SetPosition(const glm::vec3& position);
-	const glm::vec3 GetPosition() { return glm::vec3(referenceFrame[3]); }
+	const glm::vec3 GetPosition() const { return glm::vec3(referenceFrame[3]); }
 	void ResetOrientation();
 	void RotateLocalZ(float degrees);
 
@@ -71,6 +71,7 @@ public:
 	std::shared_ptr<BoundingSphere> GetBoundingSphere() const { 
 		return boundingSphere; 
 	}
+	bool OverlapsWith(const GraphicsObject& otherObject) const;
 	bool IsIntersectingWithRay(const Ray& ray) const;
 
 	void AddBehavior(std::string name, std::shared_ptr<IBehavior> behavior);

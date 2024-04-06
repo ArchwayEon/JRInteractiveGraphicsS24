@@ -201,7 +201,7 @@ void GraphicsEnvironment::Run3D()
     float farPlane = 100.0f;
     float fieldOfView = 60;
 
-    camera.SetPosition(glm::vec3(0.0f, 5.0f, 20.0f));
+    camera.SetPosition(glm::vec3(0.0f, 5.0f, 30.0f));
     //glm::vec3 cameraPosition(15.0f, 15.0f, 20.0f);
     glm::vec3 cameraTarget(0.0f, 0.0f, 0.0f);
     //glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
@@ -232,11 +232,10 @@ void GraphicsEnvironment::Run3D()
     auto mainScene = GetRenderer("LightingRenderer")->GetScene();
     auto& globalLight = mainScene->GetGlobalLight();
     auto& localLight = mainScene->GetLocalLight();
-    //float tcIntensity = 
-    //    objectManager->GetObject("TexturedCube")->GetMaterial().ambientIntensity;
-    //float cIntensity =
-    //    objectManager->GetObject("Crate")->GetMaterial().ambientIntensity;
     objectManager->SetBehaviorDefaults();
+    lookWithMouse = false;
+    bool isOverlapping = false;
+    glm::vec3 pos = objectManager->GetObject("PCLinesSphere1")->GetPosition();
     while (!glfwWindowShouldClose(window)) {
         elapsedSeconds = timer.GetElapsedTimeInSeconds();
         ProcessInput(elapsedSeconds);
@@ -298,6 +297,10 @@ void GraphicsEnvironment::Run3D()
             cylinder->SetPosition({ point.x, y, point.z });
         }
 
+        objectManager->GetObject("PCLinesSphere1")->SetPosition(pos);
+        isOverlapping = objectManager->GetObject("PCLinesSphere1")->
+            OverlapsWith(*objectManager->GetObject("PCLinesSphere2"));
+
         HighlightParams hp = { {}, &mouseRay };
         objectManager->GetObject("TexturedCube")->
             SetBehaviorParameters("highlight", hp);
@@ -327,7 +330,8 @@ void GraphicsEnvironment::Run3D()
         ImGui::SliderFloat("Z Angle", &cubeZAngle, 0, 360);
         ImGui::SliderFloat("Global Intensity", &globalLight.intensity, 0, 1);
         ImGui::SliderFloat("Local Intensity", &localLight.intensity, 0, 1);
-        ImGui::Text("Test String: %s", testStr.c_str());
+        ImGui::SliderFloat("X Position", &pos.x, -5.0f, 5.0f);
+        ImGui::Text("Is overlapping: %s", isOverlapping?"YES":"NO");
         ImGui::End();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
