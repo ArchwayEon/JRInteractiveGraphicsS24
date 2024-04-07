@@ -50,9 +50,11 @@ public:
 
 	static void LineSphere(
 		std::shared_ptr<VertexBuffer>& bufferToFill,
-		float radius, int slices, int stacks, glm::vec3 color = { 1.0f, 1.0f, 1.0f });
+		float radius, int slices, int stacks, 
+		glm::vec3 color = { 1.0f, 1.0f, 1.0f });
 
 	static void LineSphereIndexes(
-		std::shared_ptr<IndexBuffer>& bufferToFill, int slices, int stacks, int numberOfVertices);
+		std::shared_ptr<IndexBuffer>& bufferToFill, int slices, int stacks, 
+		std::size_t numberOfVertices);
 };
 

@@ -38,18 +38,18 @@ void GraphicsObject::SetVertexBuffer(std::shared_ptr<VertexBuffer> buffer)
 	this->vertexBuffer = buffer;
 }
 
-void GraphicsObject::StaticAllocateBuffers()
+void GraphicsObject::AllocateBuffers()
 {
 	vertexBuffer->Select();
-	vertexBuffer->StaticAllocate();
+	vertexBuffer->Allocate();
 	vertexBuffer->Deselect();
 	if (indexBuffer != nullptr) {
 		indexBuffer->Select();
-		indexBuffer->StaticAllocate();
+		indexBuffer->Allocate();
 		indexBuffer->Deselect();
 	}
 	for (auto& child : children) {
-		child->StaticAllocateBuffers();
+		child->AllocateBuffers();
 	}
 }
 
@@ -152,15 +152,28 @@ void GraphicsObject::SetBehaviorDefaults()
 	}
 }
 
-void GraphicsObject::SetBehaviorParameters(std::string name, IParams& params)
+void GraphicsObject::SetBehaviorParameters(
+	std::string name, std::shared_ptr<IParams> params)
 {
 	if (!behaviorMap.contains(name)) return;
 	behaviorMap[name]->SetParameter(params);
 }
 
-void GraphicsObject::Generate()
+void GraphicsObject::Generate(bool isDynamic)
 {
 	if (generator != nullptr) {
 		generator->Generate();
+		if (isDynamic) {
+			generator->SetUpDynamicBuffers();
+		}
 	}
+}
+
+void GraphicsObject::SetUpDynamicBuffers(
+	unsigned int maxNumberOfVertices, unsigned int maxNumberOfIndices)
+{
+	vertexBuffer->SetIsDynamic(true);
+	vertexBuffer->SetMaxNumberOfVertices(maxNumberOfVertices);
+	indexBuffer->SetIsDynamic(true);
+	indexBuffer->SetMaxNumberOfIndices(maxNumberOfIndices);
 }

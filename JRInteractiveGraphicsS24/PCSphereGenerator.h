@@ -14,5 +14,7 @@ public:
 
     inline void SetParameters(std::shared_ptr<IParams> params);
     void Generate();
+
+    void SetUpDynamicBuffers();
 };
 

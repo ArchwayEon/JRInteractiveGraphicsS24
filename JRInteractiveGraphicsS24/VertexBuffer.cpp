@@ -5,7 +5,7 @@
 VertexBuffer::VertexBuffer(unsigned int numElementsPerVertex)
 {
 	numberOfElementsPerVertex = numElementsPerVertex;
-	numberOfVertices = 0;
+	//numberOfVertices = 0;
 	primitiveType = GL_TRIANGLES;
 	glGenBuffers(1, &vboId);
 	textureUnit = 0;
@@ -30,15 +30,26 @@ void VertexBuffer::AddVertexData(unsigned int count, ...)
 		vertexData.push_back(static_cast<float>(va_arg(args, double)));
 		count--;
 	}
-	numberOfVertices++;
+	//numberOfVertices++;
 	va_end(args);
 }
 
-void VertexBuffer::StaticAllocate()
+void VertexBuffer::Allocate()
 {
-	unsigned long long bytesToAllocate = vertexData.size() * sizeof(float);
-	glBufferData(
-		GL_ARRAY_BUFFER, bytesToAllocate, vertexData.data(), GL_STATIC_DRAW);
+	unsigned long long bytesToAllocate;
+	if (isDynamic == false) {
+		bytesToAllocate = vertexData.size() * sizeof(float);
+		glBufferData(
+			GL_ARRAY_BUFFER, bytesToAllocate, vertexData.data(), GL_STATIC_DRAW);
+	}
+	else {
+		unsigned long long numberOfElements =
+			unsigned long long(maxNumberOfVertices) * numberOfElementsPerVertex;
+		bytesToAllocate = numberOfElements * sizeof(float);
+		glBufferData(
+			GL_ARRAY_BUFFER, bytesToAllocate, nullptr, GL_DYNAMIC_DRAW);
+	}
+	
 	if (texture != nullptr) {
 		texture->Allocate();
 	}
@@ -75,4 +86,10 @@ void VertexBuffer::SelectTexture() const
 	if (texture != nullptr) {
 		texture->SelectToRender(textureUnit);
 	}
+}
+
+void VertexBuffer::SendData()
+{
+	unsigned long long sizeInBytes = vertexData.size() * sizeof(float);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeInBytes, vertexData.data());
 }

@@ -35,6 +35,7 @@ struct MouseParams {
 };
 
 struct Material {
+    glm::vec3 color = { 1.0f, 1.0f, 1.0f };
     float ambientIntensity;  // 0 to 1
     float specularIntensity; // 0 to 1
     float shininess;         // 0 to infinity
@@ -53,8 +54,12 @@ struct HighlightParams : IParams {
     Ray* ray;
 };
 
+struct ChangeColorParams : IParams {
+    glm::vec3 color = { 1.0f, 1.0f, 1.0f };
+};
+
 struct PCSphereParams : IParams {
     float radius = 1.0f;
     int slices = 10, stacks = 10;
-    glm::vec3 color = { 1.0f, 1.0f, 1.0f };
+    //glm::vec3 color = { 1.0f, 1.0f, 1.0f };
 };

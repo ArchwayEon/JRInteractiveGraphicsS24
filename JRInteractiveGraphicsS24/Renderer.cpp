@@ -9,12 +9,12 @@ Renderer::Renderer(std::shared_ptr<Shader> shader)
     glGenVertexArrays(1, &vaoId);
 }
 
-void Renderer::StaticAllocateVertexBuffers()
+void Renderer::AllocateBuffers()
 {
 	glBindVertexArray(vaoId);
 	auto& objects = scene->GetObjects();
 	for (auto& object : objects) {
-		object->StaticAllocateBuffers();
+		object->AllocateBuffers();
 	}
 	glBindVertexArray(0);
 }
@@ -53,22 +53,28 @@ void Renderer::RenderObject(GraphicsObject& object)
 	shader->SendFloatUniform("materialAmbientIntensity", m.ambientIntensity);
 	shader->SendFloatUniform("materialSpecularIntensity", m.specularIntensity);
 	shader->SendFloatUniform("materialShininess", m.shininess);
-	auto& buffer = object.GetVertexBuffer();
-	buffer->Select();
-	if (buffer->HasTexture()) {
-		shader->SendIntUniform("tex", buffer->GetTextureUnit());
-		buffer->GetTexture()->SelectToRender();
+	auto& vertexBuffer = object.GetVertexBuffer();
+	vertexBuffer->Select();
+	if (vertexBuffer->HasTexture()) {
+		shader->SendIntUniform("tex", vertexBuffer->GetTextureUnit());
+		vertexBuffer->GetTexture()->SelectToRender();
 	}
-	buffer->SetUpAttributeInterpretration();
+	vertexBuffer->SetUpAttributeInterpretration();
+	if (vertexBuffer->IsDynamic()) {
+		vertexBuffer->SendData();
+	}
 	if (object.IsIndexed()) {
 		auto& indexBuffer = object.GetIndexBuffer();
 		indexBuffer->Select();
-		int numberOfIndexes = (int)indexBuffer->GetNumberOfIndexes();
-		glDrawElements(buffer->GetPrimitiveType(), numberOfIndexes, 
+		if (indexBuffer->IsDynamic()) {
+			indexBuffer->SendData();
+		}
+		int numberOfIndexes = (int)indexBuffer->GetNumberOfIndices();
+		glDrawElements(vertexBuffer->GetPrimitiveType(), numberOfIndexes, 
 			GL_UNSIGNED_SHORT, (void*)0);
 	}
 	else {
-		glDrawArrays(buffer->GetPrimitiveType(), 0, buffer->GetNumberOfVertices());
+		glDrawArrays(vertexBuffer->GetPrimitiveType(), 0, vertexBuffer->GetNumberOfVertices());
 	}
 
 	// Recursively render the children

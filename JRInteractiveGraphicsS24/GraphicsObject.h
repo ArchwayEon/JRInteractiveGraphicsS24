@@ -27,6 +27,7 @@ protected:
 	std::shared_ptr<BoundingBox> boundingBox = nullptr;
 	std::shared_ptr<BoundingSphere> boundingSphere = nullptr;
 	std::shared_ptr<IGenerator> generator = nullptr;
+	bool isOverlapping = false;
 
 public:
 	GraphicsObject();
@@ -47,7 +48,7 @@ public:
 		return indexBuffer;
 	}
 	bool IsIndexed() const { return indexBuffer != nullptr; }
-	void StaticAllocateBuffers();
+	void AllocateBuffers();
 
 	void AddChild(std::shared_ptr<GraphicsObject> child);
 	inline const std::vector<std::shared_ptr<GraphicsObject>>& GetChildren() const {
@@ -76,7 +77,8 @@ public:
 
 	void AddBehavior(std::string name, std::shared_ptr<IBehavior> behavior);
 	void SetBehaviorDefaults();
-	void SetBehaviorParameters(std::string name, IParams& params);
+	void SetBehaviorParameters(
+		std::string name, std::shared_ptr<IParams> params);
 
 	std::shared_ptr<IAnimation> GetAnimation() { return animation; }
 
@@ -87,6 +89,14 @@ public:
 		return generator;
 	}
 
-	void Generate();
+	void Generate(bool isDynamic = false);
+
+	void SetUpDynamicBuffers(
+		unsigned int maxNumberOfVertices, unsigned int maxNumberOfIndices);
+
+	void SetIsOverlapping(bool isOverlapping) { 
+		this->isOverlapping = isOverlapping; 
+	}
+	bool IsOverlapping() const { return isOverlapping; }
 };
 

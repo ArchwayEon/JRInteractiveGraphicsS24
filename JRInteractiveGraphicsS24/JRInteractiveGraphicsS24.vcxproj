@@ -143,6 +143,7 @@
     <ClCompile Include="BoundingBox.cpp" />
     <ClCompile Include="BoundingSphere.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ChangeColorBehavior.cpp" />
     <ClCompile Include="Generate.cpp" />
     <ClCompile Include="GeometricPlane.cpp" />
     <ClCompile Include="GraphicsEnvironment.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="BoundingSphere.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="ChangeColorBehavior.h" />
     <ClInclude Include="Generate.h" />
     <ClInclude Include="GeometricPlane.h" />
     <ClInclude Include="GraphicsEnvironment.h" />

@@ -42,7 +42,7 @@ public:
 	}
 	void CreateRenderer(const std::string& name, std::shared_ptr<Shader> shader);
 	std::shared_ptr<Renderer> GetRenderer(const std::string& name);
-	void StaticAllocate();
+	void Allocate();
 	void Render();
 	void Run2D();
 	void Run3D();
@@ -61,6 +61,7 @@ public:
 	static void OnWindowSizeChanged(GLFWwindow* window, int width, int height);
 	static void OnMouseMove(GLFWwindow* window, double mouseX, double mouseY);
 	static void OnMouseButton(GLFWwindow* window, int button, int action, int mods);
+	static void OnKey(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 private:
 	void ShutDown();

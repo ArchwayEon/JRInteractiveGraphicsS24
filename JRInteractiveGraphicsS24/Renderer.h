@@ -18,7 +18,7 @@ private:
 
 public:
     Renderer(std::shared_ptr<Shader> shader);
-    void StaticAllocateVertexBuffers();
+    void AllocateBuffers();
     inline const std::shared_ptr<Shader>& GetShader() const { return shader; }
     inline void SetScene(std::shared_ptr<Scene> scene) { this->scene = scene; }
     std::shared_ptr<Scene> GetScene() { return scene;  }

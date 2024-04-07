@@ -19,13 +19,15 @@ class VertexBuffer
 {
 protected:
 	unsigned int numberOfElementsPerVertex;
-	unsigned int numberOfVertices;
+	//unsigned int numberOfVertices;
+	unsigned int maxNumberOfVertices = 0;
 	unsigned int vboId;
 	int primitiveType;
 	std::vector<float> vertexData;
 	std::unordered_map<std::string, VertexAttribute> attributeMap;
 	int textureUnit;
 	std::shared_ptr<Texture> texture;
+	bool isDynamic = false;
 
 public:
 	VertexBuffer(unsigned int numElementsPerVertex = 3);
@@ -33,13 +35,15 @@ public:
 
 	inline void Select() { glBindBuffer(GL_ARRAY_BUFFER, vboId); }
 	inline void Deselect() { glBindBuffer(GL_ARRAY_BUFFER, 0); }
-	inline unsigned int GetNumberOfVertices() const { return numberOfVertices; }
+	inline std::size_t GetNumberOfVertices() const { 
+		return vertexData.size() / numberOfElementsPerVertex;
+	}
 	inline int GetPrimitiveType() const { return primitiveType; }
 	inline void SetPrimitiveType(int primitiveType) { this->primitiveType = primitiveType; }
 
 	// Variadic function
 	void AddVertexData(unsigned int count, ...);
-	void StaticAllocate();
+	void Allocate();
 	void AddVertexAttribute(
 		const std::string& name, unsigned int index, 
 		unsigned int numberOfElements, unsigned int offsetCount=0);
@@ -53,5 +57,19 @@ public:
 	std::shared_ptr<Texture> GetTexture() const { return texture; }
 	bool HasTexture() const { return texture != nullptr; }
 	void SelectTexture() const;
+
+	void SetIsDynamic(bool isDynamic) { this->isDynamic = isDynamic; }
+	bool IsDynamic() const { return isDynamic; }
+	void SetMaxNumberOfVertices(unsigned int maxNumberOfVertices) {
+		this->maxNumberOfVertices = maxNumberOfVertices;
+	}
+	unsigned int GetMaxNumberOfVertices() const {
+		return maxNumberOfVertices;
+	}
+
+	void SendData();
+	void Clear() { 
+		vertexData.clear(); 
+	}
 };
 

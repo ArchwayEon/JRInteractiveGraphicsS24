@@ -72,6 +72,7 @@ void GraphicsEnvironment::SetupGraphics()
     glfwSetFramebufferSizeCallback(window, OnWindowSizeChanged);
     glfwSetCursorPosCallback(window, OnMouseMove);
     glfwSetMouseButtonCallback(window, OnMouseButton);
+    glfwSetKeyCallback(window, OnKey);
     glfwMaximizeWindow(window);
 
     IMGUI_CHECKVERSION();
@@ -93,10 +94,10 @@ std::shared_ptr<Renderer> GraphicsEnvironment::GetRenderer(const std::string& na
     return rendererMap[name];
 }
 
-void GraphicsEnvironment::StaticAllocate()
+void GraphicsEnvironment::Allocate()
 {
     for (const auto& [key, renderer] : rendererMap) {
-        renderer->StaticAllocateVertexBuffers();
+        renderer->AllocateBuffers();
     }
 }
 
@@ -300,8 +301,12 @@ void GraphicsEnvironment::Run3D()
         objectManager->GetObject("PCLinesSphere1")->SetPosition(pos);
         isOverlapping = objectManager->GetObject("PCLinesSphere1")->
             OverlapsWith(*objectManager->GetObject("PCLinesSphere2"));
+        GetObject("PCLinesSphere1")->SetIsOverlapping(isOverlapping);
+        GetObject("PCLinesSphere2")->SetIsOverlapping(isOverlapping);
 
-        HighlightParams hp = { {}, &mouseRay };
+        std::shared_ptr<HighlightParams> hp =
+            std::make_shared< HighlightParams>();
+        hp->ray = &mouseRay;
         objectManager->GetObject("TexturedCube")->
             SetBehaviorParameters("highlight", hp);
         objectManager->GetObject("Crate")->
@@ -419,6 +424,16 @@ void GraphicsEnvironment::OnMouseButton(
             self->testStr = "World!";
         }
     }
+
+}
+
+void GraphicsEnvironment::OnKey(
+    GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_F2 && action == GLFW_PRESS) {
+        self->lookWithMouse = !self->lookWithMouse;
+        return;
+    }
 }
 
 void GraphicsEnvironment::ProcessInput(double elapsedSeconds)
@@ -451,10 +466,7 @@ void GraphicsEnvironment::ProcessInput(double elapsedSeconds)
         camera.MoveDown(elapsedSeconds);
         return;
     }
-    if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) {
-        lookWithMouse = !lookWithMouse;
-        return;
-    }
+
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
         glm::mat4 lookFrame(1.0f);
         camera.SetPosition({0.0f, 5.0f, 30.0f});

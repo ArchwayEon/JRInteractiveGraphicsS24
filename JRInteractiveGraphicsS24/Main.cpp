@@ -20,6 +20,7 @@
 #include "Generate.h"
 #include "HighlightBehavior.h"
 #include "PCSphereGenerator.h"
+#include "ChangeColorBehavior.h"
 
 static void SetUpTexturedScene(
 	std::shared_ptr<Shader>& textureShader, 
@@ -419,11 +420,14 @@ static void SetUpPCObjectsScene(
 	params->radius = 2.0f;
 	params->slices = 10;
 	params->stacks = 10;
-	params->color = { 0.0f, 1.0f, 0.0f };
+	pcLinesSphere1->GetMaterial().color = { 0.0f, 1.0f, 0.0f };
 	pcLinesSphere1->GetGenerator()->SetParameters(params);
-	pcLinesSphere1->Generate();
+	pcLinesSphere1->Generate(true);
 	pcLinesSphere1->SetPosition({ -5.0f, 2.0f, 15.0f });
 	pcLinesSphere1->CreateBoundingSphere(2.0f);
+	auto ccb = std::make_shared<ChangeColorBehavior>();
+	ccb->SetObject(pcLinesSphere1);
+	pcLinesSphere1->AddBehavior("changecolor", ccb);
 	scene->AddObject(pcLinesSphere1);
 	env.AddObject("PCLinesSphere1", pcLinesSphere1);
 
@@ -435,11 +439,14 @@ static void SetUpPCObjectsScene(
 	params->radius = 2.0f;
 	params->slices = 10;
 	params->stacks = 10;
-	params->color = { 0.0f, 1.0f, 0.0f };
+	pcLinesSphere2->GetMaterial().color = { 0.0f, 1.0f, 0.0f };
 	pcLinesSphere2->GetGenerator()->SetParameters(params);
-	pcLinesSphere2->Generate();
+	pcLinesSphere2->Generate(true);
 	pcLinesSphere2->SetPosition({ 5.0f, 2.0f, 15.0f });
 	pcLinesSphere2->CreateBoundingSphere(2.0f);
+	ccb = std::make_shared<ChangeColorBehavior>(glm::vec3(0.0f, 0.0f, 1.0f));
+	ccb->SetObject(pcLinesSphere2);
+	pcLinesSphere2->AddBehavior("changecolor", ccb);
 	scene->AddObject(pcLinesSphere2);
 	env.AddObject("PCLinesSphere2", pcLinesSphere2);
 }
@@ -482,7 +489,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	glfw.CreateRenderer("PCRenderer", pcShader);
 	glfw.GetRenderer("PCRenderer")->SetScene(pcScene);
 
-	glfw.StaticAllocate();
+	glfw.Allocate();
 
 	glfw.Run3D();
 	return 0;

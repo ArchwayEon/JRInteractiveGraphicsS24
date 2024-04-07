@@ -19,5 +19,6 @@ public:
 
 	virtual void SetParameters(std::shared_ptr<IParams> params) = 0;
 	virtual void Generate() = 0;
+	virtual void SetUpDynamicBuffers() = 0;
 };
 

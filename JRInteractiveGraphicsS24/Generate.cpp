@@ -246,7 +246,8 @@ void Generate::LineSphere(
 }
 
 void Generate::LineSphereIndexes(
-    std::shared_ptr<IndexBuffer>& bufferToFill, int slices, int stacks, int numberOfVertices)
+    std::shared_ptr<IndexBuffer>& bufferToFill, int slices, int stacks, 
+    std::size_t numberOfVertices)
 {
     int index, nextIndex, stack, slice;
     for (stack = 0; stack < stacks - 1; stack++) {
@@ -257,7 +258,7 @@ void Generate::LineSphereIndexes(
             bufferToFill->AddIndexData(2, index, nextIndex);
         }
     }
-    int lastIndex = numberOfVertices - 1;
+    int lastIndex = (int)numberOfVertices - 1;
     for (slice = 0; slice < slices; slice++) {
         bufferToFill->AddIndexData(2, 0, slice + 1);
         for (stack = 1; stack < stacks - 1; stack++) {

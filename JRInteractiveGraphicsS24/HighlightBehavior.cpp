@@ -7,16 +7,15 @@ void HighlightBehavior::StoreDefaults()
 	ambientIntensity = this->object->GetMaterial().ambientIntensity;
 }
 
-void HighlightBehavior::SetParameter(IParams& params)
+void HighlightBehavior::SetParameter(std::shared_ptr<IParams> params)
 {
-	auto& p = reinterpret_cast<HighlightParams&>(params);
-	this->params = p;
+	this->params = std::static_pointer_cast<HighlightParams>(params);
 }
 
 void HighlightBehavior::Update(double elapsedSeconds)
 {
 	if (object == nullptr) return;
-	if (object->IsIntersectingWithRay(*params.ray)) {
+	if (object->IsIntersectingWithRay(*params->ray)) {
 		object->GetMaterial().ambientIntensity = 1.0f;
 	}
 	else {

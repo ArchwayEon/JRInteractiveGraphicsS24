@@ -17,13 +17,25 @@ inline void PCSphereGenerator::SetParameters(std::shared_ptr<IParams> params)
 
 void PCSphereGenerator::Generate()
 {
+	auto color = graphicsObject->GetMaterial().color;
 	auto& vertexBuffer = graphicsObject->GetVertexBuffer();
+	vertexBuffer->Clear();
 	Generate::LineSphere(vertexBuffer, 
-		params->radius, params->slices, params->stacks, params->color);
+		params->radius, params->slices, params->stacks, color);
 	vertexBuffer->SetPrimitiveType(GL_LINES);
 	vertexBuffer->AddVertexAttribute("position", 0, 3, 0);
 	vertexBuffer->AddVertexAttribute("color", 1, 3, 3);
 	auto& indexBuffer = graphicsObject->GetIndexBuffer();
+	indexBuffer->Clear();
 	Generate::LineSphereIndexes(indexBuffer, params->slices, params->stacks,
 		vertexBuffer->GetNumberOfVertices());
+}
+
+void PCSphereGenerator::SetUpDynamicBuffers()
+{
+	auto& vertexBuffer = graphicsObject->GetVertexBuffer();
+	auto& indexBuffer = graphicsObject->GetIndexBuffer();
+	graphicsObject->SetUpDynamicBuffers(
+		vertexBuffer->GetNumberOfVertices(),
+		indexBuffer->GetNumberOfIndices());
 }
