@@ -422,7 +422,7 @@ static void SetUpPCObjectsScene(
 	params->stacks = 10;
 	pcLinesSphere1->GetMaterial().color = { 0.0f, 1.0f, 0.0f };
 	pcLinesSphere1->GetGenerator()->SetParameters(params);
-	pcLinesSphere1->Generate(true);
+	pcLinesSphere1->Generate(UseDynamicBuffers);
 	pcLinesSphere1->SetPosition({ -5.0f, 2.0f, 15.0f });
 	pcLinesSphere1->CreateBoundingSphere(2.0f);
 	auto ccb = std::make_shared<ChangeColorBehavior>();
@@ -441,7 +441,7 @@ static void SetUpPCObjectsScene(
 	params->stacks = 10;
 	pcLinesSphere2->GetMaterial().color = { 0.0f, 1.0f, 0.0f };
 	pcLinesSphere2->GetGenerator()->SetParameters(params);
-	pcLinesSphere2->Generate(true);
+	pcLinesSphere2->Generate(UseDynamicBuffers);
 	pcLinesSphere2->SetPosition({ 5.0f, 2.0f, 15.0f });
 	pcLinesSphere2->CreateBoundingSphere(2.0f);
 	ccb = std::make_shared<ChangeColorBehavior>(glm::vec3(0.0f, 0.0f, 1.0f));

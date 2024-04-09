@@ -89,7 +89,7 @@ public:
 		return generator;
 	}
 
-	void Generate(bool isDynamic = false);
+	void Generate(DynamicBufferFlag flag = NoDynamicBuffer);
 
 	void SetUpDynamicBuffers(
 		unsigned int maxNumberOfVertices, unsigned int maxNumberOfIndices);

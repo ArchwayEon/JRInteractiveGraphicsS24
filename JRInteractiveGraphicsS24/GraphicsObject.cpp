@@ -159,11 +159,11 @@ void GraphicsObject::SetBehaviorParameters(
 	behaviorMap[name]->SetParameter(params);
 }
 
-void GraphicsObject::Generate(bool isDynamic)
+void GraphicsObject::Generate(DynamicBufferFlag flag)
 {
 	if (generator != nullptr) {
 		generator->Generate();
-		if (isDynamic) {
+		if (flag == UseDynamicBuffers) {
 			generator->SetUpDynamicBuffers();
 		}
 	}

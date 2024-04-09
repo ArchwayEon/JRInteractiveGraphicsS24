@@ -63,3 +63,8 @@ struct PCSphereParams : IParams {
     int slices = 10, stacks = 10;
     //glm::vec3 color = { 1.0f, 1.0f, 1.0f };
 };
+
+enum DynamicBufferFlag {
+    NoDynamicBuffer,
+    UseDynamicBuffers
+};
