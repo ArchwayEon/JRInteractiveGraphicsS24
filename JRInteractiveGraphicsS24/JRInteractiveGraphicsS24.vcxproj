@@ -156,6 +156,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MoveAnimation.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
+    <ClCompile Include="PCCuboidGenerator.cpp" />
     <ClCompile Include="PCSphereGenerator.cpp" />
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="MoveAnimation.h" />
     <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="PCCuboidGenerator.h" />
     <ClInclude Include="PCSphereGenerator.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Renderer.h" />

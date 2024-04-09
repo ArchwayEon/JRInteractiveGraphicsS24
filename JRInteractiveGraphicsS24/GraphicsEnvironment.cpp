@@ -295,7 +295,7 @@ void GraphicsEnvironment::Run3D()
             glm::vec3 point = mouseRay.GetPoint(offset);
             auto cylinder = objectManager->GetObject("PCLinesCylinder");
             float y = cylinder->GetPosition().y;
-            cylinder->SetPosition({ point.x, y, point.z });
+            //cylinder->SetPosition({ point.x, y, point.z });
         }
 
         objectManager->GetObject("PCLinesSphere1")->SetPosition(pos);

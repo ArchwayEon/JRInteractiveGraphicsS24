@@ -1,5 +1,31 @@
 #include "Generate.h"
 
+void Generate::LineCuboid(
+    std::shared_ptr<VertexBuffer>& bufferToFill,
+    float width, float height, float depth, glm::vec3 color)
+{
+    float hw = width / 2;
+    float hh = height / 2;
+    float hd = depth / 2;
+
+    bufferToFill->AddVertexData(6, -hw,  hh, hd, color.r, color.g, color.b); // 0
+    bufferToFill->AddVertexData(6, -hw, -hh, hd, color.r, color.g, color.b); // 1
+    bufferToFill->AddVertexData(6,  hw, -hh, hd, color.r, color.g, color.b); // 2
+    bufferToFill->AddVertexData(6,  hw,  hh, hd, color.r, color.g, color.b); // 3
+
+    bufferToFill->AddVertexData(6,  hw,  hh, -hd, color.r, color.g, color.b); // 4
+    bufferToFill->AddVertexData(6,  hw, -hh, -hd, color.r, color.g, color.b); // 5
+    bufferToFill->AddVertexData(6, -hw, -hh, -hd, color.r, color.g, color.b); // 6
+    bufferToFill->AddVertexData(6, -hw,  hh, -hd, color.r, color.g, color.b); // 7
+}
+
+void Generate::LineCuboidIndices(std::shared_ptr<IndexBuffer>& bufferToFill)
+{
+    bufferToFill->AddIndexData(8, 0, 1, 1, 2, 2, 3, 3, 0);
+    bufferToFill->AddIndexData(8, 4, 5, 5, 6, 6, 7, 7, 4);
+    bufferToFill->AddIndexData(8, 3, 4, 2, 5, 0, 7, 1, 6);
+}
+
 std::shared_ptr<VertexBuffer> Generate::Cuboid(
     float width, float height, float depth, glm::vec3 color, glm::vec2 tex)
 {

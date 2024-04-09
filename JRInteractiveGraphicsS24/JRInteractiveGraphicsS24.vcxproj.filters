@@ -123,6 +123,9 @@
     <ClCompile Include="ChangeColorBehavior.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PCCuboidGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseObject.h">
@@ -204,6 +207,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ChangeColorBehavior.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PCCuboidGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

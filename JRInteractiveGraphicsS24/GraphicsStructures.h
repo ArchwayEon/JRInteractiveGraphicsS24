@@ -61,7 +61,10 @@ struct ChangeColorParams : IParams {
 struct PCSphereParams : IParams {
     float radius = 1.0f;
     int slices = 10, stacks = 10;
-    //glm::vec3 color = { 1.0f, 1.0f, 1.0f };
+};
+
+struct PCCuboidParams : IParams {
+    float width = 1.0f, height = 1.0f, depth = 1.0f;
 };
 
 enum DynamicBufferFlag {

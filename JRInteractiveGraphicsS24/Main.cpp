@@ -21,6 +21,7 @@
 #include "HighlightBehavior.h"
 #include "PCSphereGenerator.h"
 #include "ChangeColorBehavior.h"
+#include "PCCuboidGenerator.h"
 
 static void SetUpTexturedScene(
 	std::shared_ptr<Shader>& textureShader, 
@@ -449,6 +450,21 @@ static void SetUpPCObjectsScene(
 	pcLinesSphere2->AddBehavior("changecolor", ccb);
 	scene->AddObject(pcLinesSphere2);
 	env.AddObject("PCLinesSphere2", pcLinesSphere2);
+
+	std::shared_ptr<GraphicsObject> pcLineCuboid =
+		std::make_shared<GraphicsObject>();
+	pcLineCuboid->SetGenerator(
+		std::make_shared<PCCuboidGenerator>(pcLineCuboid));
+	auto cparams = std::make_shared<PCCuboidParams>();
+	cparams->width = 2.0f;
+	cparams->height = 2.0f;
+	cparams->depth = 2.0f;
+	pcLineCuboid->GetMaterial().color = { 1.0f, 0.0f, 0.0f };
+	pcLineCuboid->GetGenerator()->SetParameters(cparams);
+	pcLineCuboid->Generate(UseDynamicBuffers);
+	pcLineCuboid->SetPosition({-5.0f, 2.0f, 20.0f });
+	scene->AddObject(pcLineCuboid);
+	env.AddObject("PCLineCuboid", pcLineCuboid);
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,

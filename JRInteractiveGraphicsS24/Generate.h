@@ -7,6 +7,13 @@
 class Generate
 {
 public:
+	static void LineCuboid(
+		std::shared_ptr<VertexBuffer>& bufferToFill,
+		float width, float height, float depth, 
+		glm::vec3 color = { 1.0f, 1.0f, 1.0f });
+	static void LineCuboidIndices(
+		std::shared_ptr<IndexBuffer>& bufferToFill);
+
 	static std::shared_ptr<VertexBuffer> Cuboid(
 		float width, float height, float depth,
 		glm::vec3 color = { 1.0f, 1.0f, 1.0f },
