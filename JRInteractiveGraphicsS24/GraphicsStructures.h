@@ -58,6 +58,11 @@ struct ChangeColorParams : IParams {
     glm::vec3 color = { 1.0f, 1.0f, 1.0f };
 };
 
+struct RotateParams : IParams {
+    float degrees = 0.0f;
+    glm::vec3 axis = { 0.0f, 1.0f, 0.0f };
+};
+
 struct PCSphereParams : IParams {
     float radius = 1.0f;
     int slices = 10, stacks = 10;

@@ -22,6 +22,7 @@
 #include "PCSphereGenerator.h"
 #include "ChangeColorBehavior.h"
 #include "PCCuboidGenerator.h"
+#include "RotateBehavior.h"
 
 static void SetUpTexturedScene(
 	std::shared_ptr<Shader>& textureShader, 
@@ -448,6 +449,7 @@ static void SetUpPCObjectsScene(
 	ccb = std::make_shared<ChangeColorBehavior>(glm::vec3(0.0f, 0.0f, 1.0f));
 	ccb->SetObject(pcLinesSphere2);
 	pcLinesSphere2->AddBehavior("changecolor", ccb);
+	
 	scene->AddObject(pcLinesSphere2);
 	env.AddObject("PCLinesSphere2", pcLinesSphere2);
 
@@ -463,8 +465,35 @@ static void SetUpPCObjectsScene(
 	pcLineCuboid->GetGenerator()->SetParameters(cparams);
 	pcLineCuboid->Generate(UseDynamicBuffers);
 	pcLineCuboid->SetPosition({-5.0f, 2.0f, 20.0f });
+	pcLineCuboid->CreateBoundingBox(2.0f, 2.0f, 2.0f);
+	ccb = std::make_shared<ChangeColorBehavior>(glm::vec3(1.0f, 0.0f, 1.0f));
+	ccb->SetObject(pcLineCuboid);
+	pcLineCuboid->AddBehavior("changecolor", ccb);
+	auto rb = std::make_shared<RotateBehavior>(pcLineCuboid);
+	pcLineCuboid->AddBehavior("rotateY", rb);
 	scene->AddObject(pcLineCuboid);
-	env.AddObject("PCLineCuboid", pcLineCuboid);
+	env.AddObject("PCLineCuboid1", pcLineCuboid);
+
+	std::shared_ptr<GraphicsObject> pcLineCuboid2 =
+		std::make_shared<GraphicsObject>();
+	pcLineCuboid2->SetGenerator(
+		std::make_shared<PCCuboidGenerator>(pcLineCuboid2));
+	cparams = std::make_shared<PCCuboidParams>();
+	cparams->width = 2.0f;
+	cparams->height = 2.0f;
+	cparams->depth = 2.0f;
+	pcLineCuboid2->GetMaterial().color = { 1.0f, 0.0f, 0.0f };
+	pcLineCuboid2->GetGenerator()->SetParameters(cparams);
+	pcLineCuboid2->Generate(UseDynamicBuffers);
+	pcLineCuboid2->SetPosition({ 5.0f, 2.0f, 20.0f });
+	pcLineCuboid2->CreateBoundingBox(2.0f, 2.0f, 2.0f);
+	ccb = std::make_shared<ChangeColorBehavior>(glm::vec3(1.0f, 1.0f, 0.0f));
+	ccb->SetObject(pcLineCuboid2);
+	pcLineCuboid2->AddBehavior("changecolor", ccb);
+	rb = std::make_shared<RotateBehavior>(pcLineCuboid2);
+	pcLineCuboid2->AddBehavior("rotateY", rb);
+	scene->AddObject(pcLineCuboid2);
+	env.AddObject("PCLineCuboid2", pcLineCuboid2);
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,

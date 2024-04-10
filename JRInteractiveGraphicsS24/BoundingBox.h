@@ -3,6 +3,11 @@
 #include "GeometricPlane.h"
 #include <vector>
 
+struct MinMax {
+	float min = 0.0f;
+	float max = 0.0f;
+};
+
 class BoundingBox
 {
 public:
@@ -32,5 +37,7 @@ public:
 	}
 	void Create(float width, float height, float depth);
 	bool IsIntersectingWithRay(const Ray& ray);
+	MinMax GetMinMaxProjection(const glm::vec3& axis) const;
+	bool OverlapsWith(const BoundingBox& other) const;
 };
 

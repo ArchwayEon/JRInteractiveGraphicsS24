@@ -72,7 +72,8 @@ public:
 	std::shared_ptr<BoundingSphere> GetBoundingSphere() const { 
 		return boundingSphere; 
 	}
-	bool OverlapsWith(const GraphicsObject& otherObject) const;
+	bool OverlapsWithBoundingSphere(const GraphicsObject& otherObject) const;
+	bool OverlapsWithBoundingBox(const GraphicsObject& otherObject) const;
 	bool IsIntersectingWithRay(const Ray& ray) const;
 
 	void AddBehavior(std::string name, std::shared_ptr<IBehavior> behavior);

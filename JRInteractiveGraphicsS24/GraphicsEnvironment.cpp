@@ -207,7 +207,7 @@ void GraphicsEnvironment::Run3D()
     glm::vec3 cameraTarget(0.0f, 0.0f, 0.0f);
     //glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
-    glm::mat4 referenceFrame(1.0f);
+    glm::mat4 cubeReferenceFrame(1.0f);
     glm::vec3 clearColor = { 0.0f, 0.0f, 0.0f };
 
     //auto& scene = GetRenderer("renderer")->GetScene();
@@ -235,8 +235,14 @@ void GraphicsEnvironment::Run3D()
     auto& localLight = mainScene->GetLocalLight();
     objectManager->SetBehaviorDefaults();
     lookWithMouse = false;
-    bool isOverlapping = false;
-    glm::vec3 pos = objectManager->GetObject("PCLinesSphere1")->GetPosition();
+    bool isSphereOverlapping = false;
+    glm::vec3 spherePos = 
+        objectManager->GetObject("PCLinesSphere1")->GetPosition();
+    bool isCuboidOverlapping = false;
+    glm::vec3 cuboidPos =
+        objectManager->GetObject("PCLineCuboid1")->GetPosition();
+    float cuboid1Deg = 0.0f;
+    float cuboid2Deg = 0.0f;
     while (!glfwWindowShouldClose(window)) {
         elapsedSeconds = timer.GetElapsedTimeInSeconds();
         ProcessInput(elapsedSeconds);
@@ -254,15 +260,15 @@ void GraphicsEnvironment::Run3D()
         glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        referenceFrame = 
+        cubeReferenceFrame = 
             glm::rotate(
                 glm::mat4(1.0f), glm::radians(cubeYAngle), glm::vec3(0.0f, 1.0f, 0.0f));
-        referenceFrame = 
+        cubeReferenceFrame = 
             glm::rotate(
-                referenceFrame, glm::radians(cubeXAngle), glm::vec3(1.0f, 0.0f, 0.0f));
-        referenceFrame = 
+                cubeReferenceFrame, glm::radians(cubeXAngle), glm::vec3(1.0f, 0.0f, 0.0f));
+        cubeReferenceFrame = 
             glm::rotate(
-                referenceFrame, glm::radians(cubeZAngle), glm::vec3(0.0f, 0.0f, 1.0f));
+                cubeReferenceFrame, glm::radians(cubeZAngle), glm::vec3(0.0f, 0.0f, 1.0f));
 
         if (lookWithMouse) {
             camera.SetLookFrame(mouse.spherical.ToMat4());
@@ -283,7 +289,7 @@ void GraphicsEnvironment::Run3D()
 
         SetRendererProjectionAndView(projection, view);
         
-        cube->SetReferenceFrame(referenceFrame);
+        cube->SetReferenceFrame(cubeReferenceFrame);
         lightBulb->SetPosition(localLight.position);
         lightBulb->PointAt(camera.GetPosition());
 
@@ -298,14 +304,31 @@ void GraphicsEnvironment::Run3D()
             //cylinder->SetPosition({ point.x, y, point.z });
         }
 
-        objectManager->GetObject("PCLinesSphere1")->SetPosition(pos);
-        isOverlapping = objectManager->GetObject("PCLinesSphere1")->
-            OverlapsWith(*objectManager->GetObject("PCLinesSphere2"));
-        GetObject("PCLinesSphere1")->SetIsOverlapping(isOverlapping);
-        GetObject("PCLinesSphere2")->SetIsOverlapping(isOverlapping);
+        auto sphere1 = objectManager->GetObject("PCLinesSphere1");
+        auto sphere2 = objectManager->GetObject("PCLinesSphere2");
+        sphere1->SetPosition(spherePos);
+        isSphereOverlapping = sphere1->OverlapsWithBoundingSphere(*sphere2);
+        sphere1->SetIsOverlapping(isSphereOverlapping);
+        sphere2->SetIsOverlapping(isSphereOverlapping);
+
+
+        std::shared_ptr<RotateParams> rp1 = std::make_shared<RotateParams>();
+        rp1->axis = { 0.0f, 1.0f, 0.0f };
+        rp1->degrees = cuboid1Deg;
+        std::shared_ptr<RotateParams> rp2 = std::make_shared<RotateParams>();
+        rp2->axis = { 0.0f, 1.0f, 0.0f };
+        rp2->degrees = cuboid2Deg;
+        auto cuboid1 = objectManager->GetObject("PCLineCuboid1");
+        auto cuboid2 = objectManager->GetObject("PCLineCuboid2");
+        cuboid1->SetBehaviorParameters("rotateY", rp1);
+        cuboid2->SetBehaviorParameters("rotateY", rp2);
+        cuboid1->SetPosition(cuboidPos);
+        isCuboidOverlapping = cuboid1->OverlapsWithBoundingBox(*cuboid2);
+        cuboid1->SetIsOverlapping(isCuboidOverlapping);
+        cuboid2->SetIsOverlapping(isCuboidOverlapping);
 
         std::shared_ptr<HighlightParams> hp =
-            std::make_shared< HighlightParams>();
+            std::make_shared<HighlightParams>();
         hp->ray = &mouseRay;
         objectManager->GetObject("TexturedCube")->
             SetBehaviorParameters("highlight", hp);
@@ -335,8 +358,12 @@ void GraphicsEnvironment::Run3D()
         ImGui::SliderFloat("Z Angle", &cubeZAngle, 0, 360);
         ImGui::SliderFloat("Global Intensity", &globalLight.intensity, 0, 1);
         ImGui::SliderFloat("Local Intensity", &localLight.intensity, 0, 1);
-        ImGui::SliderFloat("X Position", &pos.x, -5.0f, 5.0f);
-        ImGui::Text("Is overlapping: %s", isOverlapping?"YES":"NO");
+        ImGui::SliderFloat("Sphere X Position", &spherePos.x, -5.0f, 5.0f);
+        ImGui::Text("Is sphere overlapping: %s", isSphereOverlapping?"YES":"NO");
+        ImGui::SliderFloat("Cuboid 1 Y Degrees", &cuboid1Deg, 0, 360);
+        ImGui::SliderFloat("Cuboid 2 Y Degrees", &cuboid2Deg, 0, 360);
+        ImGui::SliderFloat("Cuboid X Position", &cuboidPos.x, -5.0f, 5.0f);
+        ImGui::Text("Is cuboid overlapping: %s", isCuboidOverlapping ? "YES" : "NO");
         ImGui::End();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

@@ -12,6 +12,7 @@ protected:
 
 public:
 	IBehavior() : object(nullptr) {}
+	IBehavior(std::shared_ptr<GraphicsObject> object) : object(object) {}
 	virtual ~IBehavior() = default;
 
 	virtual void SetObject(std::shared_ptr<GraphicsObject> object);
