@@ -9,6 +9,7 @@
 #include "BoundingBox.h"
 #include "IBehavior.h"
 #include "BoundingSphere.h"
+#include "ReferenceFrame.h"
 
 class IAnimation;
 class IGenerator;
@@ -16,7 +17,8 @@ class IGenerator;
 class GraphicsObject : public BaseObject
 {
 protected:
-	glm::mat4 referenceFrame;
+	//glm::mat4 referenceFrame;
+	ReferenceFrame referenceFrame;
 	std::shared_ptr<VertexBuffer> vertexBuffer = nullptr;
 	std::shared_ptr<IndexBuffer> indexBuffer = nullptr;
 	GraphicsObject* parent;
@@ -33,9 +35,9 @@ public:
 	GraphicsObject();
 	virtual ~GraphicsObject();
 
-	const glm::mat4 GetReferenceFrame() const;
-	glm::mat4& GetLocalReferenceFrame() { return referenceFrame; }
-	inline void SetReferenceFrame(const glm::mat4& referenceFrame) {
+	ReferenceFrame GetReferenceFrame();
+	ReferenceFrame& GetLocalReferenceFrame() { return referenceFrame; }
+	inline void SetReferenceFrame(const ReferenceFrame& referenceFrame) {
 		this->referenceFrame = referenceFrame;
 	}
 	void CreateVertexBuffer(unsigned int numberOfElementsPerVertex);
@@ -56,7 +58,9 @@ public:
 	}
 
 	void SetPosition(const glm::vec3& position);
-	const glm::vec3 GetPosition() const { return glm::vec3(referenceFrame[3]); }
+	const glm::vec3 GetPosition() const { 
+		return referenceFrame.GetPosition(); 
+	}
 	void ResetOrientation();
 	void RotateLocalZ(float degrees);
 
@@ -93,7 +97,7 @@ public:
 	void Generate(DynamicBufferFlag flag = NoDynamicBuffer);
 
 	void SetUpDynamicBuffers(
-		unsigned int maxNumberOfVertices, unsigned int maxNumberOfIndices);
+		std::size_t maxNumberOfVertices, std::size_t maxNumberOfIndices);
 
 	void SetIsOverlapping(bool isOverlapping) { 
 		this->isOverlapping = isOverlapping; 

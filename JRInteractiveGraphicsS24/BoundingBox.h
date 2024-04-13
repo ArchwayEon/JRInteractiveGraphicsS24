@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include "GeometricPlane.h"
 #include <vector>
+#include "ReferenceFrame.h"
 
 struct MinMax {
 	float min = 0.0f;
@@ -20,18 +21,19 @@ public:
 
 protected:
 	float width = 1.0f, height = 1.0f, depth = 1.0f;
-	glm::mat4 frame;
-	glm::mat4 invFrame;
+	ReferenceFrame frame;
+	ReferenceFrame invFrame;
 	GeometricPlane planes[6];
 	std::vector<float> intersections;
 	glm::vec3 intersectionPoint{};
 
 public:
-	void SetReferenceFrame(glm::mat4 frameIn) {
+	void SetReferenceFrame(const ReferenceFrame& frameIn) {
 		frame = frameIn;
-		invFrame = glm::inverse(frame);
+		invFrame = frameIn;
+		invFrame.Invert();
 	}
-	const glm::mat4& GetReferenceFrame() const { return frame; }
+	const ReferenceFrame& GetReferenceFrame() const { return frame; }
 	const glm::vec3& GetIntersectionPoint() const { 
 		return intersectionPoint; 
 	}

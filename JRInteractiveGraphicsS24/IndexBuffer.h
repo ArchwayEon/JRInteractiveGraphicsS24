@@ -9,7 +9,7 @@ protected:
     unsigned int iboId;
     std::vector<unsigned short> indexData;
     bool isDynamic = false;
-    unsigned int maxNumberOfIndices = 0;
+    std::size_t maxNumberOfIndices = 0;
 
 public:
     IndexBuffer();
@@ -30,10 +30,10 @@ public:
 
     void SetIsDynamic(bool isDynamic) { this->isDynamic = isDynamic; }
     bool IsDynamic() const { return isDynamic; }
-    void SetMaxNumberOfIndices(unsigned int maxNumberOfIndices) {
+    void SetMaxNumberOfIndices(std::size_t maxNumberOfIndices) {
         this->maxNumberOfIndices = maxNumberOfIndices;
     }
-    unsigned int GetMaxNumberOfIndices() const {
+    std::size_t GetMaxNumberOfIndices() const {
         return maxNumberOfIndices;
     }
     void SendData();

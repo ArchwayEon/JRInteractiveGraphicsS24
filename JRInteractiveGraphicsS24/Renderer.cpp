@@ -48,7 +48,7 @@ void Renderer::RenderScene(const Camera& camera)
 
 void Renderer::RenderObject(GraphicsObject& object)
 {
-	shader->SendMat4Uniform("world", object.GetReferenceFrame());
+	shader->SendMat4Uniform("world", object.GetReferenceFrame().GetMatrix());
 	Material& m = object.GetMaterial();
 	shader->SendFloatUniform("materialAmbientIntensity", m.ambientIntensity);
 	shader->SendFloatUniform("materialSpecularIntensity", m.specularIntensity);
@@ -74,7 +74,10 @@ void Renderer::RenderObject(GraphicsObject& object)
 			GL_UNSIGNED_SHORT, (void*)0);
 	}
 	else {
-		glDrawArrays(vertexBuffer->GetPrimitiveType(), 0, vertexBuffer->GetNumberOfVertices());
+		glDrawArrays(
+			vertexBuffer->GetPrimitiveType(), 
+			0, 
+			(int)vertexBuffer->GetNumberOfVertices());
 	}
 
 	// Recursively render the children

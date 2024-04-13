@@ -159,6 +159,7 @@
     <ClCompile Include="PCCuboidGenerator.cpp" />
     <ClCompile Include="PCSphereGenerator.cpp" />
     <ClCompile Include="Ray.cpp" />
+    <ClCompile Include="ReferenceFrame.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RotateAnimation.cpp" />
     <ClCompile Include="RotateBehavior.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="PCCuboidGenerator.h" />
     <ClInclude Include="PCSphereGenerator.h" />
     <ClInclude Include="Ray.h" />
+    <ClInclude Include="ReferenceFrame.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RotateAnimation.h" />
     <ClInclude Include="RotateBehavior.h" />

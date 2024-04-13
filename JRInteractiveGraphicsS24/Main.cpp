@@ -221,7 +221,7 @@ static void SetUp3DScene1(
 
 }
 
-static void SetUp3DScene2(
+static void SetUp3DLitScene(
 	std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, GraphicsEnvironment& env)
 {
 	TextFile textFile;
@@ -270,9 +270,20 @@ static void SetUp3DScene2(
 	buffer->SetTexture(rgbwTexture);
 	texturedCube->SetVertexBuffer(buffer);
 	texturedCube->CreateBoundingBox(10.0f, 5.0f, 5.0f);
-	auto hb1 = std::make_shared<HighlightBehavior>();
-	hb1->SetObject(texturedCube);
+	auto hb1 = std::make_shared<HighlightBehavior>(texturedCube);
 	texturedCube->AddBehavior("highlight", hb1);
+	auto rb = std::make_shared<RotateBehavior>(texturedCube);
+	rb->SetUpParameter();
+	rb->GetParameter()->axis = { 0.0f, 1.0f, 0.0f };
+	texturedCube->AddBehavior("rotateY", rb);
+	rb = std::make_shared<RotateBehavior>(texturedCube);
+	rb->SetUpParameter();
+	rb->GetParameter()->axis = { 1.0f, 0.0f, 0.0f };
+	texturedCube->AddBehavior("rotateX", rb);
+	rb = std::make_shared<RotateBehavior>(texturedCube);
+	rb->SetUpParameter();
+	rb->GetParameter()->axis = { 0.0f, 0.0f, 1.0f };
+	texturedCube->AddBehavior("rotateZ", rb);
 	scene->AddObject(texturedCube);
 	env.AddObject("TexturedCube", texturedCube);
 
@@ -287,8 +298,7 @@ static void SetUp3DScene2(
 	buffer->SetTexture(crateTexture);
 	crate->SetVertexBuffer(buffer);
 	crate->CreateBoundingBox(10.0f, 10.0f, 10.0f);
-	auto hb2 = std::make_shared<HighlightBehavior>();
-	hb2->SetObject(crate);
+	auto hb2 = std::make_shared<HighlightBehavior>(crate);
 	crate->AddBehavior("highlight", hb2);
 	crate->SetPosition(glm::vec3(-20.0f, 5.0f, -5.0f));
 	scene->AddObject(crate);
@@ -305,8 +315,7 @@ static void SetUp3DScene2(
 	buffer->SetTexture(worldTexture);
 	world->SetVertexBuffer(buffer);
 	world->CreateBoundingBox(3.0f, 3.0f, 3.0f);
-	auto hb3 = std::make_shared<HighlightBehavior>();
-	hb3->SetObject(world);
+	auto hb3 = std::make_shared<HighlightBehavior>(world);
 	world->AddBehavior("highlight", hb3);
 	world->SetPosition(glm::vec3(20.0f, 1.5f, 22.0f));
 	scene->AddObject(world);
@@ -494,6 +503,22 @@ static void SetUpPCObjectsScene(
 	pcLineCuboid2->AddBehavior("rotateY", rb);
 	scene->AddObject(pcLineCuboid2);
 	env.AddObject("PCLineCuboid2", pcLineCuboid2);
+
+	std::shared_ptr<GraphicsObject> pcMouseRay =
+		std::make_shared<GraphicsObject>();
+	pcMouseRay->CreateVertexBuffer(6);
+	auto& mrvb = pcMouseRay->GetVertexBuffer();
+	mrvb->SetPrimitiveType(GL_LINES);
+	mrvb->AddVertexData(6, 0.0f, 2.0f, 5.0f, 1.0f, 1.0f, 1.0f);
+	mrvb->AddVertexData(6, 0.0f, 2.0f, -5.0f, 1.0f, 1.0f, 1.0f);
+	mrvb->AddVertexAttribute("position", 0, 3, 0);
+	mrvb->AddVertexAttribute("color", 1, 3, 3);
+	pcMouseRay->CreateIndexBuffer();
+	pcMouseRay->GetIndexBuffer()->AddIndexData(2, 0, 1);
+	pcMouseRay->SetUpDynamicBuffers(2, 2);
+	pcMouseRay->SetPosition({ 0.0f, 0.0f, 0.0f });
+	scene->AddObject(pcMouseRay);
+	env.AddObject("PCMouseRay", pcMouseRay);
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -515,7 +540,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	std::shared_ptr<Shader> shader;
 	std::shared_ptr<Scene> scene;
-	SetUp3DScene2(shader, scene, glfw);
+	SetUp3DLitScene(shader, scene, glfw);
 
 	std::shared_ptr<Shader> basicShader;
 	std::shared_ptr<Scene> basicScene;

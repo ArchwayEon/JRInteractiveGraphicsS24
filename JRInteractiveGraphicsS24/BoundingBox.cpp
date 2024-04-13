@@ -9,9 +9,9 @@ void BoundingBox::Create(float width, float height, float depth)
 	float hw = this->width / 2;
 	float hh = this->height / 2;
 	float hd = this->depth / 2;
-	glm::vec3 xAxis = frame[0];
-	glm::vec3 yAxis = frame[1];
-	glm::vec3 zAxis = frame[2];
+	glm::vec3 xAxis = frame.GetXAxis();
+	glm::vec3 yAxis = frame.GetYAxis();
+	glm::vec3 zAxis = frame.GetZAxis();
 	planes[FRONT].Set(-zAxis, hd);
 	planes[BACK].Set(zAxis, hd);
 	planes[RIGHT].Set(-xAxis, hw);
@@ -25,11 +25,11 @@ bool BoundingBox::IsIntersectingWithRay(const Ray& ray)
 	intersections.clear();
 	float intersection;
 	Ray localRay;
-	glm::vec3 localStart = glm::vec3(
-		invFrame * glm::vec4(ray.GetStartPoint(), 1.0f));
+	glm::vec3 localStart = 
+		frame.WorldToLocal(glm::vec4(ray.GetStartPoint(), 1.0f));
 	localRay.SetStartPoint(localStart);
-	glm::vec3 localDir = glm::vec3(
-		invFrame * glm::vec4(ray.GetDirection(), 0.0f));
+	glm::vec3 localDir = 
+		frame.WorldToLocal(glm::vec4(ray.GetDirection(), 0.0f));
 	localRay.SetDirection(localDir);
 	for (int i = FRONT; i <= BOTTOM; i++) {
 		intersection = planes[i].GetIntersectionOffset(localRay);
@@ -88,15 +88,23 @@ MinMax BoundingBox::GetMinMaxProjection(const glm::vec3& axis) const
 	float halfDepth = depth / 2;
 	glm::vec3 v[8]{};
 	// Front Face
-	v[0] = frame * glm::vec4(-halfWidth, halfHeight, halfDepth, 1.0f);
-	v[1] = frame * glm::vec4(-halfWidth, -halfHeight, halfDepth, 1.0f);
-	v[2] = frame * glm::vec4(halfWidth, -halfHeight, halfDepth, 1.0f);
-	v[3] = frame * glm::vec4(halfWidth, halfHeight, halfDepth, 1.0f);
+	v[0] = 
+		frame.LocalToWorld(glm::vec4(-halfWidth, halfHeight, halfDepth, 1.0f));
+	v[1] = 
+		frame.LocalToWorld(glm::vec4(-halfWidth, -halfHeight, halfDepth, 1.0f));
+	v[2] = 
+		frame.LocalToWorld(glm::vec4(halfWidth, -halfHeight, halfDepth, 1.0f));
+	v[3] = 
+		frame.LocalToWorld(glm::vec4(halfWidth, halfHeight, halfDepth, 1.0f));
 	// Back Face
-	v[4] = frame * glm::vec4(-halfWidth, halfHeight, -halfDepth, 1.0f);
-	v[5] = frame * glm::vec4(-halfWidth, -halfHeight, -halfDepth, 1.0f);
-	v[6] = frame * glm::vec4(halfWidth, -halfHeight, -halfDepth, 1.0f);
-	v[7] = frame * glm::vec4(halfWidth, halfHeight, -halfDepth, 1.0f);
+	v[4] = 
+		frame.LocalToWorld(glm::vec4(-halfWidth, halfHeight, -halfDepth, 1.0f));
+	v[5] = 
+		frame.LocalToWorld(glm::vec4(-halfWidth, -halfHeight, -halfDepth, 1.0f));
+	v[6] = 
+		frame.LocalToWorld(glm::vec4(halfWidth, -halfHeight, -halfDepth, 1.0f));
+	v[7] = 
+		frame.LocalToWorld(glm::vec4(halfWidth, halfHeight, -halfDepth, 1.0f));
 
 	MinMax m;
 	m.min = m.max = glm::dot(v[0], axis);
@@ -116,32 +124,32 @@ MinMax BoundingBox::GetMinMaxProjection(const glm::vec3& axis) const
 bool BoundingBox::OverlapsWith(const BoundingBox& other) const
 {
 	// 1
-	glm::vec3 xAxis = frame[0];
+	glm::vec3 xAxis = frame.GetXAxis();
 	MinMax b1 = GetMinMaxProjection(xAxis);
 	MinMax b2 = other.GetMinMaxProjection(xAxis);
 	if (b1.max < b2.min || b2.max < b1.min) return false;
 	// 2
-	glm::vec3 xAxisOther = other.frame[0];
+	glm::vec3 xAxisOther = other.frame.GetXAxis();
 	b1 = GetMinMaxProjection(xAxisOther);
 	b2 = other.GetMinMaxProjection(xAxisOther);
 	if (b1.max < b2.min || b2.max < b1.min) return false;
 	// 3
-	glm::vec3 yAxis = frame[1];
+	glm::vec3 yAxis = frame.GetYAxis();
 	b1 = GetMinMaxProjection(yAxis);
 	b2 = other.GetMinMaxProjection(yAxis);
 	if (b1.max < b2.min || b2.max < b1.min) return false;
 	// 4
-	glm::vec3 yAxisOther = other.frame[1];
+	glm::vec3 yAxisOther = other.frame.GetYAxis();
 	b1 = GetMinMaxProjection(yAxisOther);
 	b2 = other.GetMinMaxProjection(yAxisOther);
 	if (b1.max < b2.min || b2.max < b1.min) return false;
 	// 5
-	glm::vec3 zAxis = frame[2];
+	glm::vec3 zAxis = frame.GetZAxis();
 	b1 = GetMinMaxProjection(zAxis);
 	b2 = other.GetMinMaxProjection(zAxis);
 	if (b1.max < b2.min || b2.max < b1.min) return false;
 	// 6
-	glm::vec3 zAxisOther = other.frame[2];
+	glm::vec3 zAxisOther = other.frame.GetZAxis();
 	b1 = GetMinMaxProjection(zAxisOther);
 	b2 = other.GetMinMaxProjection(zAxisOther);
 	if (b1.max < b2.min || b2.max < b1.min) return false;

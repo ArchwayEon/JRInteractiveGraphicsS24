@@ -13,11 +13,9 @@ void MoveAnimation::Update(double elapsedSeconds)
 	if (state == MOVING) {
 		float deltaSpeed = static_cast<float>(speed * elapsedSeconds);
 		auto& frame = object->GetLocalReferenceFrame();
-		glm::vec3 pos = frame[3];
+		glm::vec3 pos = frame.GetPosition();
 		pos += direction * deltaSpeed;
-		frame[3].x = pos.x;
-		frame[3].y = pos.y;
-		frame[3].z = pos.z;
+		frame.SetPosition(pos);
 		distanceMoved += deltaSpeed;
 	}
 }

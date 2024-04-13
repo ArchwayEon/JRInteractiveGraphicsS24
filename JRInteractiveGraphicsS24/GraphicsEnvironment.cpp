@@ -70,7 +70,7 @@ void GraphicsEnvironment::SetupGraphics()
 
     glViewport(0, 0, 1200, 800);
     glfwSetFramebufferSizeCallback(window, OnWindowSizeChanged);
-    glfwSetCursorPosCallback(window, OnMouseMove);
+    //glfwSetCursorPosCallback(window, OnMouseMove);
     glfwSetMouseButtonCallback(window, OnMouseButton);
     glfwSetKeyCallback(window, OnKey);
     glfwMaximizeWindow(window);
@@ -211,7 +211,7 @@ void GraphicsEnvironment::Run3D()
     glm::vec3 clearColor = { 0.0f, 0.0f, 0.0f };
 
     //auto& scene = GetRenderer("renderer")->GetScene();
-    auto cube = objectManager->GetObject("TexturedCube");
+    
     auto lightBulb = objectManager->GetObject("LightBulb");
 
     std::shared_ptr<RotateAnimation> rotateAnimation = 
@@ -243,12 +243,24 @@ void GraphicsEnvironment::Run3D()
         objectManager->GetObject("PCLineCuboid1")->GetPosition();
     float cuboid1Deg = 0.0f;
     float cuboid2Deg = 0.0f;
+
+    auto cube = objectManager->GetObject("TexturedCube");
+    auto sphere1 = objectManager->GetObject("PCLinesSphere1");
+    auto sphere2 = objectManager->GetObject("PCLinesSphere2");
+    auto cylinder = objectManager->GetObject("PCLinesCylinder");
+    auto floor = objectManager->GetObject("Floor");
+    auto cuboid1 = objectManager->GetObject("PCLineCuboid1");
+    auto cuboid2 = objectManager->GetObject("PCLineCuboid2");
+    auto crate = objectManager->GetObject("Crate");
+    auto cubeWorld = objectManager->GetObject("World");
+    auto mouseRayLine = objectManager->GetObject("PCMouseRay");
     while (!glfwWindowShouldClose(window)) {
         elapsedSeconds = timer.GetElapsedTimeInSeconds();
         ProcessInput(elapsedSeconds);
         glfwGetWindowSize(window, &width, &height);
         mouse.windowWidth = width;
         mouse.windowHeight = height;
+        UpdateMousePosition();
 
         if (correctGamma) {
             glEnable(GL_FRAMEBUFFER_SRGB);
@@ -273,9 +285,7 @@ void GraphicsEnvironment::Run3D()
         if (lookWithMouse) {
             camera.SetLookFrame(mouse.spherical.ToMat4());
         }
-        
-        //view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
-        //view = camera.LookAt(cameraTarget);
+
         view = camera.LookForward();
 
         if (width >= height) {
@@ -293,24 +303,20 @@ void GraphicsEnvironment::Run3D()
         lightBulb->SetPosition(localLight.position);
         lightBulb->PointAt(camera.GetPosition());
 
-        auto& position = objectManager->GetObject("Floor")->GetPosition();
+        auto& position = floor->GetPosition();
         floorPlane.Set({ 0.0f, 1.0f, 0.0f }, position.y);
-        mouseRay = GetMouseRay(projection, view);
+        
         offset = floorPlane.GetIntersectionOffset(mouseRay);
         if (offset >= 0) {
             glm::vec3 point = mouseRay.GetPoint(offset);
-            auto cylinder = objectManager->GetObject("PCLinesCylinder");
             float y = cylinder->GetPosition().y;
-            //cylinder->SetPosition({ point.x, y, point.z });
+            cylinder->SetPosition({ point.x, y, point.z });
         }
 
-        auto sphere1 = objectManager->GetObject("PCLinesSphere1");
-        auto sphere2 = objectManager->GetObject("PCLinesSphere2");
         sphere1->SetPosition(spherePos);
         isSphereOverlapping = sphere1->OverlapsWithBoundingSphere(*sphere2);
         sphere1->SetIsOverlapping(isSphereOverlapping);
         sphere2->SetIsOverlapping(isSphereOverlapping);
-
 
         std::shared_ptr<RotateParams> rp1 = std::make_shared<RotateParams>();
         rp1->axis = { 0.0f, 1.0f, 0.0f };
@@ -318,8 +324,6 @@ void GraphicsEnvironment::Run3D()
         std::shared_ptr<RotateParams> rp2 = std::make_shared<RotateParams>();
         rp2->axis = { 0.0f, 1.0f, 0.0f };
         rp2->degrees = cuboid2Deg;
-        auto cuboid1 = objectManager->GetObject("PCLineCuboid1");
-        auto cuboid2 = objectManager->GetObject("PCLineCuboid2");
         cuboid1->SetBehaviorParameters("rotateY", rp1);
         cuboid2->SetBehaviorParameters("rotateY", rp2);
         cuboid1->SetPosition(cuboidPos);
@@ -330,12 +334,23 @@ void GraphicsEnvironment::Run3D()
         std::shared_ptr<HighlightParams> hp =
             std::make_shared<HighlightParams>();
         hp->ray = &mouseRay;
-        objectManager->GetObject("TexturedCube")->
-            SetBehaviorParameters("highlight", hp);
-        objectManager->GetObject("Crate")->
-            SetBehaviorParameters("highlight", hp);
-        objectManager->GetObject("World")->
-            SetBehaviorParameters("highlight", hp);
+        cube->SetBehaviorParameters("highlight", hp);
+        crate->SetBehaviorParameters("highlight", hp);
+        cubeWorld->SetBehaviorParameters("highlight", hp);
+
+        auto& mrvb = mouseRayLine->GetVertexBuffer();
+        auto lookFrame = camera.GetLookFrame();
+        auto refFrame = glm::mat4(1.0f);
+        refFrame[0] = lookFrame[0];
+        refFrame[1] = lookFrame[1];
+        refFrame[2] = -lookFrame[2];
+        mouseRayLine->SetReferenceFrame(refFrame);
+        mrvb->Clear();
+        auto mrStart = mouseRay.GetStartPoint();
+        auto mrEnd = mouseRay.GetPoint(50.0f);
+        //auto mrEnd = glm::vec3(0.0f, 0.0f, 0.0f);
+        mrvb->AddVertexData(6, mrStart.x, mrStart.y, mrStart.z, 1.0f, 1.0f, 1.0f);
+        mrvb->AddVertexData(6, mrEnd.x, mrEnd.y, mrEnd.z, 1.0f, 1.0f, 1.0f);
 
         objectManager->Update(elapsedSeconds);
 
@@ -349,6 +364,12 @@ void GraphicsEnvironment::Run3D()
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
             1000.0f / io.Framerate, io.Framerate);
         ImGui::Text("Offset: %.3f", offset);
+        ImGui::Text("Mouse NSC: (%.3f, %.3f)", mouse.nsx, mouse.nsy);
+        ImGui::Text("Mouse SC: (%.3f, %.3f)", mouse.x, mouse.y);
+        ImGui::Text("Mouse Ray Start: (%.3f, %.3f, %.3f)", 
+            mrStart.x, mrStart.y, mrStart.z);
+        ImGui::Text("Mouse Ray End: (%.3f, %.3f, %.3f)",
+            mrEnd.x, mrEnd.y, mrEnd.z);
         ImGui::ColorEdit3("Background color", (float*)&clearColor.r);
         ImGui::DragFloat3("Local light position", 
             (float*)&localLight.position, 0.1f);
@@ -389,38 +410,39 @@ void GraphicsEnvironment::AddObject(const std::string& name, std::shared_ptr<Gra
 }
 
 
-Ray GraphicsEnvironment::GetMouseRay(const glm::mat4& projection, const glm::mat4& view)
+Ray GraphicsEnvironment::GetMouseRay(
+    const glm::mat4& projection, const glm::mat4& view)
 {
     Ray ray;
     auto projInverse = glm::inverse(projection);
     auto viewInverse = glm::inverse(view);
 
-    glm::vec4 rayDirClip = { mouse.nsx, mouse.nsy, -1, 1 };
+    glm::vec4 rayStartClip = { mouse.nsx, mouse.nsy, 0, 0 };
+    glm::vec4 rayStartEye = projInverse * rayStartClip;
+    rayStartEye.z = 1.0f;
+    rayStartEye.w = 1.0f; // This is a position vector
+    glm::vec3 start = glm::vec3(viewInverse * rayStartEye);
+
+    glm::vec4 rayDirClip = { mouse.nsx, mouse.nsy, 0, 0 };
     glm::vec4 rayDirEye = projInverse * rayDirClip;
     rayDirEye.z = -1.0f; // Forward, down the -ve z
     rayDirEye.w = 0.0f; // This is a direction vector
-    glm::vec3 dir = glm::vec3(glm::normalize(viewInverse * rayDirEye));
+    glm::vec3 dir = glm::vec3(viewInverse * rayDirEye);
 
-    glm::vec4 rayStartClip = { mouse.nsx, mouse.nsy, 1, 1 };
-    glm::vec4 rayStartEye = projInverse * rayStartClip;
-    rayStartEye.z = 1.0f; 
-    rayStartEye.w = 1.0f; // This is a position vector
-    glm::vec3 start = glm::vec3(viewInverse * rayStartEye);
+    //auto lookFrame = camera.GetLookFrame();
+    //auto position = camera.GetPosition();
+    //lookFrame[3] = glm::vec4(position, 1.0f);
+    //auto invLookFrame = glm::inverse(lookFrame);
 
     ray.SetStartPoint(start);
     ray.SetDirection(dir);
     return ray;
 }
 
-void GraphicsEnvironment::OnWindowSizeChanged(GLFWwindow* window, int width, int height)
+void GraphicsEnvironment::UpdateMousePosition()
 {
-    glViewport(0, 0, width, height);
-}
-
-void GraphicsEnvironment::OnMouseMove(
-    GLFWwindow* window, double mouseX, double mouseY)
-{
-    MouseParams& mouse = self->GetMouseParams();
+    double mouseX, mouseY;
+    glfwGetCursorPos(window, &mouseX, &mouseY);
     mouse.x = mouseX;
     mouse.y = mouseY;
 
@@ -432,6 +454,31 @@ void GraphicsEnvironment::OnMouseMove(
 
     mouse.nsx = xPercent * 2.0f - 1.0f;
     mouse.nsy = -(yPercent * 2.0f - 1.0f);
+    mouseRay = GetMouseRay(projection, view);
+}
+
+void GraphicsEnvironment::OnWindowSizeChanged(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+}
+
+void GraphicsEnvironment::OnMouseMove(
+    GLFWwindow* window, double mouseX, double mouseY)
+{
+    self->UpdateMousePosition();
+    //MouseParams& mouse = self->GetMouseParams();
+    //mouse.x = mouseX;
+    //mouse.y = mouseY;
+
+    //float xPercent = static_cast<float>(mouse.x / mouse.windowWidth);
+    //float yPercent = static_cast<float>(mouse.y / mouse.windowHeight);
+
+    //mouse.spherical.theta = 90.0f - (xPercent * 180); // left/right
+    //mouse.spherical.phi = 180.0f - (yPercent * 180); // up/down
+
+    //mouse.nsx = xPercent * 2.0f - 1.0f;
+    //mouse.nsy = -(yPercent * 2.0f - 1.0f);
+    //self->mouseRay = self->GetMouseRay(self->projection, self->view);
 }
 
 void GraphicsEnvironment::OnMouseButton(

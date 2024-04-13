@@ -1,6 +1,11 @@
 #include "HighlightBehavior.h"
 #include "GraphicsObject.h"
 
+HighlightBehavior::HighlightBehavior(std::shared_ptr<GraphicsObject> object)
+{
+	SetObject(object);
+}
+
 void HighlightBehavior::StoreDefaults()
 {
 	if (object == nullptr) return;

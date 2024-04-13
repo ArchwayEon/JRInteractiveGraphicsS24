@@ -6,6 +6,6 @@ void RotateAnimation::Update(double elapsedSeconds)
 {
 	if (object == nullptr) return;
 	float deltaSpeed = static_cast<float>(speed * elapsedSeconds);
-	glm::mat4& referenceFrame = object->GetLocalReferenceFrame();
-	referenceFrame = glm::rotate(referenceFrame, glm::radians(deltaSpeed), axis);
+	auto& referenceFrame = object->GetLocalReferenceFrame();
+	referenceFrame.RotateAxis(axis, deltaSpeed);
 }

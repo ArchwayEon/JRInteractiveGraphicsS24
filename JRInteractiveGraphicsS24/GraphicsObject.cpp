@@ -3,7 +3,7 @@
 #include "IAnimation.h"
 #include "IGenerator.h"
 
-GraphicsObject::GraphicsObject() : referenceFrame(1.0f), parent(nullptr)
+GraphicsObject::GraphicsObject() : referenceFrame(), parent(nullptr)
 {
 	material.ambientIntensity = 0.01f;
 	material.specularIntensity = 0.01f;
@@ -15,10 +15,10 @@ GraphicsObject::~GraphicsObject()
 {
 }
 
-const glm::mat4 GraphicsObject::GetReferenceFrame() const
+ReferenceFrame GraphicsObject::GetReferenceFrame()
 {
 	if (parent != nullptr) {
-		return parent->referenceFrame * referenceFrame;
+		return referenceFrame.CombineWithParentFrame(parent->referenceFrame);
 	}
 	return referenceFrame;
 }
@@ -61,23 +61,17 @@ void GraphicsObject::AddChild(std::shared_ptr<GraphicsObject> child)
 
 void GraphicsObject::SetPosition(const glm::vec3& position)
 {
-	referenceFrame[3] = glm::vec4(position, 1.0f);
+	referenceFrame.SetPosition(position);
 }
 
 void GraphicsObject::ResetOrientation()
 {
-	glm::vec4 position = referenceFrame[3];
-	referenceFrame = glm::mat4(1.0f);
-	referenceFrame[3] = position;
+	referenceFrame.Reset();
 }
 
 void GraphicsObject::RotateLocalZ(float degrees)
 {
-	referenceFrame = glm::rotate(
-		referenceFrame, 
-		glm::radians(degrees), 
-		glm::vec3(0.0f, 0.0f, 1.0f)
-	);
+	referenceFrame.RotateZ(degrees);
 }
 
 void GraphicsObject::Update(double elapsedSeconds)
@@ -97,14 +91,14 @@ void GraphicsObject::SetAnimation(std::shared_ptr<IAnimation> animation)
 
 void GraphicsObject::PointAt(const glm::vec3& target)
 {
-	glm::vec3 position = referenceFrame[3];
+	glm::vec3 position = referenceFrame.GetPosition();
 	glm::vec3 zAxis = glm::normalize(target - position);
 	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 xAxis = glm::normalize(glm::cross(up, zAxis));
 	glm::vec3 yAxis = glm::cross(zAxis, xAxis);
-	referenceFrame[0] = glm::vec4(xAxis, 0.0f);
-	referenceFrame[1] = glm::vec4(yAxis, 0.0f);
-	referenceFrame[2] = glm::vec4(zAxis, 0.0f);
+	referenceFrame.SetXAxis(xAxis);
+	referenceFrame.SetYAxis(yAxis);
+	referenceFrame.SetZAxis(zAxis);
 }
 
 void GraphicsObject::CreateBoundingBox(float width, float height, float depth)
@@ -117,7 +111,7 @@ void GraphicsObject::CreateBoundingBox(float width, float height, float depth)
 void GraphicsObject::CreateBoundingSphere(float radius)
 {
 	boundingSphere= std::make_shared<BoundingSphere>(radius);
-	boundingSphere->SetPosition(referenceFrame[3]);
+	boundingSphere->SetPosition(referenceFrame.GetPosition());
 }
 
 bool GraphicsObject::OverlapsWithBoundingSphere(const GraphicsObject& otherObject) const
@@ -183,7 +177,7 @@ void GraphicsObject::Generate(DynamicBufferFlag flag)
 }
 
 void GraphicsObject::SetUpDynamicBuffers(
-	unsigned int maxNumberOfVertices, unsigned int maxNumberOfIndices)
+	std::size_t maxNumberOfVertices, std::size_t maxNumberOfIndices)
 {
 	vertexBuffer->SetIsDynamic(true);
 	vertexBuffer->SetMaxNumberOfVertices(maxNumberOfVertices);

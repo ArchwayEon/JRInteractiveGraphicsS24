@@ -24,5 +24,10 @@ public:
 	void MoveRight(double elapsedSeconds);
 	void MoveUp(double elapsedSeconds);
 	void MoveDown(double elapsedSeconds);
+
+	glm::mat4 GetLookFrame() const { return lookFrame; }
+	glm::mat4 GetReferenceFrame() const { return referenceFrame; }
+
+	//glm::vec3 TransformVectorToLocal(glm::vec3 v);
 };
 

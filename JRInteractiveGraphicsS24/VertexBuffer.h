@@ -18,9 +18,8 @@ struct VertexAttribute {
 class VertexBuffer
 {
 protected:
-	unsigned int numberOfElementsPerVertex;
-	//unsigned int numberOfVertices;
-	unsigned int maxNumberOfVertices = 0;
+	std::size_t numberOfElementsPerVertex;
+	std::size_t maxNumberOfVertices = 0;
 	unsigned int vboId;
 	int primitiveType;
 	std::vector<float> vertexData;
@@ -60,10 +59,10 @@ public:
 
 	void SetIsDynamic(bool isDynamic) { this->isDynamic = isDynamic; }
 	bool IsDynamic() const { return isDynamic; }
-	void SetMaxNumberOfVertices(unsigned int maxNumberOfVertices) {
+	void SetMaxNumberOfVertices(std::size_t maxNumberOfVertices) {
 		this->maxNumberOfVertices = maxNumberOfVertices;
 	}
-	unsigned int GetMaxNumberOfVertices() const {
+	std::size_t GetMaxNumberOfVertices() const {
 		return maxNumberOfVertices;
 	}
 

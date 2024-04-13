@@ -57,6 +57,8 @@ public:
 	Ray GetMouseRay(const glm::mat4& projection, const glm::mat4& view);
 	const Ray& GetMouseRay() const { return mouseRay; }
 
+	void UpdateMousePosition();
+
 public:
 	static void OnWindowSizeChanged(GLFWwindow* window, int width, int height);
 	static void OnMouseMove(GLFWwindow* window, double mouseX, double mouseY);

@@ -19,7 +19,7 @@ public:
 	void SetStartPoint(glm::vec3 start) {
 		startPoint = start;
 	}
-	const glm::vec3& GetStartPoint() const {
+	glm::vec3 GetStartPoint() const {
 		return startPoint;
 	}
 
