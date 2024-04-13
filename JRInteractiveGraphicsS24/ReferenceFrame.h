@@ -45,6 +45,7 @@ public:
 	ReferenceFrame CombineWithParentFrame(const ReferenceFrame& parent);
 
 	glm::vec3 WorldToLocal(glm::vec4 wv) const;
+	glm::vec3 WorldToLocal(glm::vec3 wv) const;
 	glm::vec3 LocalToWorld(glm::vec4 wv) const;
 };
 

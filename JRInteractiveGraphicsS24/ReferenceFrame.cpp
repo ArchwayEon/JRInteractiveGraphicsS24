@@ -56,6 +56,11 @@ glm::vec3 ReferenceFrame::WorldToLocal(glm::vec4 wv) const
 	return invMat * wv;
 }
 
+glm::vec3 ReferenceFrame::WorldToLocal(glm::vec3 wv) const
+{
+	return WorldToLocal(glm::vec4(wv, 1.0f));
+}
+
 glm::vec3 ReferenceFrame::LocalToWorld(glm::vec4 lv) const
 {
 	return matrix4 * lv;

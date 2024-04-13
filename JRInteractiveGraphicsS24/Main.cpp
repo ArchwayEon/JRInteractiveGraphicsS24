@@ -509,8 +509,8 @@ static void SetUpPCObjectsScene(
 	pcMouseRay->CreateVertexBuffer(6);
 	auto& mrvb = pcMouseRay->GetVertexBuffer();
 	mrvb->SetPrimitiveType(GL_LINES);
-	mrvb->AddVertexData(6, 0.0f, 2.0f, 5.0f, 1.0f, 1.0f, 1.0f);
-	mrvb->AddVertexData(6, 0.0f, 2.0f, -5.0f, 1.0f, 1.0f, 1.0f);
+	mrvb->AddVertexData(6, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+	mrvb->AddVertexData(6, 0.0f, 0.0f, -50.0f, 1.0f, 1.0f, 1.0f);
 	mrvb->AddVertexAttribute("position", 0, 3, 0);
 	mrvb->AddVertexAttribute("color", 1, 3, 3);
 	pcMouseRay->CreateIndexBuffer();

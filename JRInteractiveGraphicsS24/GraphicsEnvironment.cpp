@@ -338,19 +338,19 @@ void GraphicsEnvironment::Run3D()
         crate->SetBehaviorParameters("highlight", hp);
         cubeWorld->SetBehaviorParameters("highlight", hp);
 
-        auto& mrvb = mouseRayLine->GetVertexBuffer();
-        auto lookFrame = camera.GetLookFrame();
-        auto refFrame = glm::mat4(1.0f);
-        refFrame[0] = lookFrame[0];
-        refFrame[1] = lookFrame[1];
-        refFrame[2] = -lookFrame[2];
-        mouseRayLine->SetReferenceFrame(refFrame);
-        mrvb->Clear();
+        auto& mrDir = mouseRay.GetDirection();
         auto mrStart = mouseRay.GetStartPoint();
         auto mrEnd = mouseRay.GetPoint(50.0f);
-        //auto mrEnd = glm::vec3(0.0f, 0.0f, 0.0f);
-        mrvb->AddVertexData(6, mrStart.x, mrStart.y, mrStart.z, 1.0f, 1.0f, 1.0f);
-        mrvb->AddVertexData(6, mrEnd.x, mrEnd.y, mrEnd.z, 1.0f, 1.0f, 1.0f);
+        auto cameraPos = camera.GetPosition();
+        mouseRayLine->SetPosition(mrStart);
+        auto localDir =
+            mouseRayLine->GetLocalReferenceFrame().WorldToLocal(glm::vec4(mrDir, 0.0f));
+        auto& mrvb = mouseRayLine->GetVertexBuffer();
+        mrvb->Clear();
+        mrvb->AddVertexData(6, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+        //mrvb->AddVertexData(6, endLocal.x, endLocal.y, endLocal.z, 1.0f, 1.0f, 1.0f);
+        mrvb->AddVertexData(
+            6, localDir.x * 10.0f, localDir.y * 10.0f, localDir.z * 10.0f, 1.0f, 1.0f, 1.0f);
 
         objectManager->Update(elapsedSeconds);
 
@@ -366,10 +366,16 @@ void GraphicsEnvironment::Run3D()
         ImGui::Text("Offset: %.3f", offset);
         ImGui::Text("Mouse NSC: (%.3f, %.3f)", mouse.nsx, mouse.nsy);
         ImGui::Text("Mouse SC: (%.3f, %.3f)", mouse.x, mouse.y);
+        ImGui::Text("Camera position: (%.3f, %.3f, %.3f)",
+            cameraPos.x, cameraPos.y, cameraPos.z);
         ImGui::Text("Mouse Ray Start: (%.3f, %.3f, %.3f)", 
             mrStart.x, mrStart.y, mrStart.z);
+        ImGui::Text("Mouse Ray direction: (%.3f, %.3f, %.3f)",
+            mrDir.x, mrDir.y, mrDir.z);
         ImGui::Text("Mouse Ray End: (%.3f, %.3f, %.3f)",
             mrEnd.x, mrEnd.y, mrEnd.z);
+        ImGui::Text("Mouse Ray Local Dir: (%.3f, %.3f, %.3f)",
+            localDir.x, localDir.y, localDir.z);
         ImGui::ColorEdit3("Background color", (float*)&clearColor.r);
         ImGui::DragFloat3("Local light position", 
             (float*)&localLight.position, 0.1f);
