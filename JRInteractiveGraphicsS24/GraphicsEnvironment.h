@@ -2,6 +2,7 @@
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h>
 #include <sstream>
+#include <memory>
 #include <string>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
@@ -12,6 +13,8 @@
 #include "GraphicsStructures.h"
 #include "Ray.h"
 #include "GraphicsWorld.h"
+#include "Logger.h"
+#include "GraphicsObject.h"
 
 class GraphicsEnvironment
 {
@@ -23,7 +26,9 @@ private:
 	std::unordered_map<std::string, std::shared_ptr<Scene>> sceneMap;
 	std::unordered_map<std::string, std::shared_ptr<Texture>> textureMap;
 	std::unordered_map<std::string, std::shared_ptr<GraphicsWorld>> worldMap;
-	Camera camera;
+	std::unordered_map<std::string, std::shared_ptr<Camera>> cameraMap;
+	std::shared_ptr<Camera> currentCamera = nullptr;
+	std::shared_ptr<GraphicsWorld> currentWorld = nullptr;
 	MouseParams mouse;
 	static GraphicsEnvironment* self;
 	bool lookWithMouse = true;
@@ -31,13 +36,13 @@ private:
 	glm::mat4 view;
 	glm::mat4 projection;
 	Ray mouseRay;
-	std::string testStr;
 
 public:
 	GraphicsEnvironment();
 	~GraphicsEnvironment();
-
+	void ShowNotice(const std::string& message);
 	GLFWwindow* GetWindow() const { return window; }
+	std::shared_ptr<ObjectManager> GetObjectManager() { return objectManager; }
 	void Init(unsigned int majorVersion, unsigned int minorVersion);
 	bool SetWindow(unsigned int width, unsigned int height, const std::string& title);
 	bool InitGlad();
@@ -53,8 +58,8 @@ public:
 	void Run3D();
 	void SetRendererProjectionAndView(const glm::mat4& projection, const glm::mat4& view);
 	void AddObject(const std::string& name, std::shared_ptr<GraphicsObject> object);
-	std::shared_ptr<GraphicsObject> GetObject(const std::string& name) {
-		return objectManager->GetObject(name);
+	std::shared_ptr<GraphicsObject> GetGraphicsObject(const std::string& name) {
+		return objectManager->GetGraphicsObject(name);
 	}
 
 	MouseParams& GetMouseParams() { return mouse; }
@@ -63,6 +68,7 @@ public:
 	const Ray& GetMouseRay() const { return mouseRay; }
 
 	void UpdateMousePosition();
+	void UpdateWindowSize();
 	void AddShader(const std::string& name, std::shared_ptr<Shader> shader);
 	std::shared_ptr<Shader> GetShader(const std::string& name) {
 		if (shaderMap.contains(name) == false) return nullptr;
@@ -76,6 +82,14 @@ public:
 	void AddTexture(const std::string& name, std::shared_ptr<Texture> texture);
 	void AddGraphicsWorld(
 		const std::string& name, std::shared_ptr<GraphicsWorld> world);
+	void SetCurrentWorld(const std::string& name) {
+		if (worldMap.contains(name) == false) {
+			Logger::Log("No such world!");
+			return;
+		}
+		currentWorld = worldMap[name];
+	}
+	void CreateWorlds();
 
 public:
 	static void OnWindowSizeChanged(GLFWwindow* window, int width, int height);
@@ -83,7 +97,6 @@ public:
 	static void OnMouseButton(GLFWwindow* window, int button, int action, int mods);
 	static void OnKey(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-private:
 	void ShutDown();
 	void ProcessInput(double elapsedSeconds);
 	static glm::mat4 CreateViewMatrix(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& up);

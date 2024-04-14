@@ -24,7 +24,7 @@ public:
     inline void SetView(const glm::mat4& view) { this->view = view; }
     inline void SetProjection(const glm::mat4& projection) { this->projection = projection; }
     inline const std::shared_ptr<Scene>& GetScene() const { return scene; }
-    void RenderScene(const Camera& camera);
+    void RenderScene(std::shared_ptr<Camera> camera);
 
 private:
     void RenderObject(GraphicsObject& object);

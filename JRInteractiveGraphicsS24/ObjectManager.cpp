@@ -6,7 +6,7 @@ void ObjectManager::AddObject(const std::string& name, std::shared_ptr<GraphicsO
     objectMap[name] = object;
 }
 
-std::shared_ptr<GraphicsObject> ObjectManager::GetObject(const std::string& name)
+std::shared_ptr<GraphicsObject> ObjectManager::GetGraphicsObject(const std::string& name)
 {
     if (objectMap.contains(name) == false) return nullptr;
     return objectMap[name];

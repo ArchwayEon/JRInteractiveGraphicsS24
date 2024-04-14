@@ -19,7 +19,7 @@ void Renderer::AllocateBuffers()
 	glBindVertexArray(0);
 }
 
-void Renderer::RenderScene(const Camera& camera)
+void Renderer::RenderScene(std::shared_ptr<Camera> camera)
 {
 	glUseProgram(shader->GetShaderProgram());
 	glBindVertexArray(vaoId);
@@ -34,7 +34,7 @@ void Renderer::RenderScene(const Camera& camera)
 	shader->SendVec3Uniform("localLightColor", ll.color);
 	shader->SendFloatUniform("localLightIntensity", ll.intensity);
 	shader->SendFloatUniform("localLightAttenuationCoef", ll.attenuationCoef);
-	shader->SendVec3Uniform("viewPosition", camera.GetPosition());
+	shader->SendVec3Uniform("viewPosition", camera->GetPosition());
 	// Render the objects in the scene
 	auto& objects = scene->GetObjects();
 	for (auto& object : objects) {

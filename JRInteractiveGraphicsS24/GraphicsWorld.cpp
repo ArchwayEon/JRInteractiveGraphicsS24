@@ -8,7 +8,14 @@
 #include "ChangeColorBehavior.h"
 #include "PCCuboidGenerator.h"
 
-GraphicsWorld::GraphicsWorld(std::shared_ptr<GraphicsEnvironment> env)
+#include <glm/gtc/matrix_transform.hpp>
+#include "GraphicsStructures.h"
+#include "RotateAnimation.h"
+#include "MoveAnimation.h"
+
+GraphicsWorld::GraphicsWorld(std::shared_ptr<GraphicsEnvironment> env) :
+	cubeReferenceFrame(1.0f), projection(1.0f), view(1.0f),
+	globalLight{}, localLight{}
 {
 	_env = env;
 }
@@ -19,6 +26,174 @@ void GraphicsWorld::Create()
 	CreateScene2();
 	CreateScene3();
 	CreateRenderers();
+}
+
+void GraphicsWorld::Preupdate()
+{
+	mainScene = _env->GetScene("Lighting");
+	globalLight = mainScene->GetGlobalLight();
+	localLight = mainScene->GetLocalLight();
+	spherePos =
+		_env->GetGraphicsObject("PCLinesSphere1")->GetPosition();
+	cuboidPos =
+		_env->GetGraphicsObject("PCLineCuboid1")->GetPosition();
+	_env->GetObjectManager()->SetBehaviorDefaults();
+
+	auto crate = _env->GetGraphicsObject("Crate");
+	std::shared_ptr<RotateAnimation> rotateAnimation =
+		std::make_shared<RotateAnimation>();
+	rotateAnimation->SetObject(crate);
+	crate->SetAnimation(rotateAnimation);
+
+	auto cubeWorld = _env->GetGraphicsObject("World");
+	std::shared_ptr<MoveAnimation> moveAnimation =
+		std::make_shared<MoveAnimation>();
+	moveAnimation->SetObject(cubeWorld);
+	cubeWorld->SetAnimation(moveAnimation);
+
+	camera->SetPosition({ 0.0f, 2.0f, 30.0f });
+}
+
+void GraphicsWorld::Update(float elapsedSeconds)
+{
+	auto cube = _env->GetGraphicsObject("TexturedCube");
+	auto lightBulb = _env->GetGraphicsObject("LightBulb");
+	auto floor = _env->GetGraphicsObject("Floor");
+	auto cylinder = _env->GetGraphicsObject("PCLinesCylinder");
+	auto sphere1 = _env->GetGraphicsObject("PCLinesSphere1");
+	auto sphere2 = _env->GetGraphicsObject("PCLinesSphere2");
+	auto cuboid1 = _env->GetGraphicsObject("PCLineCuboid1");
+	auto cuboid2 = _env->GetGraphicsObject("PCLineCuboid2");
+	auto crate = _env->GetGraphicsObject("Crate");
+	auto cubeWorld = _env->GetGraphicsObject("World");
+	auto mouseRayLine = _env->GetGraphicsObject("PCMouseRay");
+
+	auto& mouse = _env->GetMouseParams();
+
+	_env->ProcessInput(elapsedSeconds);
+	_env->UpdateWindowSize();
+	_env->UpdateMousePosition();
+
+	if (correctGamma) {
+		glEnable(GL_FRAMEBUFFER_SRGB);
+	}
+	else {
+		glDisable(GL_FRAMEBUFFER_SRGB);
+	}
+
+	if (lookWithMouse) {
+		camera->SetLookFrame(mouse.spherical.ToMat4());
+	}
+
+	view = camera->GetLookForwardViewMatrix();
+
+	if (mouse.windowWidth >= mouse.windowHeight) {
+		aspectRatio = mouse.windowWidth / (mouse.windowHeight * 1.0f);
+	}
+	else {
+		aspectRatio = mouse.windowHeight / (mouse.windowWidth * 1.0f);
+	}
+	projection = glm::perspective(
+		glm::radians(fieldOfView), aspectRatio, nearPlane, farPlane);
+
+	_env->SetRendererProjectionAndView(projection, view);
+
+	mouseRay = _env->GetMouseRay(projection, view);
+
+	cubeReferenceFrame =
+		glm::rotate(
+			glm::mat4(1.0f), glm::radians(cubeYAngle),
+			glm::vec3(0.0f, 1.0f, 0.0f));
+	cubeReferenceFrame =
+		glm::rotate(
+			cubeReferenceFrame, glm::radians(cubeXAngle),
+			glm::vec3(1.0f, 0.0f, 0.0f));
+	cubeReferenceFrame =
+		glm::rotate(
+			cubeReferenceFrame, glm::radians(cubeZAngle),
+			glm::vec3(0.0f, 0.0f, 1.0f));
+
+	cube->SetReferenceFrame(cubeReferenceFrame);
+	lightBulb->SetPosition(localLight.position);
+	lightBulb->PointAt(camera->GetPosition());
+
+	auto& position = floor->GetPosition();
+	floorPlane.Set({ 0.0f, 1.0f, 0.0f }, position.y);
+
+	offset = floorPlane.GetIntersectionOffset(mouseRay);
+	if (offset >= 0) {
+		glm::vec3 point = mouseRay.GetPoint(offset);
+		float y = cylinder->GetPosition().y;
+		cylinder->SetPosition({ point.x, y, point.z });
+	}
+
+	sphere1->SetPosition(spherePos);
+	isSphereOverlapping = sphere1->OverlapsWithBoundingSphere(*sphere2);
+	sphere1->SetIsOverlapping(isSphereOverlapping);
+	sphere2->SetIsOverlapping(isSphereOverlapping);
+
+	std::shared_ptr<RotateParams> rp1 = std::make_shared<RotateParams>();
+	rp1->axis = { 0.0f, 1.0f, 0.0f };
+	rp1->degrees = cuboid1Deg;
+	std::shared_ptr<RotateParams> rp2 = std::make_shared<RotateParams>();
+	rp2->axis = { 0.0f, 1.0f, 0.0f };
+	rp2->degrees = cuboid2Deg;
+	cuboid1->SetBehaviorParameters("rotateY", rp1);
+	cuboid2->SetBehaviorParameters("rotateY", rp2);
+	cuboid1->SetPosition(cuboidPos);
+	isCuboidOverlapping = cuboid1->OverlapsWithBoundingBox(*cuboid2);
+	cuboid1->SetIsOverlapping(isCuboidOverlapping);
+	cuboid2->SetIsOverlapping(isCuboidOverlapping);
+
+	std::shared_ptr<HighlightParams> hp =
+		std::make_shared<HighlightParams>();
+	hp->ray = &mouseRay;
+	cube->SetBehaviorParameters("highlight", hp);
+	crate->SetBehaviorParameters("highlight", hp);
+	cubeWorld->SetBehaviorParameters("highlight", hp);
+
+	// Get the mouse ray parameters
+	mouseRayStart = mouseRay.GetStartPoint();
+	mouseRayEnd = mouseRay.GetPoint(50.0f);
+	// Draw a line to show the mouse ray
+	auto& mrvb = mouseRayLine->GetVertexBuffer();
+	mrvb->Clear();
+	mrvb->AddVertexData(6,
+		mouseRayStart.x, mouseRayStart.y, mouseRayStart.z,
+		1.0f, 1.0f, 1.0f);
+	mrvb->AddVertexData(6,
+		mouseRayEnd.x, mouseRayEnd.y, mouseRayEnd.z,
+		0.0f, 0.0f, 1.0f);
+}
+
+void GraphicsWorld::UI(ImGuiIO& io)
+{
+	auto& mouse = _env->GetMouseParams();
+	ImGui::Text(Logger::GetLog().c_str());
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+		1000.0f / io.Framerate, io.Framerate);
+	ImGui::Text("Offset: %.3f", offset);
+	ImGui::Text("Mouse NSC: (%.3f, %.3f)", mouse.nsx, mouse.nsy);
+	ImGui::Text("Mouse SC: (%.3f, %.3f)", mouse.x, mouse.y);
+	ImGui::Text("Mouse Ray Start: (%.3f, %.3f, %.3f)",
+		mouseRayStart.x, mouseRayStart.y, mouseRayStart.z);
+	ImGui::Text("Mouse Ray End: (%.3f, %.3f, %.3f)",
+		mouseRayEnd.x, mouseRayEnd.y, mouseRayEnd.z);
+	ImGui::DragFloat3("Local light position",
+		(float*)&localLight.position, 0.1f);
+	ImGui::Checkbox("Correct gamma", &correctGamma);
+	ImGui::Checkbox("Look with mouse", &lookWithMouse);
+	ImGui::SliderFloat("X Angle", &cubeXAngle, 0, 360);
+	ImGui::SliderFloat("Y Angle", &cubeYAngle, 0, 360);
+	ImGui::SliderFloat("Z Angle", &cubeZAngle, 0, 360);
+	ImGui::SliderFloat("Global Intensity", &globalLight.intensity, 0, 1);
+	ImGui::SliderFloat("Local Intensity", &localLight.intensity, 0, 1);
+	ImGui::SliderFloat("Sphere X Position", &spherePos.x, -5.0f, 5.0f);
+	ImGui::Text("Is sphere overlapping: %s", isSphereOverlapping ? "YES" : "NO");
+	ImGui::SliderFloat("Cuboid 1 Y Degrees", &cuboid1Deg, 0, 360);
+	ImGui::SliderFloat("Cuboid 2 Y Degrees", &cuboid2Deg, 0, 360);
+	ImGui::SliderFloat("Cuboid X Position", &cuboidPos.x, -5.0f, 5.0f);
+	ImGui::Text("Is cuboid overlapping: %s", isCuboidOverlapping ? "YES" : "NO");
 }
 
 void GraphicsWorld::CreateScene1()
@@ -344,6 +519,8 @@ void GraphicsWorld::CreateRenderers()
 	CreateRenderer2();
 	CreateRenderer3();
 }
+
+
 
 void GraphicsWorld::CreateRenderer1()
 {
