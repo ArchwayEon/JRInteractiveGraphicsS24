@@ -221,124 +221,6 @@ static void SetUp3DScene1(
 
 }
 
-static void SetUp3DLitScene(
-	std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, GraphicsEnvironment& env)
-{
-	TextFile textFile;
-	bool chk;
-	chk = textFile.Read("lighting.vert.glsl");
-	if (chk == false) return;
-	std::string vs = textFile.GetData();
-	chk = textFile.Read("lighting.frag.glsl");
-	if (chk == false) return;
-	std::string fs = textFile.GetData();
-	shader = std::make_shared<Shader>(vs, fs);
-	shader->AddUniform("projection");
-	shader->AddUniform("world");
-	shader->AddUniform("view");
-	shader->AddUniform("texUnit");
-	shader->AddUniform("materialAmbientIntensity");
-	shader->AddUniform("materialSpecularIntensity");
-	shader->AddUniform("materialShininess");
-	shader->AddUniform("globalLightPosition");
-	shader->AddUniform("globalLightColor");
-	shader->AddUniform("globalLightIntensity");
-	shader->AddUniform("localLightPosition");
-	shader->AddUniform("localLightColor");
-	shader->AddUniform("localLightIntensity");
-	shader->AddUniform("localLightAttenuationCoef");
-	shader->AddUniform("viewPosition");
-
-	std::shared_ptr<Texture> rgbwTexture = std::make_shared<Texture>();
-	rgbwTexture->SetDimension(4, 4);
-	unsigned char data[] = {
-		255, 255, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 255, 255, 255, 255,
-		0, 255, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 0, 255,
-		0, 255, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 0, 255,
-		255, 255, 255, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 255, 255, 255
-	};
-	rgbwTexture->SetTextureData(64, data);
-
-	scene = std::make_shared<Scene>();
-
-	std::shared_ptr<GraphicsObject> texturedCube = std::make_shared<GraphicsObject>();
-	std::shared_ptr<VertexBuffer> buffer = Generate::CuboidWithNormals(10.0f, 5.0f, 5.0f);
-	buffer->AddVertexAttribute("position", 0, 3, 0);
-	buffer->AddVertexAttribute("vertexColor", 1, 4, 3);
-	buffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
-	buffer->AddVertexAttribute("texCoord", 3, 2, 10);
-	buffer->SetTexture(rgbwTexture);
-	texturedCube->SetVertexBuffer(buffer);
-	texturedCube->CreateBoundingBox(10.0f, 5.0f, 5.0f);
-	auto hb1 = std::make_shared<HighlightBehavior>(texturedCube);
-	texturedCube->AddBehavior("highlight", hb1);
-	auto rb = std::make_shared<RotateBehavior>(texturedCube);
-	rb->SetUpParameter();
-	rb->GetParameter()->axis = { 0.0f, 1.0f, 0.0f };
-	texturedCube->AddBehavior("rotateY", rb);
-	rb = std::make_shared<RotateBehavior>(texturedCube);
-	rb->SetUpParameter();
-	rb->GetParameter()->axis = { 1.0f, 0.0f, 0.0f };
-	texturedCube->AddBehavior("rotateX", rb);
-	rb = std::make_shared<RotateBehavior>(texturedCube);
-	rb->SetUpParameter();
-	rb->GetParameter()->axis = { 0.0f, 0.0f, 1.0f };
-	texturedCube->AddBehavior("rotateZ", rb);
-	scene->AddObject(texturedCube);
-	env.AddObject("TexturedCube", texturedCube);
-
-	std::shared_ptr<Texture> crateTexture = std::make_shared<Texture>();
-	crateTexture->LoadTextureDataFromFile("crate.jpg");
-	std::shared_ptr<GraphicsObject> crate = std::make_shared<GraphicsObject>();
-	buffer = Generate::CuboidWithNormals(10.0f, 10.0f, 10.0f);
-	buffer->AddVertexAttribute("position", 0, 3, 0);
-	buffer->AddVertexAttribute("vertexColor", 1, 4, 3);
-	buffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
-	buffer->AddVertexAttribute("texCoord", 3, 2, 10);
-	buffer->SetTexture(crateTexture);
-	crate->SetVertexBuffer(buffer);
-	crate->CreateBoundingBox(10.0f, 10.0f, 10.0f);
-	auto hb2 = std::make_shared<HighlightBehavior>(crate);
-	crate->AddBehavior("highlight", hb2);
-	crate->SetPosition(glm::vec3(-20.0f, 5.0f, -5.0f));
-	scene->AddObject(crate);
-	env.AddObject("Crate", crate);
-
-	std::shared_ptr<Texture> worldTexture = std::make_shared<Texture>();
-	worldTexture->LoadTextureDataFromFile("world.jpg");
-	std::shared_ptr<GraphicsObject> world = std::make_shared<GraphicsObject>();
-	buffer = Generate::CuboidWithNormals(3.0f, 3.0f, 3.0f);
-	buffer->AddVertexAttribute("position", 0, 3, 0);
-	buffer->AddVertexAttribute("vertexColor", 1, 4, 3);
-	buffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
-	buffer->AddVertexAttribute("texCoord", 3, 2, 10);
-	buffer->SetTexture(worldTexture);
-	world->SetVertexBuffer(buffer);
-	world->CreateBoundingBox(3.0f, 3.0f, 3.0f);
-	auto hb3 = std::make_shared<HighlightBehavior>(world);
-	world->AddBehavior("highlight", hb3);
-	world->SetPosition(glm::vec3(20.0f, 1.5f, 22.0f));
-	scene->AddObject(world);
-	env.AddObject("World", world);
-
-	std::shared_ptr<Texture> floorTexture = std::make_shared<Texture>();
-	floorTexture->LoadTextureDataFromFile("floor.jpg");
-	std::shared_ptr<GraphicsObject> floor = std::make_shared<GraphicsObject>();
-	buffer = Generate::XZPlaneWithNormals(50.0f, 50.0f, { 1.0f, 1.0f, 1.0f, 1.0f }, { 10.0f, 10.0f });
-	buffer->AddVertexAttribute("position", 0, 3, 0);
-	buffer->AddVertexAttribute("vertexColor", 1, 4, 3);
-	buffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
-	buffer->AddVertexAttribute("texCoord", 3, 2, 10);
-	buffer->SetTexture(floorTexture);
-	floor->SetVertexBuffer(buffer);
-	floor->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-	scene->AddObject(floor);
-	env.AddObject("Floor", floor);
-
-	scene->GetLocalLight().position = { 0.0f, 5.0f, 5.0f };
-	scene->GetLocalLight().intensity = 0.5f;
-}
-
 static void SetUpLightBulbScene(
 	std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, 
 	GraphicsEnvironment& env)
@@ -515,7 +397,7 @@ static void SetUpPCObjectsScene(
 	mrvb->AddVertexAttribute("color", 1, 3, 3);
 	pcMouseRay->CreateIndexBuffer();
 	pcMouseRay->GetIndexBuffer()->AddIndexData(2, 0, 1);
-	pcMouseRay->SetUpDynamicBuffers(2, 2);
+	pcMouseRay->SetUpDynamicBuffers(4, 4);
 	pcMouseRay->SetPosition({ 0.0f, 0.0f, 0.0f });
 	scene->AddObject(pcMouseRay);
 	env.AddObject("PCMouseRay", pcMouseRay);
@@ -526,42 +408,31 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
-	GraphicsEnvironment glfw;
-	glfw.Init(4, 3);
+	auto glfw = std::make_shared<GraphicsEnvironment>();
+	glfw->Init(4, 3);
 
-	bool created = glfw.SetWindow(
+	bool created = glfw->SetWindow(
 		1200, 800, "ETSU Computing Interactive Graphics");
 	if (created == false) return -1;
 
-	bool loaded = glfw.InitGlad();
+	bool loaded = glfw->InitGlad();
 	if (loaded == false) return -1;
 
-	glfw.SetupGraphics();
+	glfw->SetupGraphics();
 
-	std::shared_ptr<Shader> shader;
-	std::shared_ptr<Scene> scene;
-	SetUp3DLitScene(shader, scene, glfw);
+	auto world = std::make_shared<GraphicsWorld>(glfw);
+	world->Create();
 
-	std::shared_ptr<Shader> basicShader;
-	std::shared_ptr<Scene> basicScene;
-	SetUpLightBulbScene(basicShader, basicScene, glfw);
+	//std::shared_ptr<Shader> pcShader;
+	//std::shared_ptr<Scene> pcScene;
+	//SetUpPCObjectsScene(pcShader, pcScene, *glfw);
 
-	std::shared_ptr<Shader> pcShader;
-	std::shared_ptr<Scene> pcScene;
-	SetUpPCObjectsScene(pcShader, pcScene, glfw);
+	//glfw->CreateRenderer("PCRenderer", pcShader);
+	//glfw->GetRenderer("PCRenderer")->SetScene(pcScene);
 
-	glfw.CreateRenderer("LightingRenderer", shader);
-	glfw.GetRenderer("LightingRenderer")->SetScene(scene);
+	glfw->Allocate();
 
-	glfw.CreateRenderer("BasicRenderer", basicShader);
-	glfw.GetRenderer("BasicRenderer")->SetScene(basicScene);
-
-	glfw.CreateRenderer("PCRenderer", pcShader);
-	glfw.GetRenderer("PCRenderer")->SetScene(pcScene);
-
-	glfw.Allocate();
-
-	glfw.Run3D();
+	glfw->Run3D();
 	return 0;
 }
 

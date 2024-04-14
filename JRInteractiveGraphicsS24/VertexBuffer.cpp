@@ -59,12 +59,12 @@ void VertexBuffer::AddVertexAttribute(
 	const std::string& name, unsigned int index, 
 	unsigned int numberOfElements, unsigned int offsetCount)
 {
-	unsigned int vertexSizeInBytes = sizeof(float) * numberOfElementsPerVertex;
-	unsigned int bytesToNext = vertexSizeInBytes;
+	unsigned long long vertexSizeInBytes = sizeof(float) * numberOfElementsPerVertex;
+	unsigned long long bytesToNext = vertexSizeInBytes;
 	unsigned long long offsetBytes = sizeof(float) * offsetCount;
 	VertexAttribute attr = { 
 		index, numberOfElements, GL_FLOAT, GL_FALSE, 
-		bytesToNext, (void*)offsetBytes 
+		(unsigned int)bytesToNext, (void*)offsetBytes 
 	};
 	attributeMap[name] = attr;
 }

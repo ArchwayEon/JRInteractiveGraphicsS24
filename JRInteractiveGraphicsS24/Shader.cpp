@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <glm/gtc/type_ptr.hpp>
+#include "Logger.h"
 
 Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource)
 {
@@ -106,10 +107,10 @@ unsigned int Shader::CompileShaderSource(int type, const std::string& shaderSour
 		// We don't need the shader anymore.
 		glDeleteShader(shaderId);
 
-		Log(infoLog);
+		Logger::Log(infoLog);
 		return -1;
 	}
-	Log("Successfully compiled the shader!");
+	Logger::Log("Successfully compiled the shader!");
 	return shaderId;
 }
 
@@ -150,7 +151,7 @@ void Shader::CreateShaderProgram()
 		// Don't leak shaders either.
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
-		Log(infoLog);
+		Logger::Log(infoLog);
 
 		//std::copy(infoLog.begin(), infoLog.end(), std::ostream_iterator<char>(logger, ""));
 	}
@@ -158,5 +159,5 @@ void Shader::CreateShaderProgram()
 	// Always detach shaders after a successful link.
 	glDetachShader(shaderProgram, vertexShader);
 	glDetachShader(shaderProgram, fragmentShader);
-	Log("Successfully created the shader!");
+	Logger::Log("Successfully created the shader!");
 }

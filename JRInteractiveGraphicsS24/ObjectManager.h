@@ -1,10 +1,9 @@
 #pragma once
-#include "BaseObject.h"
 #include <string>
 #include <unordered_map>
 #include "GraphicsObject.h"
 
-class ObjectManager : public BaseObject
+class ObjectManager
 {
 private:
     std::unordered_map<std::string, std::shared_ptr<GraphicsObject>> objectMap;

@@ -1,23 +1,23 @@
 #pragma once
-#include "BaseObject.h"
 #include <glm/glm.hpp>
+#include "ReferenceFrame.h"
 
-class Camera : public BaseObject
+class Camera
 {
 private:
-	glm::mat4 lookFrame;
-	glm::mat4 referenceFrame;
+	ReferenceFrame lookFrame;
+	ReferenceFrame referenceFrame;
 	float moveSpeed = 10.0f;
 
 public:
-	Camera() : lookFrame(1.0f), referenceFrame(1.0f) {}
+	Camera() : lookFrame(), referenceFrame() {}
 
-	void SetLookFrame(glm::mat4 lookFrame) { this->lookFrame = lookFrame; }
+	void SetLookFrame(ReferenceFrame lookFrame) { this->lookFrame = lookFrame; }
 	void SetMoveSpeed(float moveSpeed) { this->moveSpeed = moveSpeed; }
 	void SetPosition(glm::vec3 position);
 	glm::vec3 GetPosition() const;
-	glm::mat4 LookForward() const;
-	glm::mat4 LookAt(glm::vec3 target) const;
+	glm::mat4 GetLookForwardViewMatrix() const;
+	glm::mat4 GetLookAtViewMatrix(glm::vec3 target) const;
 	void MoveForward(double elapsedSeconds);
 	void MoveBackward(double elapsedSeconds);
 	void MoveLeft(double elapsedSeconds);
@@ -25,8 +25,8 @@ public:
 	void MoveUp(double elapsedSeconds);
 	void MoveDown(double elapsedSeconds);
 
-	glm::mat4 GetLookFrame() const { return lookFrame; }
-	glm::mat4 GetReferenceFrame() const { return referenceFrame; }
+	ReferenceFrame GetLookFrame() const { return lookFrame; }
+	ReferenceFrame GetReferenceFrame() const { return referenceFrame; }
 
 	//glm::vec3 TransformVectorToLocal(glm::vec3 v);
 };

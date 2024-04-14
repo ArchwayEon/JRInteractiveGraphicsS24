@@ -56,7 +56,7 @@ void Renderer::RenderObject(GraphicsObject& object)
 	auto& vertexBuffer = object.GetVertexBuffer();
 	vertexBuffer->Select();
 	if (vertexBuffer->HasTexture()) {
-		shader->SendIntUniform("tex", vertexBuffer->GetTextureUnit());
+		shader->SendIntUniform("texUnit", vertexBuffer->GetTextureUnit());
 		vertexBuffer->GetTexture()->SelectToRender();
 	}
 	vertexBuffer->SetUpAttributeInterpretration();

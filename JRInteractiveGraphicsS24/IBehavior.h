@@ -1,11 +1,10 @@
 #pragma once
-#include "BaseObject.h"
 #include "GraphicsStructures.h"
 #include <memory>
 
 class GraphicsObject; // Forward declaration
 
-class IBehavior :  public BaseObject
+class IBehavior
 {
 protected:
 	std::shared_ptr<GraphicsObject> object;
@@ -18,7 +17,7 @@ public:
 	virtual void SetObject(std::shared_ptr<GraphicsObject> object);
 	virtual void Update(double elapsedSeconds) = 0;
 
-	virtual void SetUpParameter() {};
+	virtual void SetUpParameters() {};
 	virtual void SetParameter(std::shared_ptr<IParams> params) {};
 	virtual void StoreDefaults() {};
 };

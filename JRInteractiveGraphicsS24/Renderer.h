@@ -1,5 +1,4 @@
 #pragma once
-#include "BaseObject.h"
 #include "Shader.h"
 #include "GraphicsObject.h"
 #include "Scene.h"
@@ -7,7 +6,7 @@
 #include <vector>
 #include "Camera.h"
 
-class Renderer : public BaseObject
+class Renderer 
 {
 private:
     unsigned int vaoId;

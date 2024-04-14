@@ -1,6 +1,7 @@
 #include "TextFile.h"
 #include <sstream>
 #include <fstream>
+#include "Logger.h"
 
 bool TextFile::Read(const std::string& filePath)
 {
@@ -9,7 +10,7 @@ bool TextFile::Read(const std::string& filePath)
     fin.open(filePath.c_str());
     if (fin.fail()) {
         ss << "Could not open: " << filePath << std::endl;
-        Log(ss.str());
+        Logger::Log(ss.str());
         return false;
     }
 

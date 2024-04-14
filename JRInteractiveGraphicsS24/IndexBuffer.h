@@ -1,9 +1,8 @@
 #pragma once
-#include "BaseObject.h"
 #include <vector>
 #include <glad/glad.h> 
 
-class IndexBuffer :  public BaseObject
+class IndexBuffer
 {
 protected:
     unsigned int iboId;

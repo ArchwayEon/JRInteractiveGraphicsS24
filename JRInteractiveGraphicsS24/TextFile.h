@@ -1,8 +1,7 @@
 #pragma once
-#include "BaseObject.h"
 #include <string>
 
-class TextFile :  public BaseObject
+class TextFile
 {
 private:
 	std::string data;

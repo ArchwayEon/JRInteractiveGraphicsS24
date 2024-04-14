@@ -4,6 +4,7 @@
 #include "RotateAnimation.h"
 #include "GeometricPlane.h"
 #include "MoveAnimation.h"
+#include "Logger.h"
 
 GraphicsEnvironment* GraphicsEnvironment::self;
 
@@ -34,7 +35,7 @@ bool GraphicsEnvironment::SetWindow(unsigned int width, unsigned int height, con
     window = glfwCreateWindow(
         width, height, title.c_str(), nullptr, nullptr);
     if (window == nullptr) {
-        _log << "Failed to create GLFW window" << std::endl;
+        Logger::Log("Failed to create GLFW window!");
         return false;
     }
     glfwMakeContextCurrent(window);
@@ -44,7 +45,7 @@ bool GraphicsEnvironment::SetWindow(unsigned int width, unsigned int height, con
 bool GraphicsEnvironment::InitGlad()
 {
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        _log << "Failed to initialize GLAD" << std::endl;
+        Logger::Log("Failed to initialize GLAD!");
         return false;
     }
     return true;
@@ -89,7 +90,8 @@ void GraphicsEnvironment::CreateRenderer(
     rendererMap.emplace(name, renderer);
 }
 
-std::shared_ptr<Renderer> GraphicsEnvironment::GetRenderer(const std::string& name)
+std::shared_ptr<Renderer> GraphicsEnvironment::GetRenderer(
+    const std::string& name)
 {
     return rendererMap[name];
 }
@@ -159,7 +161,7 @@ void GraphicsEnvironment::Run2D()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 		ImGui::Begin("Computing Interactive Graphics");
-		ImGui::Text(GetLog().c_str());
+		ImGui::Text(Logger::GetLog().c_str());
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
 			1000.0f / io.Framerate, io.Framerate);
 		ImGui::ColorEdit3("Background color", (float*)&clearColor.r);
@@ -203,14 +205,10 @@ void GraphicsEnvironment::Run3D()
     float fieldOfView = 60;
 
     camera.SetPosition(glm::vec3(0.0f, 5.0f, 30.0f));
-    //glm::vec3 cameraPosition(15.0f, 15.0f, 20.0f);
     glm::vec3 cameraTarget(0.0f, 0.0f, 0.0f);
-    //glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
     glm::mat4 cubeReferenceFrame(1.0f);
     glm::vec3 clearColor = { 0.0f, 0.0f, 0.0f };
-
-    //auto& scene = GetRenderer("renderer")->GetScene();
     
     auto lightBulb = objectManager->GetObject("LightBulb");
 
@@ -223,14 +221,13 @@ void GraphicsEnvironment::Run3D()
         std::make_shared<MoveAnimation>();
     moveAnimation->SetObject(objectManager->GetObject("World"));
     objectManager->GetObject("World")->SetAnimation(moveAnimation);
-
     
     GeometricPlane floorPlane;
     float offset;
     double elapsedSeconds;
     Timer timer;
     ImGuiIO& io = ImGui::GetIO();
-    auto mainScene = GetRenderer("LightingRenderer")->GetScene();
+    auto mainScene = GetScene("Lighting");
     auto& globalLight = mainScene->GetGlobalLight();
     auto& localLight = mainScene->GetLocalLight();
     objectManager->SetBehaviorDefaults();
@@ -286,7 +283,7 @@ void GraphicsEnvironment::Run3D()
             camera.SetLookFrame(mouse.spherical.ToMat4());
         }
 
-        view = camera.LookForward();
+        view = camera.GetLookForwardViewMatrix();
 
         if (width >= height) {
             aspectRatio = width / (height * 1.0f);
@@ -298,6 +295,7 @@ void GraphicsEnvironment::Run3D()
             glm::radians(fieldOfView), aspectRatio, nearPlane, farPlane);
 
         SetRendererProjectionAndView(projection, view);
+        mouseRay = GetMouseRay(projection, view);
         
         cube->SetReferenceFrame(cubeReferenceFrame);
         lightBulb->SetPosition(localLight.position);
@@ -338,19 +336,18 @@ void GraphicsEnvironment::Run3D()
         crate->SetBehaviorParameters("highlight", hp);
         cubeWorld->SetBehaviorParameters("highlight", hp);
 
-        auto& mrDir = mouseRay.GetDirection();
-        auto mrStart = mouseRay.GetStartPoint();
-        auto mrEnd = mouseRay.GetPoint(50.0f);
-        auto cameraPos = camera.GetPosition();
-        mouseRayLine->SetPosition(mrStart);
-        auto localDir =
-            mouseRayLine->GetLocalReferenceFrame().WorldToLocal(glm::vec4(mrDir, 0.0f));
+        // Get the mouse ray parameters
+        auto mouseRayStart = mouseRay.GetStartPoint();
+        auto mouseRayEnd = mouseRay.GetPoint(50.0f);
+        // Draw a line to show the mouse ray
         auto& mrvb = mouseRayLine->GetVertexBuffer();
         mrvb->Clear();
-        mrvb->AddVertexData(6, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-        //mrvb->AddVertexData(6, endLocal.x, endLocal.y, endLocal.z, 1.0f, 1.0f, 1.0f);
-        mrvb->AddVertexData(
-            6, localDir.x * 10.0f, localDir.y * 10.0f, localDir.z * 10.0f, 1.0f, 1.0f, 1.0f);
+        mrvb->AddVertexData(6, 
+            mouseRayStart.x, mouseRayStart.y, mouseRayStart.z, 
+            1.0f, 1.0f, 1.0f);
+        mrvb->AddVertexData(6, 
+            mouseRayEnd.x, mouseRayEnd.y, mouseRayEnd.z, 
+            0.0f, 0.0f, 1.0f);
 
         objectManager->Update(elapsedSeconds);
 
@@ -360,22 +357,16 @@ void GraphicsEnvironment::Run3D()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         ImGui::Begin("Computing Interactive Graphics");
-        ImGui::Text(GetLog().c_str());
+        ImGui::Text(Logger::GetLog().c_str());
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
             1000.0f / io.Framerate, io.Framerate);
         ImGui::Text("Offset: %.3f", offset);
         ImGui::Text("Mouse NSC: (%.3f, %.3f)", mouse.nsx, mouse.nsy);
         ImGui::Text("Mouse SC: (%.3f, %.3f)", mouse.x, mouse.y);
-        ImGui::Text("Camera position: (%.3f, %.3f, %.3f)",
-            cameraPos.x, cameraPos.y, cameraPos.z);
         ImGui::Text("Mouse Ray Start: (%.3f, %.3f, %.3f)", 
-            mrStart.x, mrStart.y, mrStart.z);
-        ImGui::Text("Mouse Ray direction: (%.3f, %.3f, %.3f)",
-            mrDir.x, mrDir.y, mrDir.z);
+            mouseRayStart.x, mouseRayStart.y, mouseRayStart.z);
         ImGui::Text("Mouse Ray End: (%.3f, %.3f, %.3f)",
-            mrEnd.x, mrEnd.y, mrEnd.z);
-        ImGui::Text("Mouse Ray Local Dir: (%.3f, %.3f, %.3f)",
-            localDir.x, localDir.y, localDir.z);
+            mouseRayEnd.x, mouseRayEnd.y, mouseRayEnd.z);
         ImGui::ColorEdit3("Background color", (float*)&clearColor.r);
         ImGui::DragFloat3("Local light position", 
             (float*)&localLight.position, 0.1f);
@@ -460,7 +451,35 @@ void GraphicsEnvironment::UpdateMousePosition()
 
     mouse.nsx = xPercent * 2.0f - 1.0f;
     mouse.nsy = -(yPercent * 2.0f - 1.0f);
-    mouseRay = GetMouseRay(projection, view);
+
+}
+
+void GraphicsEnvironment::AddShader(
+    const std::string& name, std::shared_ptr<Shader> shader)
+{
+    if (shaderMap.contains(name)) return;
+    shaderMap[name] = shader;
+}
+
+void GraphicsEnvironment::AddScene(
+    const std::string& name, std::shared_ptr<Scene> scene)
+{
+    if (sceneMap.contains(name)) return;
+    sceneMap[name] = scene;
+}
+
+void GraphicsEnvironment::AddTexture(
+    const std::string& name, std::shared_ptr<Texture> texture)
+{
+    if (textureMap.contains(name)) return;
+    textureMap[name] = texture;
+}
+
+void GraphicsEnvironment::AddGraphicsWorld(
+    const std::string& name, std::shared_ptr<GraphicsWorld> world)
+{
+    if (worldMap.contains(name)) return;
+    worldMap[name] = world;
 }
 
 void GraphicsEnvironment::OnWindowSizeChanged(GLFWwindow* window, int width, int height)
@@ -472,19 +491,6 @@ void GraphicsEnvironment::OnMouseMove(
     GLFWwindow* window, double mouseX, double mouseY)
 {
     self->UpdateMousePosition();
-    //MouseParams& mouse = self->GetMouseParams();
-    //mouse.x = mouseX;
-    //mouse.y = mouseY;
-
-    //float xPercent = static_cast<float>(mouse.x / mouse.windowWidth);
-    //float yPercent = static_cast<float>(mouse.y / mouse.windowHeight);
-
-    //mouse.spherical.theta = 90.0f - (xPercent * 180); // left/right
-    //mouse.spherical.phi = 180.0f - (yPercent * 180); // up/down
-
-    //mouse.nsx = xPercent * 2.0f - 1.0f;
-    //mouse.nsy = -(yPercent * 2.0f - 1.0f);
-    //self->mouseRay = self->GetMouseRay(self->projection, self->view);
 }
 
 void GraphicsEnvironment::OnMouseButton(
@@ -580,7 +586,8 @@ void GraphicsEnvironment::ProcessInput(double elapsedSeconds)
     }
 }
 
-glm::mat4 GraphicsEnvironment::CreateViewMatrix(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& up)
+glm::mat4 GraphicsEnvironment::CreateViewMatrix(
+    const glm::vec3& position, const glm::vec3& direction, const glm::vec3& up)
 {
     glm::vec3 right = glm::cross(direction, up);
     right = glm::normalize(right);

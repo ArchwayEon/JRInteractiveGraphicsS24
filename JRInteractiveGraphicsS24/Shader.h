@@ -3,9 +3,8 @@
 #include <sstream>
 #include <unordered_map>
 #include <glm/glm.hpp>
-#include "BaseObject.h"
 
-class Shader : public BaseObject
+class Shader
 {
 private:
 	std::string vertexSource;

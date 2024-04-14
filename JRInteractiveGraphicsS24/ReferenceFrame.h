@@ -23,19 +23,19 @@ public:
 		return { matrix4[0].x, matrix4[0].y, matrix4[0].z };
 	}
 	void SetXAxis(glm::vec3 axis) {
-		matrix4[0] = glm::vec4(axis, 1.0f);
+		matrix4[0] = glm::vec4(axis, 0.0f);
 	}
 	glm::vec3 GetYAxis() const {
 		return { matrix4[1].x, matrix4[1].y, matrix4[1].z };
 	}
 	void SetYAxis(glm::vec3 axis) {
-		matrix4[1] = glm::vec4(axis, 1.0f);
+		matrix4[1] = glm::vec4(axis, 0.0f);
 	}
 	glm::vec3 GetZAxis() const {
 		return { matrix4[2].x, matrix4[2].y, matrix4[2].z };
 	}
 	void SetZAxis(glm::vec3 axis) {
-		matrix4[2] = glm::vec4(axis, 1.0f);
+		matrix4[2] = glm::vec4(axis, 0.0f);
 	}
 	void SetPosition(glm::vec3 position);
 	void RotateX(float deltaDegrees);

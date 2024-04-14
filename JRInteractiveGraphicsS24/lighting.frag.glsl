@@ -21,7 +21,7 @@ uniform float localLightAttenuationCoef;
 
 uniform vec3 viewPosition;
 
-uniform sampler2D tex;
+uniform sampler2D texUnit;
 
 vec4 calculateDiffuse(vec3 lightDir, vec3 unitNormal, float lightIntensity, vec3 lightColor);
 
@@ -56,7 +56,7 @@ void main()
       specular.a = 1.0f;
    }
 
-   vec4 texFragColor = texture(tex, fragTexCoord) * fragColor;
+   vec4 texFragColor = texture(texUnit, fragTexCoord) * fragColor;
    vec4 ambientColor = materialAmbientIntensity * vec4(1.0f, 1.0f, 1.0f, 1.0f);
    ambientColor.a = 1.0f;
    color = (ambientColor + globalDiffuse + localDiffuse + specular) *   

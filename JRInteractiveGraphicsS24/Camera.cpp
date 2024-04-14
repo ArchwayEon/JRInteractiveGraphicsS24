@@ -3,82 +3,82 @@
 
 void Camera::SetPosition(glm::vec3 position)
 {
-	referenceFrame[3] = glm::vec4(position, 1.0f);
+    referenceFrame.SetPosition(position);
 }
 
-glm::mat4 Camera::LookForward() const
+glm::mat4 Camera::GetLookForwardViewMatrix() const
 {
-    glm::vec3 cameraPosition = referenceFrame[3];
-    glm::vec3 cameraForward = -lookFrame[2];
+    glm::vec3 cameraPosition = referenceFrame.GetPosition();
+    glm::vec3 cameraForward = -lookFrame.GetZAxis();
     glm::vec3 cameraTarget = cameraPosition + cameraForward;
-    glm::vec3 cameraUp = lookFrame[1];
+    glm::vec3 cameraUp = lookFrame.GetYAxis();
 	return glm::lookAt(cameraPosition, cameraTarget, cameraUp);
 }
 
 glm::vec3 Camera::GetPosition() const
 {
-    return glm::vec3(referenceFrame[3]);
+    return referenceFrame.GetPosition();
 }
 
-glm::mat4 Camera::LookAt(glm::vec3 target) const
+glm::mat4 Camera::GetLookAtViewMatrix(glm::vec3 target) const
 {
-    glm::vec3 cameraPosition = referenceFrame[3];
-    glm::vec3 cameraUp = lookFrame[1];
+    glm::vec3 cameraPosition = referenceFrame.GetPosition();
+    glm::vec3 cameraUp = lookFrame.GetYAxis();
     return glm::lookAt(cameraPosition, target, cameraUp);
 }
 
 void Camera::MoveBackward(double elapsedSeconds)
 {
-    glm::vec3 backward = lookFrame[2];
-    glm::vec3 position = referenceFrame[3];
+    glm::vec3 backward = lookFrame.GetZAxis();
+    glm::vec3 position = referenceFrame.GetPosition();
     backward = backward * static_cast<float>(moveSpeed * elapsedSeconds);
     position = position + backward;
-    referenceFrame[3] = glm::vec4(position, 1.0f);
+    referenceFrame.SetPosition(position);
 }
 
 void Camera::MoveForward(double elapsedSeconds)
 {
-    glm::vec3 forward = -lookFrame[2];
-    glm::vec3 position = referenceFrame[3];
+    glm::vec3 forward = -lookFrame.GetZAxis();
+    glm::vec3 position = referenceFrame.GetPosition();
     forward = forward * static_cast<float>(moveSpeed * elapsedSeconds);
     position = position + forward;
-    referenceFrame[3] = glm::vec4(position, 1.0f);
+    referenceFrame.SetPosition(position);
 }
 
 void Camera::MoveLeft(double elapsedSeconds)
 {
-    glm::vec3 toLeft = -lookFrame[0];
-    glm::vec3 position = referenceFrame[3];
+    glm::vec3 toLeft = -lookFrame.GetXAxis();
+    glm::vec3 position = referenceFrame.GetPosition();
     toLeft = toLeft * static_cast<float>(moveSpeed * elapsedSeconds);
     position = position + toLeft;
-    referenceFrame[3] = glm::vec4(position, 1.0f);
+    referenceFrame.SetPosition(position);
 }
 
 void Camera::MoveRight(double elapsedSeconds)
 {
-    glm::vec3 toRight = lookFrame[0];
-    glm::vec3 position = referenceFrame[3];
+    glm::vec3 toRight = lookFrame.GetXAxis();
+    glm::vec3 position = referenceFrame.GetPosition();
     toRight = toRight * static_cast<float>(moveSpeed * elapsedSeconds);
     position = position + toRight;
-    referenceFrame[3] = glm::vec4(position, 1.0f);
+    referenceFrame.SetPosition(position);
 }
 
 void Camera::MoveUp(double elapsedSeconds)
 {
-    glm::vec3 up = referenceFrame[1];
-    glm::vec3 position = referenceFrame[3];
+    glm::vec3 up = lookFrame.GetYAxis();
+    glm::vec3 position = referenceFrame.GetPosition();
     up = up * static_cast<float>(moveSpeed * elapsedSeconds);
     position = position + up;
-    referenceFrame[3] = glm::vec4(position, 1.0f);
+    referenceFrame.SetPosition(position);
 }
 
 void Camera::MoveDown(double elapsedSeconds)
 {
-    glm::vec3 down = -referenceFrame[1];
-    glm::vec3 position = referenceFrame[3];
+    glm::vec3 down = -lookFrame.GetYAxis();
+    glm::vec3 position = referenceFrame.GetPosition();
     down = down * static_cast<float>(moveSpeed * elapsedSeconds);
     position = position + down;
-    referenceFrame[3] = glm::vec4(position, 1.0f);
+    referenceFrame.SetPosition(position);
 }
 
 

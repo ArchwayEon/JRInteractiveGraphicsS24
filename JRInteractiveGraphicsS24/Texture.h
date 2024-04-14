@@ -1,6 +1,7 @@
 #pragma once
-#include "BaseObject.h"
-class Texture :  public BaseObject
+#include <string>
+
+class Texture
 {
 private:
 	unsigned char* textureData;

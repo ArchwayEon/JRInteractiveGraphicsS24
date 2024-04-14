@@ -3,7 +3,6 @@
 #include <memory>
 
 #include "VertexBuffer.h"
-#include "BaseObject.h"
 #include "GraphicsStructures.h"
 #include "IndexBuffer.h"
 #include "BoundingBox.h"
@@ -14,7 +13,7 @@
 class IAnimation;
 class IGenerator;
 
-class GraphicsObject : public BaseObject
+class GraphicsObject
 {
 protected:
 	//glm::mat4 referenceFrame;

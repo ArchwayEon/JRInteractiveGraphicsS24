@@ -12,7 +12,7 @@ protected:
 public:
 	RotateBehavior(std::shared_ptr<GraphicsObject> object);
 	void StoreDefaults() override;
-	void SetUpParameter() override;
+	void SetUpParameters() override;
 	void SetParameter(std::shared_ptr<IParams> params) override;
 	void Update(double elapsedSeconds) override;
 	std::shared_ptr<RotateParams> GetParameter() {

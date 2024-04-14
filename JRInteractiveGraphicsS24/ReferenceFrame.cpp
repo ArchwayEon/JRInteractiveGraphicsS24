@@ -18,6 +18,7 @@ void ReferenceFrame::SetPosition(glm::vec3 position)
 	matrix4[3].x = position.x;
 	matrix4[3].y = position.y;
 	matrix4[3].z = position.z;
+	matrix4[3].w = 1.0f;
 }
 
 void ReferenceFrame::RotateX(float deltaDegrees)

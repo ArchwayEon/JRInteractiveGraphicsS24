@@ -11,13 +11,18 @@
 #include "Camera.h"
 #include "GraphicsStructures.h"
 #include "Ray.h"
+#include "GraphicsWorld.h"
 
-class GraphicsEnvironment : public BaseObject
+class GraphicsEnvironment
 {
 private:
 	GLFWwindow* window;
 	std::shared_ptr<ObjectManager> objectManager;
 	std::unordered_map<std::string, std::shared_ptr<Renderer>> rendererMap;
+	std::unordered_map<std::string, std::shared_ptr<Shader>> shaderMap;
+	std::unordered_map<std::string, std::shared_ptr<Scene>> sceneMap;
+	std::unordered_map<std::string, std::shared_ptr<Texture>> textureMap;
+	std::unordered_map<std::string, std::shared_ptr<GraphicsWorld>> worldMap;
 	Camera camera;
 	MouseParams mouse;
 	static GraphicsEnvironment* self;
@@ -58,6 +63,19 @@ public:
 	const Ray& GetMouseRay() const { return mouseRay; }
 
 	void UpdateMousePosition();
+	void AddShader(const std::string& name, std::shared_ptr<Shader> shader);
+	std::shared_ptr<Shader> GetShader(const std::string& name) {
+		if (shaderMap.contains(name) == false) return nullptr;
+		return shaderMap[name];
+	}
+	void AddScene(const std::string& name, std::shared_ptr<Scene> scene);
+	std::shared_ptr<Scene> GetScene(const std::string& name) {
+		if (sceneMap.contains(name) == false) return nullptr;
+		return sceneMap[name];
+	}
+	void AddTexture(const std::string& name, std::shared_ptr<Texture> texture);
+	void AddGraphicsWorld(
+		const std::string& name, std::shared_ptr<GraphicsWorld> world);
 
 public:
 	static void OnWindowSizeChanged(GLFWwindow* window, int width, int height);

@@ -14,7 +14,7 @@ void RotateBehavior::StoreDefaults()
 	defaultFrame.SetPosition({ 0.0f, 0.0f, 0.0f });
 }
 
-void RotateBehavior::SetUpParameter()
+void RotateBehavior::SetUpParameters()
 {
 	this->params = std::make_shared<RotateParams>();
 }
