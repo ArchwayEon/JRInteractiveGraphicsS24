@@ -7,10 +7,11 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include "IGraphicsWorld.h"
 
 class GraphicsEnvironment;
 
-class GraphicsWorld
+class GraphicsWorld : public IGraphicsWorld
 {
 private:
 	bool correctGamma = false;
@@ -35,25 +36,14 @@ private:
 	glm::vec3 mouseRayStart = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 mouseRayEnd = { 0.0f, 0.0f, 0.0f };
 
-protected:
-	std::shared_ptr<GraphicsEnvironment> _env;
-	std::shared_ptr<Camera> camera = nullptr;
-	std::shared_ptr<Scene> mainScene = nullptr;
-	glm::mat4 view;
-	glm::mat4 projection;
-	Ray mouseRay;
-
 public:
 	GraphicsWorld(std::shared_ptr<GraphicsEnvironment> env);
-	void SetCamera(std::shared_ptr<Camera> camera) {
-		this->camera = camera;
-	}
-	void Create();
-	void Preupdate();
-	void Update(float elapsedSeconds);
-	void UI(ImGuiIO& io);
+	void Create() override;
+	void Preupdate() override;;
+	void Update(float elapsedSeconds) override;;
+	void UI(ImGuiIO& io) override;;
 private:
-	void CreateRenderers();
+	void CreateRenderers() override;;
 	// Specializations for each world.
 	void CreateScene1();
 	void CreateScene2();

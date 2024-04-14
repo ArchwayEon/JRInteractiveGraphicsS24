@@ -12,7 +12,7 @@
 #include "Camera.h"
 #include "GraphicsStructures.h"
 #include "Ray.h"
-#include "GraphicsWorld.h"
+#include "IGraphicsWorld.h"
 #include "Logger.h"
 #include "GraphicsObject.h"
 
@@ -25,10 +25,10 @@ private:
 	std::unordered_map<std::string, std::shared_ptr<Shader>> shaderMap;
 	std::unordered_map<std::string, std::shared_ptr<Scene>> sceneMap;
 	std::unordered_map<std::string, std::shared_ptr<Texture>> textureMap;
-	std::unordered_map<std::string, std::shared_ptr<GraphicsWorld>> worldMap;
+	std::unordered_map<std::string, std::shared_ptr<IGraphicsWorld>> worldMap;
 	std::unordered_map<std::string, std::shared_ptr<Camera>> cameraMap;
 	std::shared_ptr<Camera> currentCamera = nullptr;
-	std::shared_ptr<GraphicsWorld> currentWorld = nullptr;
+	std::shared_ptr<IGraphicsWorld> currentWorld = nullptr;
 	MouseParams mouse;
 	static GraphicsEnvironment* self;
 	bool lookWithMouse = true;
@@ -81,7 +81,7 @@ public:
 	}
 	void AddTexture(const std::string& name, std::shared_ptr<Texture> texture);
 	void AddGraphicsWorld(
-		const std::string& name, std::shared_ptr<GraphicsWorld> world);
+		const std::string& name, std::shared_ptr<IGraphicsWorld> world);
 	void SetCurrentWorld(const std::string& name) {
 		if (worldMap.contains(name) == false) {
 			Logger::Log("No such world!");

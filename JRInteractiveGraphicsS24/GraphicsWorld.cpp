@@ -14,8 +14,7 @@
 #include "MoveAnimation.h"
 
 GraphicsWorld::GraphicsWorld(std::shared_ptr<GraphicsEnvironment> env) :
-	cubeReferenceFrame(1.0f), projection(1.0f), view(1.0f),
-	globalLight{}, localLight{}
+	IGraphicsWorld(env), cubeReferenceFrame(1.0f), globalLight{}, localLight{}
 {
 	_env = env;
 }

@@ -324,7 +324,7 @@ void GraphicsEnvironment::AddTexture(
 }
 
 void GraphicsEnvironment::AddGraphicsWorld(
-    const std::string& name, std::shared_ptr<GraphicsWorld> world)
+    const std::string& name, std::shared_ptr<IGraphicsWorld> world)
 {
     if (worldMap.contains(name)) return;
     worldMap[name] = world;
