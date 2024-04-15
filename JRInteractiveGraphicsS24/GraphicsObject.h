@@ -16,7 +16,7 @@ class IGenerator;
 class GraphicsObject
 {
 protected:
-	//glm::mat4 referenceFrame;
+	std::string name = "";
 	ReferenceFrame referenceFrame;
 	std::shared_ptr<VertexBuffer> vertexBuffer = nullptr;
 	std::shared_ptr<IndexBuffer> indexBuffer = nullptr;
@@ -33,6 +33,9 @@ protected:
 public:
 	GraphicsObject();
 	virtual ~GraphicsObject();
+
+	void SetName(const std::string& name) { this->name = name; }
+	const std::string& GetName() const { return name; }
 
 	ReferenceFrame GetReferenceFrame();
 	ReferenceFrame& GetLocalReferenceFrame() { return referenceFrame; }

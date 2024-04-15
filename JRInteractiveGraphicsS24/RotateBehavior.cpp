@@ -35,7 +35,8 @@ void RotateBehavior::Update(double elapsedSeconds)
 {
 	if (object == nullptr) return;
 	if (params == nullptr) return;
-	defaultFrame.RotateAxis(params->axis, params->degrees);
-	defaultFrame.SetPosition(object->GetPosition());
-	object->SetReferenceFrame(defaultFrame);
+	auto frame = defaultFrame;
+	frame.RotateAxis(params->axis, params->degrees);
+	frame.SetPosition(object->GetPosition());
+	object->SetReferenceFrame(frame);
 }

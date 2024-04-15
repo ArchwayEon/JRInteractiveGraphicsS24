@@ -41,7 +41,10 @@ public:
 	void Create() override;
 	void Preupdate() override;;
 	void Update(float elapsedSeconds) override;;
-	void UI(ImGuiIO& io) override;;
+	void UI(ImGuiIO& io) override;
+	void OnMouseButton(int button, int action, int mods) override;
+	void OnKey(int key, int scancode, int action, int mods) override;
+	void PollInputs(float elapsedSeconds) override;
 private:
 	void CreateRenderers() override;;
 	// Specializations for each world.

@@ -98,7 +98,7 @@ public:
 	static void OnKey(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 	void ShutDown();
-	void ProcessInput(double elapsedSeconds);
+	void PollInputs(double elapsedSeconds);
 	static glm::mat4 CreateViewMatrix(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& up);
 };
 

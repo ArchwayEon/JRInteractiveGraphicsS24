@@ -30,6 +30,9 @@ public:
 	virtual void Preupdate() = 0;
 	virtual void Update(float elapsedSeconds) = 0;
 	virtual void UI(ImGuiIO& io) = 0;
+	virtual void OnMouseButton(int button, int action, int mods) = 0;
+	virtual void OnKey(int key, int scancode, int action, int mods) = 0;
+	virtual void PollInputs(float elapsedSeconds) = 0;
 private:
 	virtual void CreateRenderers() = 0;
 };

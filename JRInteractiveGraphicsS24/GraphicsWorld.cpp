@@ -12,6 +12,7 @@
 #include "GraphicsStructures.h"
 #include "RotateAnimation.h"
 #include "MoveAnimation.h"
+#include "RotateXYZBehavior.h"
 
 GraphicsWorld::GraphicsWorld(std::shared_ptr<GraphicsEnvironment> env) :
 	IGraphicsWorld(env), cubeReferenceFrame(1.0f), globalLight{}, localLight{}
@@ -69,7 +70,7 @@ void GraphicsWorld::Update(float elapsedSeconds)
 
 	auto& mouse = _env->GetMouseParams();
 
-	_env->ProcessInput(elapsedSeconds);
+	_env->PollInputs(elapsedSeconds);
 	_env->UpdateWindowSize();
 	_env->UpdateMousePosition();
 
@@ -99,20 +100,6 @@ void GraphicsWorld::Update(float elapsedSeconds)
 
 	mouseRay = _env->GetMouseRay(projection, view);
 
-	cubeReferenceFrame =
-		glm::rotate(
-			glm::mat4(1.0f), glm::radians(cubeYAngle),
-			glm::vec3(0.0f, 1.0f, 0.0f));
-	cubeReferenceFrame =
-		glm::rotate(
-			cubeReferenceFrame, glm::radians(cubeXAngle),
-			glm::vec3(1.0f, 0.0f, 0.0f));
-	cubeReferenceFrame =
-		glm::rotate(
-			cubeReferenceFrame, glm::radians(cubeZAngle),
-			glm::vec3(0.0f, 0.0f, 1.0f));
-
-	cube->SetReferenceFrame(cubeReferenceFrame);
 	lightBulb->SetPosition(localLight.position);
 	lightBulb->PointAt(camera->GetPosition());
 
@@ -143,6 +130,12 @@ void GraphicsWorld::Update(float elapsedSeconds)
 	isCuboidOverlapping = cuboid1->OverlapsWithBoundingBox(*cuboid2);
 	cuboid1->SetIsOverlapping(isCuboidOverlapping);
 	cuboid2->SetIsOverlapping(isCuboidOverlapping);
+
+	std::shared_ptr<RotateXYZParams> cubeXYZ = std::make_shared<RotateXYZParams>();
+	cubeXYZ->degreesX = cubeXAngle;
+	cubeXYZ->degreesY = cubeYAngle;
+	cubeXYZ->degreesZ = cubeZAngle;
+	cube->SetBehaviorParameters("rotateXYZ", cubeXYZ);
 
 	std::shared_ptr<HighlightParams> hp =
 		std::make_shared<HighlightParams>();
@@ -250,18 +243,9 @@ void GraphicsWorld::CreateScene1()
 	texturedCube->CreateBoundingBox(10.0f, 5.0f, 5.0f);
 	auto hb1 = std::make_shared<HighlightBehavior>(texturedCube);
 	texturedCube->AddBehavior("highlight", hb1);
-	auto rb = std::make_shared<RotateBehavior>(texturedCube);
+	auto rb = std::make_shared<RotateXYZBehavior>(texturedCube);
 	rb->SetUpParameters();
-	rb->GetParameter()->axis = { 0.0f, 1.0f, 0.0f };
-	texturedCube->AddBehavior("rotateY", rb);
-	rb = std::make_shared<RotateBehavior>(texturedCube);
-	rb->SetUpParameters();
-	rb->GetParameter()->axis = { 1.0f, 0.0f, 0.0f };
-	texturedCube->AddBehavior("rotateX", rb);
-	rb = std::make_shared<RotateBehavior>(texturedCube);
-	rb->SetUpParameters();
-	rb->GetParameter()->axis = { 0.0f, 0.0f, 1.0f };
-	texturedCube->AddBehavior("rotateZ", rb);
+	texturedCube->AddBehavior("rotateXYZ", rb);
 	scene->AddObject(texturedCube);
 	_env->AddObject("TexturedCube", texturedCube);
 
@@ -537,6 +521,98 @@ void GraphicsWorld::CreateRenderer3()
 {
 	_env->CreateRenderer("Basic", _env->GetShader("Basic"));
 	_env->GetRenderer("Basic")->SetScene(_env->GetScene("Basic"));
+}
+
+void GraphicsWorld::OnMouseButton(int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		auto worldCube = _env->GetGraphicsObject("World");
+		if (worldCube->IsIntersectingWithRay(mouseRay)) {
+			auto animation =
+				std::dynamic_pointer_cast<MoveAnimation>(
+					worldCube->GetAnimation());
+			if (animation->GetState() == MoveAnimation::NOT_MOVING) {
+				animation->SetState(MoveAnimation::MOVING);
+			}
+			else {
+				animation->SetState(MoveAnimation::NOT_MOVING);
+			}
+		}
+	}
+}
+
+void GraphicsWorld::OnKey(int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_F2 && action == GLFW_PRESS) {
+		lookWithMouse = !lookWithMouse;
+		return;
+	}
+}
+
+void GraphicsWorld::PollInputs(float elapsedSeconds)
+{
+	auto window = _env->GetWindow();
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, true);
+		return;
+	}
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		camera->MoveForward(elapsedSeconds);
+		return;
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		camera->MoveBackward(elapsedSeconds);
+		return;
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		camera->MoveLeft(elapsedSeconds);
+		return;
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		camera->MoveRight(elapsedSeconds);
+		return;
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+		camera->MoveUp(elapsedSeconds);
+		return;
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		camera->MoveDown(elapsedSeconds);
+		return;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+		glm::mat4 lookFrame(1.0f);
+		camera->SetPosition({ 0.0f, 5.0f, 30.0f });
+		camera->SetLookFrame(lookFrame);
+		lookWithMouse = false;
+		return;
+	}
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+		glm::mat4 lookFrame(1.0f);
+		lookFrame = glm::rotate(lookFrame, glm::radians(90.0f), { 0, 1, 0 });
+		camera->SetPosition({ 30.0f, 5.0f, 0.0f });
+		camera->SetLookFrame(lookFrame);
+		lookWithMouse = false;
+		return;
+	}
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+		glm::mat4 lookFrame(1.0f);
+		lookFrame = glm::rotate(lookFrame, glm::radians(180.0f), { 0, 1, 0 });
+		camera->SetPosition({ 0.0f, 5.0f, -30.0f });
+		camera->SetLookFrame(lookFrame);
+		lookWithMouse = false;
+		return;
+	}
+	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) {
+		glm::mat4 lookFrame(1.0f);
+		lookFrame = glm::rotate(lookFrame, glm::radians(-90.0f), { 0, 1, 0 });
+		camera->SetPosition({ -30.0f, 5.0f, 0.0f });
+		camera->SetLookFrame(lookFrame);
+		lookWithMouse = false;
+		return;
+	}
+
 }
 
 

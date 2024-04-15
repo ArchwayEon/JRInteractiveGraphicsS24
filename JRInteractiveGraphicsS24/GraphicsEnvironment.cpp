@@ -143,7 +143,7 @@ void GraphicsEnvironment::Run2D()
 	ImGuiIO& io = ImGui::GetIO();
 
 	while (!glfwWindowShouldClose(window)) {
-		ProcessInput(0);
+		PollInputs(0);
 		glfwGetWindowSize(window, &width, &height);
 
 		glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
@@ -237,7 +237,8 @@ void GraphicsEnvironment::Run3D()
     ShutDown();
 }
 
-void GraphicsEnvironment::SetRendererProjectionAndView(const glm::mat4& projection, const glm::mat4& view)
+void GraphicsEnvironment::SetRendererProjectionAndView(
+    const glm::mat4& projection, const glm::mat4& view)
 {
 	for (const auto& [key, renderer] : rendererMap) {
 		renderer->SetProjection(projection);
@@ -248,6 +249,7 @@ void GraphicsEnvironment::SetRendererProjectionAndView(const glm::mat4& projecti
 void GraphicsEnvironment::AddObject(
     const std::string& name, std::shared_ptr<GraphicsObject> object)
 {
+    object->SetName(name);
     objectManager->AddObject(name, object);
 }
 
@@ -291,7 +293,6 @@ void GraphicsEnvironment::UpdateMousePosition()
 
     mouse.nsx = xPercent * 2.0f - 1.0f;
     mouse.nsy = -(yPercent * 2.0f - 1.0f);
-
 }
 
 void GraphicsEnvironment::UpdateWindowSize()
@@ -352,93 +353,18 @@ void GraphicsEnvironment::OnMouseMove(
 void GraphicsEnvironment::OnMouseButton(
     GLFWwindow* window, int button, int action, int mods)
 {
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        if (self->GetGraphicsObject("World")->IsIntersectingWithRay(self->mouseRay)) {
-            auto animation =
-                std::dynamic_pointer_cast<MoveAnimation>(
-                    self->GetGraphicsObject("World")->GetAnimation());
-            if (animation->GetState() == MoveAnimation::NOT_MOVING) {
-                animation->SetState(MoveAnimation::MOVING);
-            }
-            else {
-                animation->SetState(MoveAnimation::NOT_MOVING);
-            }
-        }
-    }
-
+    self->currentWorld->OnMouseButton(button, action, mods);
 }
 
 void GraphicsEnvironment::OnKey(
     GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    if (key == GLFW_KEY_F2 && action == GLFW_PRESS) {
-        self->lookWithMouse = !self->lookWithMouse;
-        return;
-    }
+    self->currentWorld->OnKey(key, scancode, action, mods);
 }
 
-void GraphicsEnvironment::ProcessInput(double elapsedSeconds)
+void GraphicsEnvironment::PollInputs(double elapsedSeconds)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, true);
-        return;
-    }
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        currentCamera->MoveForward(elapsedSeconds);
-        return;
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        currentCamera->MoveBackward(elapsedSeconds);
-        return;
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        currentCamera->MoveLeft(elapsedSeconds);
-        return;
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        currentCamera->MoveRight(elapsedSeconds);
-        return;
-    }
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        currentCamera->MoveUp(elapsedSeconds);
-        return;
-    }
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-        currentCamera->MoveDown(elapsedSeconds);
-        return;
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
-        glm::mat4 lookFrame(1.0f);
-        currentCamera->SetPosition({0.0f, 5.0f, 30.0f});
-        currentCamera->SetLookFrame(lookFrame);
-        lookWithMouse = false;
-        return;
-    }
-    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
-        glm::mat4 lookFrame(1.0f);
-        lookFrame = glm::rotate(lookFrame, glm::radians(90.0f), { 0, 1, 0 });
-        currentCamera->SetPosition({30.0f, 5.0f, 0.0f });
-        currentCamera->SetLookFrame(lookFrame);
-        lookWithMouse = false;
-        return;
-    }
-    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
-        glm::mat4 lookFrame(1.0f);
-        lookFrame = glm::rotate(lookFrame, glm::radians(180.0f), { 0, 1, 0 });
-        currentCamera->SetPosition({ 0.0f, 5.0f, -30.0f });
-        currentCamera->SetLookFrame(lookFrame);
-        lookWithMouse = false;
-        return;
-    }
-    if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) {
-        glm::mat4 lookFrame(1.0f);
-        lookFrame = glm::rotate(lookFrame, glm::radians(-90.0f), { 0, 1, 0 });
-        currentCamera->SetPosition({-30.0f, 5.0f, 0.0f });
-        currentCamera->SetLookFrame(lookFrame);
-        lookWithMouse = false;
-        return;
-    }
+    currentWorld->PollInputs((float)elapsedSeconds);
 }
 
 glm::mat4 GraphicsEnvironment::CreateViewMatrix(

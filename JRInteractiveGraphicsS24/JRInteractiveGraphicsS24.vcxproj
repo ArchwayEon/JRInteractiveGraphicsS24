@@ -165,6 +165,7 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RotateAnimation.cpp" />
     <ClCompile Include="RotateBehavior.cpp" />
+    <ClCompile Include="RotateXYZBehavior.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="TextFile.cpp" />
@@ -199,6 +200,7 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RotateAnimation.h" />
     <ClInclude Include="RotateBehavior.h" />
+    <ClInclude Include="RotateXYZBehavior.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="TextFile.h" />

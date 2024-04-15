@@ -162,7 +162,7 @@ void GraphicsObject::SetBehaviorDefaults()
 void GraphicsObject::SetBehaviorParameters(
 	std::string name, std::shared_ptr<IParams> params)
 {
-	if (!behaviorMap.contains(name)) return;
+	if (behaviorMap.contains(name) == false) return;
 	behaviorMap[name]->SetParameter(params);
 }
 

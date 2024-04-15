@@ -63,6 +63,10 @@ struct RotateParams : IParams {
     glm::vec3 axis = { 0.0f, 1.0f, 0.0f };
 };
 
+struct RotateXYZParams : IParams {
+    float degreesX = 0.0f, degreesY = 0.0f, degreesZ = 0.0f;
+};
+
 struct PCSphereParams : IParams {
     float radius = 1.0f;
     int slices = 10, stacks = 10;
