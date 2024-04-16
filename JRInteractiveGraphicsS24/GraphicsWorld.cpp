@@ -34,18 +34,18 @@ void GraphicsWorld::Preupdate()
 	globalLight = mainScene->GetGlobalLight();
 	localLight = mainScene->GetLocalLight();
 	spherePos =
-		_env->GetGraphicsObject("PCLinesSphere1")->GetPosition();
+		GetGraphicsObject("PCLinesSphere1")->GetPosition();
 	cuboidPos =
-		_env->GetGraphicsObject("PCLineCuboid1")->GetPosition();
+		GetGraphicsObject("PCLineCuboid1")->GetPosition();
 	_env->GetObjectManager()->SetBehaviorDefaults();
 
-	auto crate = _env->GetGraphicsObject("Crate");
+	auto crate = GetGraphicsObject("Crate");
 	std::shared_ptr<RotateAnimation> rotateAnimation =
 		std::make_shared<RotateAnimation>();
 	rotateAnimation->SetObject(crate);
 	crate->SetAnimation(rotateAnimation);
 
-	auto cubeWorld = _env->GetGraphicsObject("World");
+	auto cubeWorld = GetGraphicsObject("World");
 	std::shared_ptr<MoveAnimation> moveAnimation =
 		std::make_shared<MoveAnimation>();
 	moveAnimation->SetObject(cubeWorld);
@@ -56,17 +56,17 @@ void GraphicsWorld::Preupdate()
 
 void GraphicsWorld::Update(float elapsedSeconds)
 {
-	auto cube = _env->GetGraphicsObject("TexturedCube");
-	auto lightBulb = _env->GetGraphicsObject("LightBulb");
-	auto floor = _env->GetGraphicsObject("Floor");
-	auto cylinder = _env->GetGraphicsObject("PCLinesCylinder");
-	auto sphere1 = _env->GetGraphicsObject("PCLinesSphere1");
-	auto sphere2 = _env->GetGraphicsObject("PCLinesSphere2");
-	auto cuboid1 = _env->GetGraphicsObject("PCLineCuboid1");
-	auto cuboid2 = _env->GetGraphicsObject("PCLineCuboid2");
-	auto crate = _env->GetGraphicsObject("Crate");
-	auto cubeWorld = _env->GetGraphicsObject("World");
-	auto mouseRayLine = _env->GetGraphicsObject("PCMouseRay");
+	auto cube = GetGraphicsObject("TexturedCube");
+	auto lightBulb = GetGraphicsObject("LightBulb");
+	auto floor = GetGraphicsObject("Floor");
+	auto cylinder = GetGraphicsObject("PCLinesCylinder");
+	auto sphere1 = GetGraphicsObject("PCLinesSphere1");
+	auto sphere2 = GetGraphicsObject("PCLinesSphere2");
+	auto cuboid1 = GetGraphicsObject("PCLineCuboid1");
+	auto cuboid2 = GetGraphicsObject("PCLineCuboid2");
+	auto crate = GetGraphicsObject("Crate");
+	auto cubeWorld = GetGraphicsObject("World");
+	auto mouseRayLine = GetGraphicsObject("PCMouseRay");
 
 	auto& mouse = _env->GetMouseParams();
 
@@ -156,6 +156,8 @@ void GraphicsWorld::Update(float elapsedSeconds)
 	mrvb->AddVertexData(6,
 		mouseRayEnd.x, mouseRayEnd.y, mouseRayEnd.z,
 		0.0f, 0.0f, 1.0f);
+
+	objectManager->Update(elapsedSeconds);
 }
 
 void GraphicsWorld::UI(ImGuiIO& io)
@@ -190,16 +192,8 @@ void GraphicsWorld::UI(ImGuiIO& io)
 
 void GraphicsWorld::CreateScene1()
 {
-	TextFile textFile;
-	bool chk;
-	chk = textFile.Read("lighting.vert.glsl");
-	if (chk == false) return;
-	std::string vs = textFile.GetData();
-	chk = textFile.Read("lighting.frag.glsl");
-	if (chk == false) return;
-	std::string fs = textFile.GetData();
-	std::shared_ptr<Shader> shader = std::make_shared<Shader>(vs, fs);
-	_env->AddShader("Lighting", shader);
+	auto shader = _env->CreateShader(
+		"Lighting", "lighting.vert.glsl", "lighting.frag.glsl");
 	shader->AddUniform("projection");
 	shader->AddUniform("world");
 	shader->AddUniform("view");
@@ -247,7 +241,7 @@ void GraphicsWorld::CreateScene1()
 	rb->SetUpParameters();
 	texturedCube->AddBehavior("rotateXYZ", rb);
 	scene->AddObject(texturedCube);
-	_env->AddObject("TexturedCube", texturedCube);
+	AddObject("TexturedCube", texturedCube);
 
 	std::shared_ptr<Texture> crateTexture = std::make_shared<Texture>();
 	crateTexture->LoadTextureDataFromFile("crate.jpg");
@@ -266,7 +260,7 @@ void GraphicsWorld::CreateScene1()
 	crate->AddBehavior("highlight", hb2);
 	crate->SetPosition(glm::vec3(-20.0f, 5.0f, -5.0f));
 	scene->AddObject(crate);
-	_env->AddObject("Crate", crate);
+	AddObject("Crate", crate);
 
 	std::shared_ptr<Texture> worldTexture = std::make_shared<Texture>();
 	worldTexture->LoadTextureDataFromFile("world.jpg");
@@ -285,7 +279,7 @@ void GraphicsWorld::CreateScene1()
 	world->AddBehavior("highlight", hb3);
 	world->SetPosition(glm::vec3(20.0f, 1.5f, 22.0f));
 	scene->AddObject(world);
-	_env->AddObject("World", world);
+	AddObject("World", world);
 
 	std::shared_ptr<Texture> floorTexture = std::make_shared<Texture>();
 	floorTexture->LoadTextureDataFromFile("floor.jpg");
@@ -302,7 +296,7 @@ void GraphicsWorld::CreateScene1()
 	floor->SetVertexBuffer(buffer);
 	floor->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	scene->AddObject(floor);
-	_env->AddObject("Floor", floor);
+	AddObject("Floor", floor);
 
 	scene->GetLocalLight().position = { 0.0f, 5.0f, 5.0f };
 	scene->GetLocalLight().intensity = 0.5f;
@@ -310,16 +304,8 @@ void GraphicsWorld::CreateScene1()
 
 void GraphicsWorld::CreateScene2()
 {
-	TextFile textFile;
-	bool chk;
-	chk = textFile.Read("texture.vert.glsl");
-	if (chk == false) return;
-	std::string vs = textFile.GetData();
-	chk = textFile.Read("texture.frag.glsl");
-	if (chk == false) return;
-	std::string fs = textFile.GetData();
-	auto shader = std::make_shared<Shader>(vs, fs);
-	_env->AddShader("BasicTexture", shader);
+	auto shader = _env->CreateShader(
+		"BasicTexture", "texture.vert.glsl", "texture.frag.glsl");
 
 	shader->AddUniform("projection");
 	shader->AddUniform("world");
@@ -342,23 +328,13 @@ void GraphicsWorld::CreateScene2()
 	buffer->SetTexture(lightBulbTexture);
 	lightBulb->SetVertexBuffer(buffer);
 	scene->AddObject(lightBulb);
-	_env->AddObject("LightBulb", lightBulb);
+	AddObject("LightBulb", lightBulb);
 }
 
 void GraphicsWorld::CreateScene3()
 {
-	TextFile textFile;
-	bool chk;
-	chk = textFile.Read("basic.vert.glsl");
-	if (chk == false) return;
-	std::string vs = textFile.GetData();
-	chk = textFile.Read("basic.frag.glsl");
-	if (chk == false) return;
-	std::string fs = textFile.GetData();
-
-	auto shader = std::make_shared<Shader>(vs, fs);
-	_env->AddShader("Basic", shader);
-
+	auto shader = _env->CreateShader(
+		"Basic", "basic.vert.glsl", "basic.frag.glsl");
 	shader->AddUniform("projection");
 	shader->AddUniform("world");
 	shader->AddUniform("view");
@@ -379,7 +355,7 @@ void GraphicsWorld::CreateScene3()
 	Generate::LineCircleIndexes(indexBuffer, 36, true);
 	pcLinesCircle->SetPosition({ 0.0f, 1.0f, 7.0f });
 	scene->AddObject(pcLinesCircle);
-	_env->AddObject("PCLinesCircle", pcLinesCircle);
+	AddObject("PCLinesCircle", pcLinesCircle);
 
 	std::shared_ptr<GraphicsObject> pcLinesCylinder =
 		std::make_shared<GraphicsObject>();
@@ -395,7 +371,7 @@ void GraphicsWorld::CreateScene3()
 	Generate::LineCylinderIndexes(cylinderIndexBuffer, 36);
 	pcLinesCylinder->SetPosition({ 5.0f, 2.0f, 7.0f });
 	scene->AddObject(pcLinesCylinder);
-	_env->AddObject("PCLinesCylinder", pcLinesCylinder);
+	AddObject("PCLinesCylinder", pcLinesCylinder);
 
 	std::shared_ptr<GraphicsObject> pcLinesSphere1 =
 		std::make_shared<GraphicsObject>();
@@ -414,7 +390,7 @@ void GraphicsWorld::CreateScene3()
 	ccb->SetObject(pcLinesSphere1);
 	pcLinesSphere1->AddBehavior("changecolor", ccb);
 	scene->AddObject(pcLinesSphere1);
-	_env->AddObject("PCLinesSphere1", pcLinesSphere1);
+	AddObject("PCLinesSphere1", pcLinesSphere1);
 
 	std::shared_ptr<GraphicsObject> pcLinesSphere2 =
 		std::make_shared<GraphicsObject>();
@@ -434,7 +410,7 @@ void GraphicsWorld::CreateScene3()
 	pcLinesSphere2->AddBehavior("changecolor", ccb);
 
 	scene->AddObject(pcLinesSphere2);
-	_env->AddObject("PCLinesSphere2", pcLinesSphere2);
+	AddObject("PCLinesSphere2", pcLinesSphere2);
 
 	std::shared_ptr<GraphicsObject> pcLineCuboid =
 		std::make_shared<GraphicsObject>();
@@ -455,7 +431,7 @@ void GraphicsWorld::CreateScene3()
 	auto rb = std::make_shared<RotateBehavior>(pcLineCuboid);
 	pcLineCuboid->AddBehavior("rotateY", rb);
 	scene->AddObject(pcLineCuboid);
-	_env->AddObject("PCLineCuboid1", pcLineCuboid);
+	AddObject("PCLineCuboid1", pcLineCuboid);
 
 	std::shared_ptr<GraphicsObject> pcLineCuboid2 =
 		std::make_shared<GraphicsObject>();
@@ -476,7 +452,7 @@ void GraphicsWorld::CreateScene3()
 	rb = std::make_shared<RotateBehavior>(pcLineCuboid2);
 	pcLineCuboid2->AddBehavior("rotateY", rb);
 	scene->AddObject(pcLineCuboid2);
-	_env->AddObject("PCLineCuboid2", pcLineCuboid2);
+	AddObject("PCLineCuboid2", pcLineCuboid2);
 
 	std::shared_ptr<GraphicsObject> pcMouseRay =
 		std::make_shared<GraphicsObject>();
@@ -492,7 +468,7 @@ void GraphicsWorld::CreateScene3()
 	pcMouseRay->SetUpDynamicBuffers(4, 4);
 	pcMouseRay->SetPosition({ 0.0f, 0.0f, 0.0f });
 	scene->AddObject(pcMouseRay);
-	_env->AddObject("PCMouseRay", pcMouseRay);
+	AddObject("PCMouseRay", pcMouseRay);
 
 }
 
@@ -502,8 +478,6 @@ void GraphicsWorld::CreateRenderers()
 	CreateRenderer2();
 	CreateRenderer3();
 }
-
-
 
 void GraphicsWorld::CreateRenderer1()
 {

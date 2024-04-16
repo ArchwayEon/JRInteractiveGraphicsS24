@@ -15,11 +15,8 @@ class GraphicsWorld : public IGraphicsWorld
 {
 private:
 	bool correctGamma = false;
-	bool lookWithMouse = false;
-	float aspectRatio = 0.0f;
-	float nearPlane = 1.0f;
-	float farPlane = 100.0f;
-	float fieldOfView = 60;
+
+
 	glm::mat4 cubeReferenceFrame;
 	float cubeYAngle = 0;
 	float cubeXAngle = 0;
@@ -46,7 +43,7 @@ public:
 	void OnKey(int key, int scancode, int action, int mods) override;
 	void PollInputs(float elapsedSeconds) override;
 private:
-	void CreateRenderers() override;;
+	void CreateRenderers() override;
 	// Specializations for each world.
 	void CreateScene1();
 	void CreateScene2();

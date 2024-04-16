@@ -6,6 +6,7 @@
 #include "GeometricPlane.h"
 #include "MoveAnimation.h"
 #include "Logger.h"
+#include "TextFile.h"
 
 GraphicsEnvironment* GraphicsEnvironment::self;
 
@@ -214,9 +215,8 @@ void GraphicsEnvironment::Run3D()
         glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         elapsedSeconds = timer.GetElapsedTimeInSeconds();
+        
         currentWorld->Update((float)elapsedSeconds);
-
-        objectManager->Update(elapsedSeconds);
 
         Render();
 
@@ -303,6 +303,29 @@ void GraphicsEnvironment::UpdateWindowSize()
     mouse.windowHeight = height;
 }
 
+std::shared_ptr<Shader> GraphicsEnvironment::CreateShader(
+    const std::string& name, 
+    const std::string& vertexFilePath, const std::string& fragmentFilePath)
+{
+    TextFile textFile;
+    bool chk;
+    chk = textFile.Read(vertexFilePath);
+    if (chk == false) {
+        Logger::Log("Could not read the vertex file!");
+        return nullptr;
+    }
+    std::string vs = textFile.GetData();
+    chk = textFile.Read(fragmentFilePath);
+    if (chk == false) {
+        Logger::Log("Could not read the fragment file!");
+        return nullptr;
+    }
+    std::string fs = textFile.GetData();
+    std::shared_ptr<Shader> shader = std::make_shared<Shader>(vs, fs);
+    AddShader(name, shader);
+    return shader;
+}
+
 void GraphicsEnvironment::AddShader(
     const std::string& name, std::shared_ptr<Shader> shader)
 {
@@ -331,11 +354,13 @@ void GraphicsEnvironment::AddGraphicsWorld(
     worldMap[name] = world;
 }
 
-void GraphicsEnvironment::CreateWorlds()
+void GraphicsEnvironment::CreateWorld()
 {
-    for (const auto& [key, world] : worldMap) {
-        world->Create();
+    if (currentWorld == nullptr) {
+        Logger::Log("The current world is not set.");
+        return;
     }
+    currentWorld->Create();
     Allocate();
 }
 

@@ -7,24 +7,37 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include "ObjectManager.h"
 
 class GraphicsEnvironment;
 
 class IGraphicsWorld
 {
 protected:
+	std::shared_ptr<ObjectManager> objectManager;
 	std::shared_ptr<GraphicsEnvironment> _env;
 	std::shared_ptr<Camera> camera = nullptr;
 	std::shared_ptr<Scene> mainScene = nullptr;
 	glm::mat4 view;
 	glm::mat4 projection;
 	Ray mouseRay;
+	bool lookWithMouse = false;
+	float aspectRatio = 0.0f;
+	float nearPlane = 1.0f;
+	float farPlane = 100.0f;
+	float fieldOfView = 60;
 
 public:
 	IGraphicsWorld(std::shared_ptr<GraphicsEnvironment> env);
 	virtual ~IGraphicsWorld() = default;
-	void SetCamera(std::shared_ptr<Camera> camera) {
+	virtual void SetCamera(std::shared_ptr<Camera> camera) {
 		this->camera = camera;
+	}
+	virtual void AddObject(
+		const std::string& name, std::shared_ptr<GraphicsObject> object);
+	virtual std::shared_ptr<GraphicsObject> GetGraphicsObject(
+		const std::string& name) {
+		return objectManager->GetGraphicsObject(name);
 	}
 	virtual void Create() = 0;
 	virtual void Preupdate() = 0;

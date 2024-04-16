@@ -2,6 +2,7 @@
 #include <memory>
 #include "GraphicsEnvironment.h"
 #include "GraphicsWorld.h"
+#include "ObjectMapWorld.h"
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -28,8 +29,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	auto world = std::make_shared<GraphicsWorld>(glfw);
 	glfw->AddGraphicsWorld("World1", world);
-	glfw->SetCurrentWorld("World1");
-	glfw->CreateWorlds();
+	auto world2 = std::make_shared<ObjectMapWorld>(glfw);
+	glfw->AddGraphicsWorld("World2", world2);
+	glfw->SetCurrentWorld("World2");
+	glfw->CreateWorld();
 
 	glfw->Run3D();
 	return 0;

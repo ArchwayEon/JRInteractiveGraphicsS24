@@ -69,6 +69,9 @@ public:
 
 	void UpdateMousePosition();
 	void UpdateWindowSize();
+	std::shared_ptr<Shader> CreateShader(
+		const std::string& name, const std::string& vertexFilePath, 
+		const std::string& fragmentFilePath);
 	void AddShader(const std::string& name, std::shared_ptr<Shader> shader);
 	std::shared_ptr<Shader> GetShader(const std::string& name) {
 		if (shaderMap.contains(name) == false) return nullptr;
@@ -89,7 +92,7 @@ public:
 		}
 		currentWorld = worldMap[name];
 	}
-	void CreateWorlds();
+	void CreateWorld();
 
 public:
 	static void OnWindowSizeChanged(GLFWwindow* window, int width, int height);
