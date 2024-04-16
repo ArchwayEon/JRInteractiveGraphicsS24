@@ -10,10 +10,14 @@
 #include "ObjectManager.h"
 
 class GraphicsEnvironment;
+class Shader;
+class Renderer;
 
 class IGraphicsWorld
 {
 protected:
+	std::unordered_map<std::string, std::shared_ptr<Renderer>> rendererMap;
+	std::unordered_map<std::string, std::shared_ptr<Scene>> sceneMap;
 	std::shared_ptr<ObjectManager> objectManager;
 	std::shared_ptr<GraphicsEnvironment> _env;
 	std::shared_ptr<Camera> camera = nullptr;
@@ -39,6 +43,18 @@ public:
 		const std::string& name) {
 		return objectManager->GetGraphicsObject(name);
 	}
+	virtual void CreateRenderer(
+		const std::string& name, std::shared_ptr<Shader> shader);
+	virtual std::shared_ptr<Renderer> GetRenderer(const std::string& name);
+	virtual void SetRendererProjectionAndView(
+		const glm::mat4& projection, const glm::mat4& view);
+	virtual void AddScene(
+		const std::string& name, std::shared_ptr<Scene> scene);
+	virtual std::shared_ptr<Scene> GetScene(const std::string& name) {
+		if (sceneMap.contains(name) == false) return nullptr;
+		return sceneMap[name];
+	}
+	virtual void AllocateBuffers();
 	virtual void Create() = 0;
 	virtual void Preupdate() = 0;
 	virtual void Update(float elapsedSeconds) = 0;
@@ -46,6 +62,7 @@ public:
 	virtual void OnMouseButton(int button, int action, int mods) = 0;
 	virtual void OnKey(int key, int scancode, int action, int mods) = 0;
 	virtual void PollInputs(float elapsedSeconds) = 0;
+	virtual void Render();
 private:
 	virtual void CreateRenderers() = 0;
 };

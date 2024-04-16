@@ -18,11 +18,11 @@ void ObjectMapWorld::Create()
 
 void ObjectMapWorld::Preupdate()
 {
-	mainScene = _env->GetScene("Lighting");
+	mainScene = GetScene("Lighting");
 	globalLight = mainScene->GetGlobalLight();
 	localLight = mainScene->GetLocalLight();
 	camera->SetPosition({ 0.0f, 2.0f, 30.0f });
-	_env->GetObjectManager()->SetBehaviorDefaults();
+	objectManager->SetBehaviorDefaults();
 }
 
 void ObjectMapWorld::Update(float elapsedSeconds)
@@ -49,7 +49,7 @@ void ObjectMapWorld::Update(float elapsedSeconds)
 	projection = glm::perspective(
 		glm::radians(fieldOfView), aspectRatio, nearPlane, farPlane);
 
-	_env->SetRendererProjectionAndView(projection, view);
+	SetRendererProjectionAndView(projection, view);
 
 	mouseRay = _env->GetMouseRay(projection, view);
 
@@ -177,7 +177,7 @@ void ObjectMapWorld::CreateScene1()
 	shader->AddUniform("viewPosition");
 
 	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-	_env->AddScene("Lighting", scene);
+	AddScene("Lighting", scene);
 
 	std::shared_ptr<Texture> crateTexture = std::make_shared<Texture>();
 	crateTexture->LoadTextureDataFromFile("crate.jpg");
@@ -196,8 +196,7 @@ void ObjectMapWorld::CreateScene1()
 	crate->AddBehavior("highlight", hb2);
 	crate->SetPosition(glm::vec3(-20.0f, 5.0f, -5.0f));
 	scene->AddObject(crate);
-	_env->AddObject("Crate", crate);
-	objectManager->AddObject("Crate", crate);
+	AddObject("Crate", crate);
 
 	std::shared_ptr<Texture> floorTexture = std::make_shared<Texture>();
 	floorTexture->LoadTextureDataFromFile("floor.jpg");
@@ -214,8 +213,7 @@ void ObjectMapWorld::CreateScene1()
 	floor->SetVertexBuffer(buffer);
 	floor->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	scene->AddObject(floor);
-	_env->AddObject("Floor", floor);
-	objectManager->AddObject("Floor", floor);
+	AddObject("Floor", floor);
 
 	scene->GetLocalLight().position = { 0.0f, 5.0f, 5.0f };
 	scene->GetLocalLight().intensity = 0.5f;
@@ -223,6 +221,6 @@ void ObjectMapWorld::CreateScene1()
 
 void ObjectMapWorld::CreateRenderer1()
 {
-	_env->CreateRenderer("Lighting", _env->GetShader("Lighting"));
-	_env->GetRenderer("Lighting")->SetScene(_env->GetScene("Lighting"));
+	CreateRenderer("Lighting", _env->GetShader("Lighting"));
+	GetRenderer("Lighting")->SetScene(GetScene("Lighting"));
 }

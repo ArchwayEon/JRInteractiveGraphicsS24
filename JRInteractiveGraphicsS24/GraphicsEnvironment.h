@@ -20,10 +20,7 @@ class GraphicsEnvironment
 {
 private:
 	GLFWwindow* window;
-	std::shared_ptr<ObjectManager> objectManager;
-	std::unordered_map<std::string, std::shared_ptr<Renderer>> rendererMap;
 	std::unordered_map<std::string, std::shared_ptr<Shader>> shaderMap;
-	std::unordered_map<std::string, std::shared_ptr<Scene>> sceneMap;
 	std::unordered_map<std::string, std::shared_ptr<Texture>> textureMap;
 	std::unordered_map<std::string, std::shared_ptr<IGraphicsWorld>> worldMap;
 	std::unordered_map<std::string, std::shared_ptr<Camera>> cameraMap;
@@ -42,7 +39,6 @@ public:
 	~GraphicsEnvironment();
 	void ShowNotice(const std::string& message);
 	GLFWwindow* GetWindow() const { return window; }
-	std::shared_ptr<ObjectManager> GetObjectManager() { return objectManager; }
 	void Init(unsigned int majorVersion, unsigned int minorVersion);
 	bool SetWindow(unsigned int width, unsigned int height, const std::string& title);
 	bool InitGlad();
@@ -50,17 +46,8 @@ public:
 	inline ImGuiIO& GetImGuiIO() {
 		return ImGui::GetIO();
 	}
-	void CreateRenderer(const std::string& name, std::shared_ptr<Shader> shader);
-	std::shared_ptr<Renderer> GetRenderer(const std::string& name);
-	void Allocate();
-	void Render();
 	void Run2D();
 	void Run3D();
-	void SetRendererProjectionAndView(const glm::mat4& projection, const glm::mat4& view);
-	void AddObject(const std::string& name, std::shared_ptr<GraphicsObject> object);
-	std::shared_ptr<GraphicsObject> GetGraphicsObject(const std::string& name) {
-		return objectManager->GetGraphicsObject(name);
-	}
 
 	MouseParams& GetMouseParams() { return mouse; }
 
@@ -77,11 +64,7 @@ public:
 		if (shaderMap.contains(name) == false) return nullptr;
 		return shaderMap[name];
 	}
-	void AddScene(const std::string& name, std::shared_ptr<Scene> scene);
-	std::shared_ptr<Scene> GetScene(const std::string& name) {
-		if (sceneMap.contains(name) == false) return nullptr;
-		return sceneMap[name];
-	}
+
 	void AddTexture(const std::string& name, std::shared_ptr<Texture> texture);
 	void AddGraphicsWorld(
 		const std::string& name, std::shared_ptr<IGraphicsWorld> world);

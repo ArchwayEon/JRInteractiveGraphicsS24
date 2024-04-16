@@ -15,7 +15,6 @@ GraphicsEnvironment::GraphicsEnvironment() :
 {
     currentCamera = std::make_shared<Camera>();
     cameraMap["Current"] = currentCamera;
-    objectManager = std::make_shared<ObjectManager>();
     self = this;
 }
 
@@ -98,33 +97,6 @@ void GraphicsEnvironment::SetupGraphics()
     ImGui_ImplOpenGL3_Init("#version 430");
 }
 
-void GraphicsEnvironment::CreateRenderer(
-    const std::string& name, std::shared_ptr<Shader> shader)
-{
-    auto renderer = std::make_shared<Renderer>(shader);
-    rendererMap.emplace(name, renderer);
-}
-
-std::shared_ptr<Renderer> GraphicsEnvironment::GetRenderer(
-    const std::string& name)
-{
-    return rendererMap[name];
-}
-
-void GraphicsEnvironment::Allocate()
-{
-    for (const auto& [key, renderer] : rendererMap) {
-        renderer->AllocateBuffers();
-    }
-}
-
-void GraphicsEnvironment::Render()
-{
-    for (const auto& [key, renderer] : rendererMap) {
-        renderer->RenderScene(currentCamera);
-    }
-}
-
 void GraphicsEnvironment::Run2D()
 {
 	int width, height;
@@ -166,11 +138,11 @@ void GraphicsEnvironment::Run2D()
 			projection = glm::ortho(
 				left, right, bottom * aspectRatio, top * aspectRatio, -1.0f, 1.0f);
 		}
-		SetRendererProjectionAndView(projection, view);
+		//SetRendererProjectionAndView(projection, view);
 
-		GetRenderer("renderer")->GetScene()->Update(angle, childAngle);
+		//GetRenderer("renderer")->GetScene()->Update(angle, childAngle);
 
-		Render();
+		//Render();
 
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -218,7 +190,7 @@ void GraphicsEnvironment::Run3D()
         
         currentWorld->Update((float)elapsedSeconds);
 
-        Render();
+        currentWorld->Render();
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -236,23 +208,6 @@ void GraphicsEnvironment::Run3D()
 
     ShutDown();
 }
-
-void GraphicsEnvironment::SetRendererProjectionAndView(
-    const glm::mat4& projection, const glm::mat4& view)
-{
-	for (const auto& [key, renderer] : rendererMap) {
-		renderer->SetProjection(projection);
-		renderer->SetView(view);
-	}
-}
-
-void GraphicsEnvironment::AddObject(
-    const std::string& name, std::shared_ptr<GraphicsObject> object)
-{
-    object->SetName(name);
-    objectManager->AddObject(name, object);
-}
-
 
 Ray GraphicsEnvironment::GetMouseRay(
     const glm::mat4& projection, const glm::mat4& view)
@@ -333,13 +288,6 @@ void GraphicsEnvironment::AddShader(
     shaderMap[name] = shader;
 }
 
-void GraphicsEnvironment::AddScene(
-    const std::string& name, std::shared_ptr<Scene> scene)
-{
-    if (sceneMap.contains(name)) return;
-    sceneMap[name] = scene;
-}
-
 void GraphicsEnvironment::AddTexture(
     const std::string& name, std::shared_ptr<Texture> texture)
 {
@@ -361,7 +309,7 @@ void GraphicsEnvironment::CreateWorld()
         return;
     }
     currentWorld->Create();
-    Allocate();
+    currentWorld->AllocateBuffers();
 }
 
 void GraphicsEnvironment::OnWindowSizeChanged(GLFWwindow* window, int width, int height)

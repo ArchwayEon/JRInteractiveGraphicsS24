@@ -30,14 +30,13 @@ void GraphicsWorld::Create()
 
 void GraphicsWorld::Preupdate()
 {
-	mainScene = _env->GetScene("Lighting");
+	mainScene = GetScene("Lighting");
 	globalLight = mainScene->GetGlobalLight();
 	localLight = mainScene->GetLocalLight();
 	spherePos =
 		GetGraphicsObject("PCLinesSphere1")->GetPosition();
 	cuboidPos =
 		GetGraphicsObject("PCLineCuboid1")->GetPosition();
-	_env->GetObjectManager()->SetBehaviorDefaults();
 
 	auto crate = GetGraphicsObject("Crate");
 	std::shared_ptr<RotateAnimation> rotateAnimation =
@@ -51,6 +50,7 @@ void GraphicsWorld::Preupdate()
 	moveAnimation->SetObject(cubeWorld);
 	cubeWorld->SetAnimation(moveAnimation);
 
+	objectManager->SetBehaviorDefaults();
 	camera->SetPosition({ 0.0f, 2.0f, 30.0f });
 }
 
@@ -96,7 +96,7 @@ void GraphicsWorld::Update(float elapsedSeconds)
 	projection = glm::perspective(
 		glm::radians(fieldOfView), aspectRatio, nearPlane, farPlane);
 
-	_env->SetRendererProjectionAndView(projection, view);
+	SetRendererProjectionAndView(projection, view);
 
 	mouseRay = _env->GetMouseRay(projection, view);
 
@@ -211,7 +211,7 @@ void GraphicsWorld::CreateScene1()
 	shader->AddUniform("viewPosition");
 
 	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-	_env->AddScene("Lighting", scene);
+	AddScene("Lighting", scene);
 
 	std::shared_ptr<Texture> rgbwTexture = std::make_shared<Texture>();
 	rgbwTexture->SetDimension(4, 4);
@@ -312,7 +312,7 @@ void GraphicsWorld::CreateScene2()
 	shader->AddUniform("view");
 	shader->AddUniform("texUnit");
 	auto scene = std::make_shared<Scene>();
-	_env->AddScene("BasicTexture", scene);
+	AddScene("BasicTexture", scene);
 
 	std::shared_ptr<Texture> lightBulbTexture = std::make_shared<Texture>();
 	lightBulbTexture->LoadTextureDataFromFile("lightbulb.png");
@@ -340,7 +340,7 @@ void GraphicsWorld::CreateScene3()
 	shader->AddUniform("view");
 
 	auto scene = std::make_shared<Scene>();
-	_env->AddScene("Basic", scene);
+	AddScene("Basic", scene);
 
 	std::shared_ptr<GraphicsObject> pcLinesCircle =
 		std::make_shared<GraphicsObject>();
@@ -481,26 +481,26 @@ void GraphicsWorld::CreateRenderers()
 
 void GraphicsWorld::CreateRenderer1()
 {
-	_env->CreateRenderer("Lighting", _env->GetShader("Lighting"));
-	_env->GetRenderer("Lighting")->SetScene(_env->GetScene("Lighting"));
+	CreateRenderer("Lighting", _env->GetShader("Lighting"));
+	GetRenderer("Lighting")->SetScene(GetScene("Lighting"));
 }
 
 void GraphicsWorld::CreateRenderer2()
 {
-	_env->CreateRenderer("BasicTexture", _env->GetShader("BasicTexture"));
-	_env->GetRenderer("BasicTexture")->SetScene(_env->GetScene("BasicTexture"));
+	CreateRenderer("BasicTexture", _env->GetShader("BasicTexture"));
+	GetRenderer("BasicTexture")->SetScene(GetScene("BasicTexture"));
 }
 
 void GraphicsWorld::CreateRenderer3()
 {
-	_env->CreateRenderer("Basic", _env->GetShader("Basic"));
-	_env->GetRenderer("Basic")->SetScene(_env->GetScene("Basic"));
+	CreateRenderer("Basic", _env->GetShader("Basic"));
+	GetRenderer("Basic")->SetScene(GetScene("Basic"));
 }
 
 void GraphicsWorld::OnMouseButton(int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-		auto worldCube = _env->GetGraphicsObject("World");
+		auto worldCube = GetGraphicsObject("World");
 		if (worldCube->IsIntersectingWithRay(mouseRay)) {
 			auto animation =
 				std::dynamic_pointer_cast<MoveAnimation>(
