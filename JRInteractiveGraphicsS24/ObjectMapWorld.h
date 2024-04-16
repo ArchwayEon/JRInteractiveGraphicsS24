@@ -9,6 +9,9 @@ class ObjectMapWorld : public IGraphicsWorld
 {
 private:
 	Light localLight{}, globalLight{};
+	int numberOfCrates = 50;
+	glm::vec3 mouseRayStart = { 0.0f, 0.0f, 0.0f };
+	glm::vec3 mouseRayEnd = { 0.0f, 0.0f, 0.0f };
 public:
 	ObjectMapWorld(std::shared_ptr<GraphicsEnvironment> env);
 	void Create() override;
@@ -21,6 +24,8 @@ public:
 private:
 	void CreateRenderers() override;
 	void CreateScene1();
+	void CreateScene2();
 	void CreateRenderer1();
+	void CreateRenderer2();
 };
 

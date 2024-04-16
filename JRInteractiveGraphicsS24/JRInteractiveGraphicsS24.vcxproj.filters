@@ -248,6 +248,9 @@
     <ClInclude Include="ObjectMapWorld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="UsefulMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="basic.frag.glsl" />
