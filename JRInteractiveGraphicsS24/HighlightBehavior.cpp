@@ -21,6 +21,9 @@ void HighlightBehavior::Update(double elapsedSeconds)
 {
 	if (object == nullptr) return;
 	if (object->IsIntersectingWithRay(*params->ray)) {
+		object->SetIsOverlapping(true);
+	}
+	if (object->IsOverlapping()) {
 		object->GetMaterial().ambientIntensity = 1.0f;
 	}
 	else {

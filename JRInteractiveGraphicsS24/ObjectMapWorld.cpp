@@ -11,7 +11,8 @@ ObjectMapWorld::ObjectMapWorld(std::shared_ptr<GraphicsEnvironment> env) :
 	IGraphicsWorld(env), globalLight{}, localLight{}
 {
 	_env = env;
-	map = std::make_shared<ObjectSpatialMap>(5, 5, 10, 10);
+	map = std::make_shared<ObjectSpatialMap>(5, 5, 10.0f, 10.0f);
+	SEED_RANDOM;
 }
 
 void ObjectMapWorld::Create()
@@ -34,7 +35,7 @@ void ObjectMapWorld::Preupdate()
 
 void ObjectMapWorld::Update(float elapsedSeconds)
 {
-	
+	ResetIsOverlapping();
 	auto& mouse = _env->GetMouseParams();
 
 	_env->PollInputs(elapsedSeconds);
@@ -113,7 +114,11 @@ void ObjectMapWorld::Update(float elapsedSeconds)
 	lightBulb->SetPosition(localLight.position);
 	lightBulb->PointAt(camera->GetPosition());
 
+	UpdateSpatialMap();
+	CheckSpatialMap(row, col);
+
 	objectManager->Update(elapsedSeconds);
+	
 }
 
 void ObjectMapWorld::UI(ImGuiIO& io)
@@ -130,6 +135,8 @@ void ObjectMapWorld::UI(ImGuiIO& io)
 	ImGui::SliderFloat("Local Intensity", &localLight.intensity, 0, 1);
 	ImGui::DragFloat3("Intersection point",	(float*)&point, 0.1f);
 	ImGui::Text("[Row, Col]: [%d, %d]", row, col);
+	ImGui::Text("Number of objects in cell: %d", numberOfObjectsInCell);
+	ImGui::Text("Number of overlapping objects in cell: %d", numberOfOverlappingObjectsInCell);
 }
 
 void ObjectMapWorld::OnMouseButton(int button, int action, int mods)
@@ -399,4 +406,42 @@ void ObjectMapWorld::CreateRenderer3()
 {
 	CreateRenderer("BasicTexture", _env->GetShader("BasicTexture"));
 	GetRenderer("BasicTexture")->SetScene(GetScene("BasicTexture"));
+}
+
+void ObjectMapWorld::UpdateSpatialMap()
+{
+	map->Clear();
+	auto& objectMap = objectManager->GetObjects();
+	std::string name;
+	for (const auto& [key, object] : objectMap) {
+		name = key.substr(0, 5);
+		if (name == "Crate") {
+			map->AddObject(object);
+		}
+	}
+}
+
+void ObjectMapWorld::CheckSpatialMap(int row, int col)
+{
+	auto objectsInCell = map->GetObjects(row, col);
+	numberOfOverlappingObjectsInCell = 0;
+	numberOfObjectsInCell = (int)objectsInCell.size();
+	for (const auto& object : objectsInCell) {
+		for (const auto& otherObject : objectsInCell) {
+			if (object->GetName() == otherObject->GetName()) continue;
+			if (object->OverlapsWithBoundingBox(*otherObject)) {
+				object->SetIsOverlapping(true);
+				otherObject->SetIsOverlapping(true);
+				numberOfOverlappingObjectsInCell++;
+			}
+		}
+	}
+}
+
+void ObjectMapWorld::ResetIsOverlapping()
+{
+	auto& objectMap = objectManager->GetObjects();
+	for (const auto& [key, object] : objectMap) {
+		object->SetIsOverlapping(false);
+	}
 }

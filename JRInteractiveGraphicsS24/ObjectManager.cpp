@@ -3,6 +3,7 @@
 void ObjectManager::AddObject(const std::string& name, std::shared_ptr<GraphicsObject> object)
 {
     if (objectMap.contains(name)) return;
+    object->SetName(name);
     objectMap[name] = object;
 }
 

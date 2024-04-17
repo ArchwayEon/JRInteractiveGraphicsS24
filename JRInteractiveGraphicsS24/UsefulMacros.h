@@ -46,6 +46,7 @@ constexpr auto PI = 3.14159265358979323846f;
 #define NOT_EQUAL(x, y) (!ARE_ALMOST_EQUAL(x, y))
 #define CHECK_ZERO(x) ((IS_ALMOST_ZERO((x)))?0:(x))
 
+#define SEED_RANDOM srand((unsigned int)time(nullptr))
 // Generates a random value from 0 to 1
 #define RANDOM ((rand() % 1001) / 1000.0)
 // Generates a random real values from -1 to 1

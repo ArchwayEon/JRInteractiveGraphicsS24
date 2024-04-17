@@ -18,7 +18,8 @@ private:
 	std::shared_ptr<ObjectSpatialMap> map;
 	int row = 0, col = 0;
 	glm::vec3 point{};
-
+	int numberOfObjectsInCell = 0;
+	int numberOfOverlappingObjectsInCell = 0;
 public:
 	ObjectMapWorld(std::shared_ptr<GraphicsEnvironment> env);
 	void Create() override;
@@ -36,5 +37,8 @@ private:
 	void CreateRenderer1();
 	void CreateRenderer2();
 	void CreateRenderer3();
+	void UpdateSpatialMap();
+	void CheckSpatialMap(int row, int col);
+	void ResetIsOverlapping();
 };
 

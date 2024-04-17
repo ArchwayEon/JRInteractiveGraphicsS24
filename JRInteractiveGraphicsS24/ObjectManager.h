@@ -14,6 +14,9 @@ public:
 
     void AddObject(const std::string& name, std::shared_ptr<GraphicsObject> object);
     std::shared_ptr<GraphicsObject> GetGraphicsObject(const std::string& name);
+    std::unordered_map<std::string, std::shared_ptr<GraphicsObject>>& GetObjects() {
+        return objectMap;
+    }
     void Update(double elapsedSeconds);
     void SetBehaviorDefaults();
 };
