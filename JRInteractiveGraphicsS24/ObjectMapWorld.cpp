@@ -4,17 +4,21 @@
 #include "HighlightBehavior.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include "UsefulMacros.h"
+#include "PCCuboidGenerator.h"
+#include "ChangeColorBehavior.h"
 
 ObjectMapWorld::ObjectMapWorld(std::shared_ptr<GraphicsEnvironment> env) : 
 	IGraphicsWorld(env), globalLight{}, localLight{}
 {
 	_env = env;
+	map = std::make_shared<ObjectSpatialMap>(5, 5, 10, 10);
 }
 
 void ObjectMapWorld::Create()
 {
 	CreateScene1();
 	CreateScene2();
+	CreateScene3();
 	CreateRenderers();
 }
 
@@ -23,7 +27,8 @@ void ObjectMapWorld::Preupdate()
 	mainScene = GetScene("Lighting");
 	globalLight = mainScene->GetGlobalLight();
 	localLight = mainScene->GetLocalLight();
-	camera->SetPosition({ 0.0f, 2.0f, 30.0f });
+	camera->SetPosition({ 0.0f, 20.0f, 50.0f });
+	lookWithMouse = false;
 	objectManager->SetBehaviorDefaults();
 }
 
@@ -40,7 +45,8 @@ void ObjectMapWorld::Update(float elapsedSeconds)
 		camera->SetLookFrame(mouse.spherical.ToMat4());
 	}
 
-	view = camera->GetLookForwardViewMatrix();
+	//view = camera->GetLookForwardViewMatrix();
+	view = camera->GetLookAtViewMatrix({ 0.0f, 5.0f, 0.0f });
 
 	if (mouse.windowWidth >= mouse.windowHeight) {
 		aspectRatio = mouse.windowWidth / (mouse.windowHeight * 1.0f);
@@ -79,6 +85,34 @@ void ObjectMapWorld::Update(float elapsedSeconds)
 		mouseRayEnd.x, mouseRayEnd.y, mouseRayEnd.z,
 		0.0f, 0.0f, 1.0f);
 
+	auto floor = GetGraphicsObject("Floor");
+	auto& position = floor->GetPosition();
+	floorPlane.Set({ 0.0f, 1.0f, 0.0f }, position.y);
+
+	float offset = floorPlane.GetIntersectionOffset(mouseRay);
+	if (offset >= 0) {
+		point = mouseRay.GetPoint(offset);
+		localLight.position = point;
+		localLight.position.y = 6.0f;
+		if (localLight.position.x < -25.0f) localLight.position.x = -25.0f;
+		if (localLight.position.x > 25.0f) localLight.position.x = 25.0f;
+		if (localLight.position.z < -25.0f) localLight.position.z = -25.0f;
+		if (localLight.position.z > 25.0f) localLight.position.z = 25.0f;
+		row = map->GetRow(point.z);
+		col = map->GetCol(point.x);
+	}
+	else {
+		row = -1;
+		col = -1;
+	}
+
+	mainScene->GetLocalLight().position = localLight.position;
+	mainScene->GetLocalLight().intensity = localLight.intensity;
+	mainScene->GetGlobalLight().intensity = globalLight.intensity;
+	auto lightBulb = GetGraphicsObject("LightBulb");
+	lightBulb->SetPosition(localLight.position);
+	lightBulb->PointAt(camera->GetPosition());
+
 	objectManager->Update(elapsedSeconds);
 }
 
@@ -94,6 +128,8 @@ void ObjectMapWorld::UI(ImGuiIO& io)
 	ImGui::Checkbox("Look with mouse", &lookWithMouse);
 	ImGui::SliderFloat("Global Intensity", &globalLight.intensity, 0, 1);
 	ImGui::SliderFloat("Local Intensity", &localLight.intensity, 0, 1);
+	ImGui::DragFloat3("Intersection point",	(float*)&point, 0.1f);
+	ImGui::Text("[Row, Col]: [%d, %d]", row, col);
 }
 
 void ObjectMapWorld::OnMouseButton(int button, int action, int mods)
@@ -142,7 +178,7 @@ void ObjectMapWorld::PollInputs(float elapsedSeconds)
 
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
 		glm::mat4 lookFrame(1.0f);
-		camera->SetPosition({ 0.0f, 8.0f, 30.0f });
+		camera->SetPosition({ 0.0f, 20.0f, 50.0f });
 		camera->SetLookFrame(lookFrame);
 		lookWithMouse = false;
 		return;
@@ -150,7 +186,7 @@ void ObjectMapWorld::PollInputs(float elapsedSeconds)
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
 		glm::mat4 lookFrame(1.0f);
 		lookFrame = glm::rotate(lookFrame, glm::radians(90.0f), { 0, 1, 0 });
-		camera->SetPosition({ 30.0f, 8.0f, 0.0f });
+		camera->SetPosition({ 50.0f, 20.0f, 0.0f });
 		camera->SetLookFrame(lookFrame);
 		lookWithMouse = false;
 		return;
@@ -158,7 +194,7 @@ void ObjectMapWorld::PollInputs(float elapsedSeconds)
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
 		glm::mat4 lookFrame(1.0f);
 		lookFrame = glm::rotate(lookFrame, glm::radians(180.0f), { 0, 1, 0 });
-		camera->SetPosition({ 0.0f, 8.0f, -30.0f });
+		camera->SetPosition({ 0.0f, 20.0f, -50.0f });
 		camera->SetLookFrame(lookFrame);
 		lookWithMouse = false;
 		return;
@@ -166,7 +202,7 @@ void ObjectMapWorld::PollInputs(float elapsedSeconds)
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) {
 		glm::mat4 lookFrame(1.0f);
 		lookFrame = glm::rotate(lookFrame, glm::radians(-90.0f), { 0, 1, 0 });
-		camera->SetPosition({ -30.0f, 8.0f, 0.0f });
+		camera->SetPosition({ -50.0f, 20.0f, 0.0f });
 		camera->SetLookFrame(lookFrame);
 		lookWithMouse = false;
 		return;
@@ -177,6 +213,7 @@ void ObjectMapWorld::CreateRenderers()
 {
 	CreateRenderer1();
 	CreateRenderer2();
+	CreateRenderer3();
 }
 
 void ObjectMapWorld::CreateScene1()
@@ -283,6 +320,67 @@ void ObjectMapWorld::CreateScene2()
 	pcMouseRay->SetPosition({ 0.0f, 0.0f, 0.0f });
 	scene->AddObject(pcMouseRay);
 	AddObject("PCMouseRay", pcMouseRay);
+
+	float x = -20.0f, y = 5.0f, z = -20.0f;
+	std::stringstream ss;
+	for (int i = 0; i < 25; i++) {
+		ss.str("");
+		std::shared_ptr<GraphicsObject> pcLineCuboid =
+			std::make_shared<GraphicsObject>();
+		pcLineCuboid->SetGenerator(
+			std::make_shared<PCCuboidGenerator>(pcLineCuboid));
+		auto cparams = std::make_shared<PCCuboidParams>();
+		cparams->width = 10.0f;
+		cparams->height = 10.0f;
+		cparams->depth = 10.0f;
+		pcLineCuboid->GetMaterial().color = { 1.0f, 0.0f, 1.0f };
+		pcLineCuboid->GetGenerator()->SetParameters(cparams);
+		pcLineCuboid->Generate(UseDynamicBuffers);
+		pcLineCuboid->SetPosition({ x, y, z });
+		x += 10;
+		if (x >= 25) {
+			x = -20.0f;
+			z += 10;
+		}
+		pcLineCuboid->CreateBoundingBox(10.0f, 10.0f, 10.0f);
+		auto ccb = std::make_shared<ChangeColorBehavior>(
+			glm::vec3(1.0f, 0.0f, 0.0f));
+		ccb->SetObject(pcLineCuboid);
+		pcLineCuboid->AddBehavior("ChangeColor", ccb);
+		scene->AddObject(pcLineCuboid);
+		ss << "PCLineCuboid" << i + 1;
+		AddObject(ss.str(), pcLineCuboid);
+	}
+
+}
+
+void ObjectMapWorld::CreateScene3()
+{
+	auto shader = _env->CreateShader(
+		"BasicTexture", "texture.vert.glsl", "texture.frag.glsl");
+
+	shader->AddUniform("projection");
+	shader->AddUniform("world");
+	shader->AddUniform("view");
+	shader->AddUniform("texUnit");
+	auto scene = std::make_shared<Scene>();
+	AddScene("BasicTexture", scene);
+
+	std::shared_ptr<Texture> lightBulbTexture = std::make_shared<Texture>();
+	lightBulbTexture->LoadTextureDataFromFile("lightbulb.png");
+	_env->AddTexture("LightBulb", lightBulbTexture);
+
+	std::shared_ptr<GraphicsObject> lightBulb =
+		std::make_shared<GraphicsObject>();
+	std::shared_ptr<VertexBuffer> buffer =
+		Generate::XYPlane(2.0f, 2.0f);
+	buffer->AddVertexAttribute("position", 0, 3, 0);
+	buffer->AddVertexAttribute("vertexColor", 1, 3, 3);
+	buffer->AddVertexAttribute("texCoord", 2, 2, 6);
+	buffer->SetTexture(lightBulbTexture);
+	lightBulb->SetVertexBuffer(buffer);
+	scene->AddObject(lightBulb);
+	AddObject("LightBulb", lightBulb);
 }
 
 void ObjectMapWorld::CreateRenderer1()
@@ -295,4 +393,10 @@ void ObjectMapWorld::CreateRenderer2()
 {
 	CreateRenderer("Basic", _env->GetShader("Basic"));
 	GetRenderer("Basic")->SetScene(GetScene("Basic"));
+}
+
+void ObjectMapWorld::CreateRenderer3()
+{
+	CreateRenderer("BasicTexture", _env->GetShader("BasicTexture"));
+	GetRenderer("BasicTexture")->SetScene(GetScene("BasicTexture"));
 }

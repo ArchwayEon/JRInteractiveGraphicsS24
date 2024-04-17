@@ -159,6 +159,7 @@
     <ClCompile Include="MoveAnimation.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="ObjectMapWorld.cpp" />
+    <ClCompile Include="ObjectSpatialMap.cpp" />
     <ClCompile Include="PCCuboidGenerator.cpp" />
     <ClCompile Include="PCSphereGenerator.cpp" />
     <ClCompile Include="Ray.cpp" />
@@ -195,6 +196,7 @@
     <ClInclude Include="MoveAnimation.h" />
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="ObjectMapWorld.h" />
+    <ClInclude Include="ObjectSpatialMap.h" />
     <ClInclude Include="PCCuboidGenerator.h" />
     <ClInclude Include="PCSphereGenerator.h" />
     <ClInclude Include="Ray.h" />

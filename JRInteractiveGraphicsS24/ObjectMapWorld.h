@@ -2,6 +2,8 @@
 #include "IGraphicsWorld.h"
 #include "GraphicsStructures.h"
 #include <glm/glm.hpp>
+#include "ObjectSpatialMap.h"
+#include <memory>
 
 class GraphicsEnvironment;
 
@@ -12,6 +14,11 @@ private:
 	int numberOfCrates = 50;
 	glm::vec3 mouseRayStart = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 mouseRayEnd = { 0.0f, 0.0f, 0.0f };
+	GeometricPlane floorPlane;
+	std::shared_ptr<ObjectSpatialMap> map;
+	int row = 0, col = 0;
+	glm::vec3 point{};
+
 public:
 	ObjectMapWorld(std::shared_ptr<GraphicsEnvironment> env);
 	void Create() override;
@@ -25,7 +32,9 @@ private:
 	void CreateRenderers() override;
 	void CreateScene1();
 	void CreateScene2();
+	void CreateScene3();
 	void CreateRenderer1();
 	void CreateRenderer2();
+	void CreateRenderer3();
 };
 
