@@ -6,6 +6,7 @@ in vec2 fragTexCoord;
 
 out vec4 color;
 
+uniform vec3 materialAmbientColor;
 uniform float materialAmbientIntensity;
 uniform float materialSpecularIntensity;
 uniform float materialShininess;
@@ -59,7 +60,7 @@ void main()
    vec4 texColor = texture(texUnit, fragTexCoord);
    if(texColor.a < 0.1) discard;
    vec4 texFragColor = texColor * fragColor;
-   vec4 ambientColor = materialAmbientIntensity * vec4(1.0f, 1.0f, 1.0f, 1.0f);
+   vec4 ambientColor = materialAmbientIntensity * vec4(materialAmbientColor, 1.0f);
    ambientColor.a = 1.0f;
    color = (ambientColor + globalDiffuse + localDiffuse + specular) *   
             texFragColor;

@@ -50,6 +50,7 @@ void Renderer::RenderObject(GraphicsObject& object)
 {
 	shader->SendMat4Uniform("world", object.GetReferenceFrame().GetMatrix());
 	Material& m = object.GetMaterial();
+	shader->SendVec3Uniform("materialAmbientColor", m.ambientColor);
 	shader->SendFloatUniform("materialAmbientIntensity", m.ambientIntensity);
 	shader->SendFloatUniform("materialSpecularIntensity", m.specularIntensity);
 	shader->SendFloatUniform("materialShininess", m.shininess);

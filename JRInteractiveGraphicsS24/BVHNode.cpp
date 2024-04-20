@@ -51,22 +51,12 @@ void BVHNode::Remove()
     }
 }
 
-unsigned BVHNode::GetPotentialCollisions(
-    std::vector<std::shared_ptr<PotentialCollision>>& collisions) const
-{
-    // Early out if we're a leaf node.
-    if (IsLeaf()) return 0;
 
-    // Get the potential contacts of one of our children with the other
-    unsigned count = child[0]->GetPotentialCollisionsWith(child[1], collisions);
-    count += child[0]->GetPotentialCollisions(collisions);
-    count += child[1]->GetPotentialCollisions(collisions);
-    return count;
-}
 
 void BVHNode::Insert(std::shared_ptr<GraphicsObject> newObject, 
-    const BoundingSphere& sphere)
+    BoundingSphere sphere)
 {
+    sphere.SetPosition(newObject->GetPosition());
     auto newVolume = std::make_shared<BoundingSphere>(sphere);
     // If this hierarchy is new then add the object and return.
     if (volume == nullptr && object == nullptr) {
@@ -95,8 +85,9 @@ void BVHNode::Insert(std::shared_ptr<GraphicsObject> newObject,
     // the inserted body. We give it to whoever would grow the
     // least to incorporate it.
     else {
-        if (child[0]->volume->GetGrowth(*newVolume) < 
-            child[1]->volume->GetGrowth(*newVolume)) {
+        auto volumeGrowth1 = child[0]->volume->GetGrowth(*newVolume);
+        auto volumeGrowth2 = child[1]->volume->GetGrowth(*newVolume);
+        if (volumeGrowth1 < volumeGrowth2) {
             child[0]->Insert(newObject, sphere);
         }
         else {
@@ -117,6 +108,19 @@ void BVHNode::RecalculateBoundingVolume(bool recurse)
     if (recurse == true) {
         if (parent != nullptr) parent->RecalculateBoundingVolume(true);
     }
+}
+
+unsigned BVHNode::GetPotentialCollisions(
+    std::vector<std::shared_ptr<PotentialCollision>>& collisions) const
+{
+    // Early out if we're a leaf node.
+    if (IsLeaf()) return 0;
+
+    // Get the potential contacts of one of our children with the other
+    unsigned count = child[0]->GetPotentialCollisionsWith(child[1], collisions);
+    count += child[0]->GetPotentialCollisions(collisions);
+    count += child[1]->GetPotentialCollisions(collisions);
+    return count;
 }
 
 unsigned BVHNode::GetPotentialCollisionsWith(
@@ -140,21 +144,34 @@ unsigned BVHNode::GetPotentialCollisionsWith(
     // Determine which node to descend into. If either is a leaf, then we 
     // descend the other. If both are branches, then we use the one with the 
     // largest size.
-    if (other->IsLeaf() || 
-        (!IsLeaf() && volume->GetVolume() >= other->volume->GetVolume())) {
+    unsigned count;
+    if (IsLeaf() == false && other->IsLeaf() == false) {
+        auto size1 = volume->GetVolume();
+        auto size2 = other->volume->GetVolume();
+        if (size1 > size2) {
+            // Recurse into ourself
+            count = child[0]->GetPotentialCollisionsWith(other, collisions);
+            return count + child[1]->GetPotentialCollisionsWith(other, collisions);
+        }
+        else {
+            // Recurse into the other node
+            count = GetPotentialCollisionsWith(other->child[0], collisions);
+            return count + GetPotentialCollisionsWith(other->child[1], collisions);
+        }
+    }
+    else if (other->IsLeaf()) {
         // Recurse into ourself
-        child[0]->GetPotentialCollisionsWith(other, collisions);
-        return child[1]->GetPotentialCollisionsWith(other, collisions);
+        count = child[0]->GetPotentialCollisionsWith(other, collisions);
+        return count + child[1]->GetPotentialCollisionsWith(other, collisions);
     }
     else {
         // Recurse into the other node
-        GetPotentialCollisionsWith(other->child[0], collisions);
-        return GetPotentialCollisionsWith(other->child[1], collisions);
+        count = GetPotentialCollisionsWith(other->child[0], collisions);
+        return count + GetPotentialCollisionsWith(other->child[1], collisions);
     }
 }
 
 bool BVHNode::IsOverlapping(std::shared_ptr<BVHNode> other)
 {
-    float overlap = volume->GetOverlapAmount(*other->volume);
-    return overlap > 0.0f;
+    return volume->OverlapsWith(*other->volume);
 }

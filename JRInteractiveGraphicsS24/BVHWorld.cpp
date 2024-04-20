@@ -10,7 +10,7 @@
 BVHWorld::BVHWorld(std::shared_ptr<GraphicsEnvironment> env) :
 	IGraphicsWorld(env), globalLight{}, localLight{}
 {
-	numberOfCrates = 50;
+	numberOfCrates = 100;
 	rootBVH = std::make_shared<BVHNode>();
 	SEED_RANDOM;
 }
@@ -128,6 +128,8 @@ void BVHWorld::UI(ImGuiIO& io)
 	ImGui::SliderFloat("Global Intensity", &globalLight.intensity, 0, 1);
 	ImGui::SliderFloat("Local Intensity", &localLight.intensity, 0, 1);
 	ImGui::DragFloat3("Intersection point", (float*)&floorIntersectionPoint, 0.1f);
+	ImGui::Text("Number of collisions: %d", numberOfCollisions);
+	ImGui::Text("Number of potential collisions: %d", numPotentialCollisions);
 }
 
 void BVHWorld::OnMouseButton(int button, int action, int mods)
@@ -222,6 +224,7 @@ void BVHWorld::CreateScene1()
 	shader->AddUniform("world");
 	shader->AddUniform("view");
 	shader->AddUniform("texUnit");
+	shader->AddUniform("materialAmbientColor");
 	shader->AddUniform("materialAmbientIntensity");
 	shader->AddUniform("materialSpecularIntensity");
 	shader->AddUniform("materialShininess");
@@ -246,6 +249,7 @@ void BVHWorld::CreateScene1()
 	float width, height, depth, halfHeight;
 	float x, z, rSpeed, rDistance;
 	glm::vec3 rDir{};
+	glm::vec3 rColor{};
 	for (int i = 0; i < numberOfCrates; i++) {
 		ss.str("");
 		std::shared_ptr<GraphicsObject> crate = std::make_shared<GraphicsObject>();
@@ -263,6 +267,10 @@ void BVHWorld::CreateScene1()
 		crate->CreateBoundingSphere(std::max(width, std::max(height, depth)));
 		auto crateHB = std::make_shared<HighlightBehavior>(crate);
 		crate->AddBehavior("highlight", crateHB);
+		rColor.r = (float)RANGED_RANDOM(0.0f, 1.0f);
+		rColor.g = (float)RANGED_RANDOM(0.0f, 1.0f);
+		rColor.b = (float)RANGED_RANDOM(0.0f, 1.0f);
+		crate->GetMaterial().ambientColor = rColor;
 		rSpeed = (float)RANGED_RANDOM(1.0f, 10.0f);
 		rDistance = (float)RANGED_RANDOM(5.0f, 20.0f);
 		rDir.x = (float)RANGED_RANDOM(-1.0f, 1.0f);
@@ -402,6 +410,7 @@ void BVHWorld::InsertObjectsIntoBVH()
 
 void BVHWorld::CheckForCollisions()
 {
+	numberOfCollisions = 0;
 	std::vector<std::shared_ptr<PotentialCollision>> collisions;
 	rootBVH->GetPotentialCollisions(collisions);
 	for (const auto& pc : collisions) {
@@ -410,6 +419,8 @@ void BVHWorld::CheckForCollisions()
 		if (object->OverlapsWithBoundingBox(*otherObject)) {
 			object->SetIsOverlapping(true);
 			otherObject->SetIsOverlapping(true);
+			numberOfCollisions++;
 		}
 	}
+	numPotentialCollisions = (int)collisions.size();
 }

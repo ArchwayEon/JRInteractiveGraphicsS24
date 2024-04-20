@@ -36,6 +36,7 @@ struct MouseParams {
 
 struct Material {
     glm::vec3 color = { 1.0f, 1.0f, 1.0f };
+    glm::vec3 ambientColor = { 1.0f, 1.0f, 1.0f };
     float ambientIntensity;  // 0 to 1
     float specularIntensity; // 0 to 1
     float shininess;         // 0 to infinity

@@ -48,7 +48,7 @@ public:
 	// into the hierarchy. This may involve the creation of
 	// further bounding volume nodes.
 	void Insert(std::shared_ptr<GraphicsObject> newObject, 
-		const BoundingSphere& sphere);
+		BoundingSphere sphere);
 protected:
 	// For non-leaf nodes, this method recalculates the bounding volume
     // based on the bounding volumes of its children.

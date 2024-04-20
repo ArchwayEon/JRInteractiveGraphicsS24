@@ -17,6 +17,8 @@ protected:
 	GeometricPlane floorPlane;
 	glm::vec3 floorIntersectionPoint{};
 	std::shared_ptr<BVHNode> rootBVH;
+	int numberOfCollisions = 0;
+	int numPotentialCollisions = 0;
 
 public:
 	BVHWorld(std::shared_ptr<GraphicsEnvironment> env);
