@@ -198,6 +198,7 @@ void GraphicsWorld::CreateScene1()
 	shader->AddUniform("world");
 	shader->AddUniform("view");
 	shader->AddUniform("texUnit");
+	shader->AddUniform("materialAmbientColor");
 	shader->AddUniform("materialAmbientIntensity");
 	shader->AddUniform("materialSpecularIntensity");
 	shader->AddUniform("materialShininess");
