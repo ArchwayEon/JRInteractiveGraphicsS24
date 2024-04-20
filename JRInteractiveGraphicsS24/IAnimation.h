@@ -10,6 +10,7 @@ protected:
 
 public:
 	IAnimation() : IBehavior() {}
+	IAnimation(std::shared_ptr<GraphicsObject> object) : IBehavior(object) {}
 	virtual ~IAnimation() = default;
 };
 

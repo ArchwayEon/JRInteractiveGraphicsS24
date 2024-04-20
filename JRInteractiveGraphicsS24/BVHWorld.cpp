@@ -1,21 +1,18 @@
-#include "ObjectMapWorld.h"
+#include "BVHWorld.h"
+#include "UsefulMacros.h"
 #include "GraphicsEnvironment.h"
+#include <glm/gtc/matrix_transform.hpp>
 #include "Generate.h"
 #include "HighlightBehavior.h"
-#include <glm/gtc/matrix_transform.hpp>
-#include "UsefulMacros.h"
-#include "PCCuboidGenerator.h"
-#include "ChangeColorBehavior.h"
+#include "BackForthAnimation.h"
 
-ObjectMapWorld::ObjectMapWorld(std::shared_ptr<GraphicsEnvironment> env) : 
+BVHWorld::BVHWorld(std::shared_ptr<GraphicsEnvironment> env) :
 	IGraphicsWorld(env), globalLight{}, localLight{}
 {
-	_env = env;
-	map = std::make_shared<ObjectSpatialMap>(5, 5, 10.0f, 10.0f);
 	SEED_RANDOM;
 }
 
-void ObjectMapWorld::Create()
+void BVHWorld::Create()
 {
 	CreateScene1();
 	CreateScene2();
@@ -23,17 +20,17 @@ void ObjectMapWorld::Create()
 	CreateRenderers();
 }
 
-void ObjectMapWorld::Preupdate()
+void BVHWorld::Preupdate()
 {
 	mainScene = GetScene("Lighting");
 	globalLight = mainScene->GetGlobalLight();
 	localLight = mainScene->GetLocalLight();
-	camera->SetPosition({ 0.0f, 20.0f, 50.0f });
+	camera->SetPosition({ 0.0f, 20.0f, 40.0f });
 	lookWithMouse = false;
 	objectManager->SetBehaviorDefaults();
 }
 
-void ObjectMapWorld::Update(float elapsedSeconds)
+void BVHWorld::Update(float elapsedSeconds)
 {
 	ResetIsOverlapping();
 	auto& mouse = _env->GetMouseParams();
@@ -99,12 +96,6 @@ void ObjectMapWorld::Update(float elapsedSeconds)
 		if (localLight.position.x > 25.0f) localLight.position.x = 25.0f;
 		if (localLight.position.z < -25.0f) localLight.position.z = -25.0f;
 		if (localLight.position.z > 25.0f) localLight.position.z = 25.0f;
-		row = map->GetRow(floorIntersectionPoint.z);
-		col = map->GetCol(floorIntersectionPoint.x);
-	}
-	else {
-		row = -1;
-		col = -1;
 	}
 
 	mainScene->GetLocalLight().position = localLight.position;
@@ -114,14 +105,10 @@ void ObjectMapWorld::Update(float elapsedSeconds)
 	lightBulb->SetPosition(localLight.position);
 	lightBulb->PointAt(camera->GetPosition());
 
-	UpdateSpatialMap();
-	CheckSpatialMap(row, col);
-
 	objectManager->Update(elapsedSeconds);
-	
 }
 
-void ObjectMapWorld::UI(ImGuiIO& io)
+void BVHWorld::UI(ImGuiIO& io)
 {
 	auto& mouse = _env->GetMouseParams();
 	ImGui::Text(Logger::GetLog().c_str());
@@ -133,17 +120,14 @@ void ObjectMapWorld::UI(ImGuiIO& io)
 	ImGui::Checkbox("Look with mouse", &lookWithMouse);
 	ImGui::SliderFloat("Global Intensity", &globalLight.intensity, 0, 1);
 	ImGui::SliderFloat("Local Intensity", &localLight.intensity, 0, 1);
-	ImGui::DragFloat3("Intersection point",	(float*)&floorIntersectionPoint, 0.1f);
-	ImGui::Text("[Row, Col]: [%d, %d]", row, col);
-	ImGui::Text("Number of objects in cell: %d", numberOfObjectsInCell);
-	ImGui::Text("Number of overlapping objects in cell: %d", numberOfOverlappingObjectsInCell);
+	ImGui::DragFloat3("Intersection point", (float*)&floorIntersectionPoint, 0.1f);
 }
 
-void ObjectMapWorld::OnMouseButton(int button, int action, int mods)
+void BVHWorld::OnMouseButton(int button, int action, int mods)
 {
 }
 
-void ObjectMapWorld::OnKey(int key, int scancode, int action, int mods)
+void BVHWorld::OnKey(int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_F2 && action == GLFW_PRESS) {
 		lookWithMouse = !lookWithMouse;
@@ -151,7 +135,7 @@ void ObjectMapWorld::OnKey(int key, int scancode, int action, int mods)
 	}
 }
 
-void ObjectMapWorld::PollInputs(float elapsedSeconds)
+void BVHWorld::PollInputs(float elapsedSeconds)
 {
 	auto window = _env->GetWindow();
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -216,14 +200,14 @@ void ObjectMapWorld::PollInputs(float elapsedSeconds)
 	}
 }
 
-void ObjectMapWorld::CreateRenderers()
+void BVHWorld::CreateRenderers()
 {
 	CreateRenderer1();
 	CreateRenderer2();
 	CreateRenderer3();
 }
 
-void ObjectMapWorld::CreateScene1()
+void BVHWorld::CreateScene1()
 {
 	auto shader = _env->CreateShader(
 		"Lighting", "lighting.vert.glsl", "lighting.frag.glsl");
@@ -253,14 +237,14 @@ void ObjectMapWorld::CreateScene1()
 	std::stringstream ss;
 
 	float width, height, depth, halfHeight;
-	float x, z;
+	float x, z, rSpeed, rDistance;
+	glm::vec3 rDir{};
 	for (int i = 0; i < numberOfCrates; i++) {
 		ss.str("");
 		std::shared_ptr<GraphicsObject> crate = std::make_shared<GraphicsObject>();
 		width = (float)RANGED_RANDOM_INT(1, 4);
 		height = (float)RANGED_RANDOM_INT(1, 4);
 		depth = (float)RANGED_RANDOM_INT(1, 4);
-		
 		auto buffer = Generate::CuboidWithNormals(width, height, depth);
 		buffer->AddVertexAttribute("position", 0, 3, 0);
 		buffer->AddVertexAttribute("vertexColor", 1, 4, 3);
@@ -269,14 +253,23 @@ void ObjectMapWorld::CreateScene1()
 		buffer->SetTexture(crateTexture);
 		crate->SetVertexBuffer(buffer);
 		crate->CreateBoundingBox(width, height, depth);
-		auto hb2 = std::make_shared<HighlightBehavior>(crate);
-		crate->AddBehavior("highlight", hb2);
+		auto crateHB = std::make_shared<HighlightBehavior>(crate);
+		crate->AddBehavior("highlight", crateHB);
+		rSpeed = (float)RANGED_RANDOM(1.0f, 10.0f);
+		rDistance = (float)RANGED_RANDOM(5.0f, 20.0f);
+		rDir.x = (float)RANGED_RANDOM(-1.0f, 1.0f);
+		rDir.y = 0.0f;
+		rDir.z = (float)RANGED_RANDOM(-1.0f, 1.0f);
+		rDir = glm::normalize(rDir);
+		auto crateAni = std::make_shared<BackForthAnimation>(
+			crate, rDir, rDistance, rSpeed);
+		crate->SetAnimation(crateAni);
 		halfHeight = height / 2;
 		x = (float)RANGED_RANDOM(-22.0f, 22.0f);
 		z = (float)RANGED_RANDOM(-22.0f, 22.0f);
 		crate->SetPosition(glm::vec3(x, halfHeight, z));
 		scene->AddObject(crate);
-		ss << "Crate" << i+1;
+		ss << "Crate" << i + 1;
 		AddObject(ss.str(), crate);
 	}
 
@@ -301,7 +294,7 @@ void ObjectMapWorld::CreateScene1()
 	scene->GetLocalLight().intensity = 0.5f;
 }
 
-void ObjectMapWorld::CreateScene2()
+void BVHWorld::CreateScene2()
 {
 	auto shader = _env->CreateShader(
 		"Basic", "basic.vert.glsl", "basic.frag.glsl");
@@ -327,41 +320,9 @@ void ObjectMapWorld::CreateScene2()
 	pcMouseRay->SetPosition({ 0.0f, 0.0f, 0.0f });
 	scene->AddObject(pcMouseRay);
 	AddObject("PCMouseRay", pcMouseRay);
-
-	float x = -20.0f, y = 5.0f, z = -20.0f;
-	std::stringstream ss;
-	for (int i = 0; i < 25; i++) {
-		ss.str("");
-		std::shared_ptr<GraphicsObject> pcLineCuboid =
-			std::make_shared<GraphicsObject>();
-		pcLineCuboid->SetGenerator(
-			std::make_shared<PCCuboidGenerator>(pcLineCuboid));
-		auto cparams = std::make_shared<PCCuboidParams>();
-		cparams->width = 10.0f;
-		cparams->height = 10.0f;
-		cparams->depth = 10.0f;
-		pcLineCuboid->GetMaterial().color = { 1.0f, 0.0f, 1.0f };
-		pcLineCuboid->GetGenerator()->SetParameters(cparams);
-		pcLineCuboid->Generate(UseDynamicBuffers);
-		pcLineCuboid->SetPosition({ x, y, z });
-		x += 10;
-		if (x >= 25) {
-			x = -20.0f;
-			z += 10;
-		}
-		pcLineCuboid->CreateBoundingBox(10.0f, 10.0f, 10.0f);
-		auto ccb = std::make_shared<ChangeColorBehavior>(
-			glm::vec3(1.0f, 0.0f, 0.0f));
-		ccb->SetObject(pcLineCuboid);
-		pcLineCuboid->AddBehavior("ChangeColor", ccb);
-		scene->AddObject(pcLineCuboid);
-		ss << "PCLineCuboid" << i + 1;
-		AddObject(ss.str(), pcLineCuboid);
-	}
-
 }
 
-void ObjectMapWorld::CreateScene3()
+void BVHWorld::CreateScene3()
 {
 	auto shader = _env->CreateShader(
 		"BasicTexture", "texture.vert.glsl", "texture.frag.glsl");
@@ -390,55 +351,25 @@ void ObjectMapWorld::CreateScene3()
 	AddObject("LightBulb", lightBulb);
 }
 
-void ObjectMapWorld::CreateRenderer1()
+void BVHWorld::CreateRenderer1()
 {
 	CreateRenderer("Lighting", _env->GetShader("Lighting"));
 	GetRenderer("Lighting")->SetScene(GetScene("Lighting"));
 }
 
-void ObjectMapWorld::CreateRenderer2()
+void BVHWorld::CreateRenderer2()
 {
 	CreateRenderer("Basic", _env->GetShader("Basic"));
 	GetRenderer("Basic")->SetScene(GetScene("Basic"));
 }
 
-void ObjectMapWorld::CreateRenderer3()
+void BVHWorld::CreateRenderer3()
 {
 	CreateRenderer("BasicTexture", _env->GetShader("BasicTexture"));
 	GetRenderer("BasicTexture")->SetScene(GetScene("BasicTexture"));
 }
 
-void ObjectMapWorld::UpdateSpatialMap()
-{
-	map->Clear();
-	auto& objectMap = objectManager->GetObjects();
-	std::string name;
-	for (const auto& [key, object] : objectMap) {
-		name = key.substr(0, 5);
-		if (name == "Crate") {
-			map->AddObject(object);
-		}
-	}
-}
-
-void ObjectMapWorld::CheckSpatialMap(int row, int col)
-{
-	auto objectsInCell = map->GetObjects(row, col);
-	numberOfOverlappingObjectsInCell = 0;
-	numberOfObjectsInCell = (int)objectsInCell.size();
-	for (const auto& object : objectsInCell) {
-		for (const auto& otherObject : objectsInCell) {
-			if (object->GetName() == otherObject->GetName()) continue;
-			if (object->OverlapsWithBoundingBox(*otherObject)) {
-				object->SetIsOverlapping(true);
-				otherObject->SetIsOverlapping(true);
-				numberOfOverlappingObjectsInCell++;
-			}
-		}
-	}
-}
-
-void ObjectMapWorld::ResetIsOverlapping()
+void BVHWorld::ResetIsOverlapping()
 {
 	auto& objectMap = objectManager->GetObjects();
 	for (const auto& [key, object] : objectMap) {
