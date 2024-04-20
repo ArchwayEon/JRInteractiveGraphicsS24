@@ -28,8 +28,8 @@ void ObjectSpatialMap::Clear()
 
 std::vector<std::shared_ptr<GraphicsObject>> ObjectSpatialMap::GetObjects(std::size_t row, std::size_t col)
 {
-	if (row < 0 || row > numberOfRows) return empty;
-	if (col < 0 || col > numberOfCols) return empty;
+	if (row < 0 || row >= numberOfRows) return empty;
+	if (col < 0 || col >= numberOfCols) return empty;
 	auto index = row * numberOfCols + col;
 	return objects[index];
 }
