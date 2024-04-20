@@ -29,6 +29,7 @@ protected:
 	std::shared_ptr<BoundingSphere> boundingSphere = nullptr;
 	std::shared_ptr<IGenerator> generator = nullptr;
 	bool isOverlapping = false;
+	bool inPotentialCollision = false;
 
 public:
 	GraphicsObject();
@@ -105,5 +106,9 @@ public:
 		this->isOverlapping = isOverlapping; 
 	}
 	bool IsOverlapping() const { return isOverlapping; }
+	void SetInPotentialCollision(bool inPotentialCollision) {
+		this->inPotentialCollision = inPotentialCollision;
+	}
+	bool InPotentialCollision() const { return inPotentialCollision; }
 };
 

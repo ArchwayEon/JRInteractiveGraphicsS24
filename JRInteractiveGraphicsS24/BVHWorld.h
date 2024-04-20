@@ -5,6 +5,7 @@
 #include <memory>
 
 class GraphicsEnvironment;
+class BVHNode;
 
 class BVHWorld :  public IGraphicsWorld
 {
@@ -15,6 +16,7 @@ protected:
 	glm::vec3 mouseRayEnd = { 0.0f, 0.0f, 0.0f };
 	GeometricPlane floorPlane;
 	glm::vec3 floorIntersectionPoint{};
+	std::shared_ptr<BVHNode> rootBVH;
 
 public:
 	BVHWorld(std::shared_ptr<GraphicsEnvironment> env);
@@ -34,5 +36,7 @@ private:
 	void CreateRenderer2();
 	void CreateRenderer3();
 	void ResetIsOverlapping();
+	void InsertObjectsIntoBVH();
+	void CheckForCollisions();
 };
 

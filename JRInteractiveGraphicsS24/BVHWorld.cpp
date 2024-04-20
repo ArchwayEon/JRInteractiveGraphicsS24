@@ -5,10 +5,13 @@
 #include "Generate.h"
 #include "HighlightBehavior.h"
 #include "BackForthAnimation.h"
+#include "BVHNode.h"
 
 BVHWorld::BVHWorld(std::shared_ptr<GraphicsEnvironment> env) :
 	IGraphicsWorld(env), globalLight{}, localLight{}
 {
+	numberOfCrates = 50;
+	rootBVH = std::make_shared<BVHNode>();
 	SEED_RANDOM;
 }
 
@@ -25,13 +28,14 @@ void BVHWorld::Preupdate()
 	mainScene = GetScene("Lighting");
 	globalLight = mainScene->GetGlobalLight();
 	localLight = mainScene->GetLocalLight();
-	camera->SetPosition({ 0.0f, 20.0f, 40.0f });
+	camera->SetPosition({ 0.0f, 15.0f, 45.0f });
 	lookWithMouse = false;
 	objectManager->SetBehaviorDefaults();
 }
 
 void BVHWorld::Update(float elapsedSeconds)
 {
+
 	ResetIsOverlapping();
 	auto& mouse = _env->GetMouseParams();
 
@@ -104,6 +108,9 @@ void BVHWorld::Update(float elapsedSeconds)
 	auto lightBulb = GetGraphicsObject("LightBulb");
 	lightBulb->SetPosition(localLight.position);
 	lightBulb->PointAt(camera->GetPosition());
+
+	InsertObjectsIntoBVH();
+	CheckForCollisions();
 
 	objectManager->Update(elapsedSeconds);
 }
@@ -253,6 +260,7 @@ void BVHWorld::CreateScene1()
 		buffer->SetTexture(crateTexture);
 		crate->SetVertexBuffer(buffer);
 		crate->CreateBoundingBox(width, height, depth);
+		crate->CreateBoundingSphere(std::max(width, std::max(height, depth)));
 		auto crateHB = std::make_shared<HighlightBehavior>(crate);
 		crate->AddBehavior("highlight", crateHB);
 		rSpeed = (float)RANGED_RANDOM(1.0f, 10.0f);
@@ -265,8 +273,8 @@ void BVHWorld::CreateScene1()
 			crate, rDir, rDistance, rSpeed);
 		crate->SetAnimation(crateAni);
 		halfHeight = height / 2;
-		x = (float)RANGED_RANDOM(-22.0f, 22.0f);
-		z = (float)RANGED_RANDOM(-22.0f, 22.0f);
+		x = (float)RANGED_RANDOM(-25.0f, 25.0f);
+		z = (float)RANGED_RANDOM(-25.0f, 25.0f);
 		crate->SetPosition(glm::vec3(x, halfHeight, z));
 		scene->AddObject(crate);
 		ss << "Crate" << i + 1;
@@ -374,5 +382,34 @@ void BVHWorld::ResetIsOverlapping()
 	auto& objectMap = objectManager->GetObjects();
 	for (const auto& [key, object] : objectMap) {
 		object->SetIsOverlapping(false);
+	}
+}
+
+void BVHWorld::InsertObjectsIntoBVH()
+{
+	rootBVH->Remove();
+	rootBVH = std::make_shared<BVHNode>();
+	auto& objectMap = objectManager->GetObjects();
+	std::string name;
+	for (const auto& [key, object] : objectMap) {
+		name = key.substr(0, 5);
+		if (name == "Crate") {
+			auto sphere = object->GetBoundingSphere();
+			rootBVH->Insert(object, *sphere);
+		}
+	}
+}
+
+void BVHWorld::CheckForCollisions()
+{
+	std::vector<std::shared_ptr<PotentialCollision>> collisions;
+	rootBVH->GetPotentialCollisions(collisions);
+	for (const auto& pc : collisions) {
+		auto& object = pc->objects[0];
+		auto& otherObject = pc->objects[1];
+		if (object->OverlapsWithBoundingBox(*otherObject)) {
+			object->SetIsOverlapping(true);
+			otherObject->SetIsOverlapping(true);
+		}
 	}
 }

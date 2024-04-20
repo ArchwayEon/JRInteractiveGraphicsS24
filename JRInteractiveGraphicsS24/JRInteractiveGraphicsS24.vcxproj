@@ -140,6 +140,7 @@
     <ClCompile Include="..\3rdparty\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\3rdparty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="BackForthAnimation.cpp" />
+    <ClCompile Include="BVHNode.cpp" />
     <ClCompile Include="BVHWorld.cpp" />
     <ClCompile Include="IGraphicsWorld.cpp" />
     <ClCompile Include="Logger.cpp" />
@@ -179,6 +180,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackForthAnimation.h" />
+    <ClInclude Include="BVHNode.h" />
     <ClInclude Include="BVHWorld.h" />
     <ClInclude Include="IGraphicsWorld.h" />
     <ClInclude Include="Logger.h" />
