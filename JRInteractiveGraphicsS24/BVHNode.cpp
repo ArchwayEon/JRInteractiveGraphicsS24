@@ -30,7 +30,7 @@ void BVHNode::Remove()
         parent->child[0] = sibling->child[0];
         parent->child[1] = sibling->child[1];
 
-        // Delete the sibling (we blank its parent and children to avoid 
+        // Remove the sibling (we blank its parent and children to avoid 
         // processing/deleting them)
         sibling->parent = nullptr;
         sibling->object = nullptr;
@@ -79,11 +79,10 @@ void BVHNode::Insert(std::shared_ptr<GraphicsObject> newObject,
         this->object = nullptr;
 
         // Recalculate the bounding volume
-        RecalculateBoundingVolume();
+        RecalculateBoundingVolume(true);
     }
-    // Otherwise work out which child gets to keep 
-    // the inserted body. We give it to whoever would grow the
-    // least to incorporate it.
+    // Otherwise work out which child gets to keep the inserted body. We give 
+    // it to whoever would grow the least to incorporate it.
     else {
         auto volumeGrowth1 = child[0]->volume->GetGrowth(*newVolume);
         auto volumeGrowth2 = child[1]->volume->GetGrowth(*newVolume);
