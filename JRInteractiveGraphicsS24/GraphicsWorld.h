@@ -15,8 +15,6 @@ class GraphicsWorld : public IGraphicsWorld
 {
 private:
 	bool correctGamma = false;
-
-
 	glm::mat4 cubeReferenceFrame;
 	float cubeYAngle = 0;
 	float cubeXAngle = 0;
