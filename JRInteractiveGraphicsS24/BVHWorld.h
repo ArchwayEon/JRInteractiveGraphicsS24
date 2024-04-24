@@ -19,6 +19,7 @@ protected:
 	std::shared_ptr<BVHNode> rootBVH;
 	int numberOfCollisions = 0;
 	int numPotentialCollisions = 0;
+	bool useNaiveAlgorithm = false;
 
 public:
 	BVHWorld(std::shared_ptr<GraphicsEnvironment> env);
@@ -40,5 +41,6 @@ private:
 	void ResetIsOverlapping();
 	void InsertObjectsIntoBVH();
 	void CheckForCollisions();
+	void CheckForCollisionsNaive();
 };
 

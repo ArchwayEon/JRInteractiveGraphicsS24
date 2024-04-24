@@ -109,8 +109,13 @@ void BVHWorld::Update(float elapsedSeconds)
 	lightBulb->SetPosition(localLight.position);
 	lightBulb->PointAt(camera->GetPosition());
 
-	InsertObjectsIntoBVH();
-	CheckForCollisions();
+	if (useNaiveAlgorithm == false) {
+		InsertObjectsIntoBVH();
+		CheckForCollisions();
+	}
+	else {
+		CheckForCollisionsNaive();
+	}
 
 	objectManager->Update(elapsedSeconds);
 }
@@ -125,6 +130,7 @@ void BVHWorld::UI(ImGuiIO& io)
 	ImGui::DragFloat3("Local light position",
 		(float*)&localLight.position, 0.1f);
 	ImGui::Checkbox("Look with mouse", &lookWithMouse);
+	ImGui::Checkbox("Use Naive Algorithm", &useNaiveAlgorithm);
 	ImGui::SliderFloat("Global Intensity", &globalLight.intensity, 0, 1);
 	ImGui::SliderFloat("Local Intensity", &localLight.intensity, 0, 1);
 	ImGui::DragFloat3("Intersection point", (float*)&floorIntersectionPoint, 0.1f);
@@ -423,4 +429,25 @@ void BVHWorld::CheckForCollisions()
 		}
 	}
 	numPotentialCollisions = (int)collisions.size();
+}
+
+void BVHWorld::CheckForCollisionsNaive()
+{
+	numPotentialCollisions = 0;
+	numberOfCollisions = 0;
+	std::string name;
+	auto& objectMap = objectManager->GetObjects();
+	for (const auto& [key1, object1] : objectMap) {
+		for (const auto& [key2, object2] : objectMap) {
+			if (key1 == key2) continue;
+			name = key1.substr(0, 5);
+			if (name != "Crate") continue;
+			if (object1->OverlapsWithBoundingBox(*object2)) {
+				object1->SetIsOverlapping(true);
+				object2->SetIsOverlapping(true);
+				numberOfCollisions++;
+			}
+			numPotentialCollisions++;
+		}
+	}
 }
