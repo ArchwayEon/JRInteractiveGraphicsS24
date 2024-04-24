@@ -123,9 +123,7 @@ void BVHWorld::Update(float elapsedSeconds)
 void BVHWorld::UI(ImGuiIO& io)
 {
 	auto& mouse = _env->GetMouseParams();
-	ImGui::Text(Logger::GetLog().c_str());
-	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-		1000.0f / io.Framerate, io.Framerate);
+	ImGui::Begin("BVH World");
 	ImGui::Text("Mouse SC: (%.3f, %.3f)", mouse.x, mouse.y);
 	ImGui::DragFloat3("Local light position",
 		(float*)&localLight.position, 0.1f);
@@ -136,6 +134,7 @@ void BVHWorld::UI(ImGuiIO& io)
 	ImGui::DragFloat3("Intersection point", (float*)&floorIntersectionPoint, 0.1f);
 	ImGui::Text("Number of collisions: %d", numberOfCollisions);
 	ImGui::Text("Number of potential collisions: %d", numPotentialCollisions);
+	ImGui::End();
 }
 
 void BVHWorld::OnMouseButton(int button, int action, int mods)

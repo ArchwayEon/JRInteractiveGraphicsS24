@@ -196,9 +196,12 @@ void GraphicsEnvironment::Run3D()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         ImGui::Begin("Computing Interactive Graphics");
+        ImGui::Text(Logger::GetLog().c_str());
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+            1000.0f / io.Framerate, io.Framerate);
         ImGui::ColorEdit3("Background color", (float*)&clearColor.r);
-        currentWorld->UI(io);
         ImGui::End();
+        currentWorld->UI(io);
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
