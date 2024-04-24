@@ -439,7 +439,10 @@ void BVHWorld::CheckForCollisionsNaive()
 	for (const auto& [key1, object1] : objectMap) {
 		for (const auto& [key2, object2] : objectMap) {
 			if (key1 == key2) continue;
+			if (object1->IsOverlapping() || object2->IsOverlapping()) continue;
 			name = key1.substr(0, 5);
+			if (name != "Crate") continue;
+			name = key2.substr(0, 5);
 			if (name != "Crate") continue;
 			if (object1->OverlapsWithBoundingBox(*object2)) {
 				object1->SetIsOverlapping(true);
